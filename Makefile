@@ -1,3 +1,4 @@
+NAME=dyan_os
 # Makefile
 CC=i386-elf-gcc
 LD=i386-elf-ld
@@ -20,7 +21,6 @@ SRCS= $(addprefix $(SOURCE_DIR)/, \
 )
 
 INCS = $(addprefix $(INCLUDE_DIR)/, \
-	 \
 	terminal \
 	utils \
 	vga \
@@ -28,7 +28,7 @@ INCS = $(addprefix $(INCLUDE_DIR)/, \
 
 OBJS = $(patsubst $(SOURCE_DIR)/%.c, $(OBJECT_DIR)/%.o, $(SRCS)) $(OBJECT_DIR)/boot.o
 
-KERNEL_BIN=$(BUILD_DIR)/kernel.bin
+KERNEL_BIN=$(BUILD_DIR)/$(NAME).bin
 
 
 all: $(KERNEL_BIN)
@@ -50,6 +50,15 @@ clean:
 
 re: clean all
 
+iso: all
+	@mkdir -p $(BUILD_DIR)/isodir/boot/grub
+	@cp $(BUILD_DIR)/$(NAME).bin $(BUILD_DIR)/isodir/boot/$(NAME).bin
+	@cp code/grub.cfg $(BUILD_DIR)/isodir/boot/grub/grub.cfg
+	@grub-mkrescue -o $(BUILD_DIR)/$(NAME).iso $(BUILD_DIR)/isodir
+
 run: all
 	qemu-system-i386 -kernel $(KERNEL_BIN)
+
+runiso: iso
+	qemu-system-i386 -cdrom $(BUILD_DIR)/$(NAME).iso
 
