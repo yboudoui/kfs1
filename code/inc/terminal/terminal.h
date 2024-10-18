@@ -15,5 +15,5 @@ void terminal_frame_put_entry_at(t_vga_frame* frame, t_vga_entry entry, t_termin
 void terminal_putchar(char c);
 void terminal_write(const char* data, size_t size);
 void terminal_writestring(const char* data);
-void terminal_update_frame(t_terminal_frame frame);
+void terminal_update_frame(void);
 void terminal_clear(void);

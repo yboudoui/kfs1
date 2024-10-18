@@ -1,4 +1,5 @@
 /* boot.s - Minimal Assembly to start the kernel in C */
+
 .global _start
 .section .multiboot
 .align 4
@@ -9,4 +10,7 @@
 .section .text
 _start:
     call kernel_main        /* Jump to the C kernel entry point */
+
+
+
 

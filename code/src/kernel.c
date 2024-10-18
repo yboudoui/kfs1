@@ -1,4 +1,8 @@
-#include "kernel.h"
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include "terminal.h"
+
 
 void kernel_main(void) 
 {
@@ -11,8 +15,9 @@ void kernel_main(void)
 	current_terminal_frame(&frame);
   	terminal_clear();
 
-	terminal_writestring("Hello, kernel World!\n");
+	terminal_writestring("DYAN OS!\n");
 
+	terminal_update_frame();
 	  // Halt the CPU (loop indefinitely)
 	while (1);
 	return ;

@@ -36,5 +36,10 @@ typedef struct {
   size_t width, height;
 } t_vga_frame;
 
-static inline uint16_t vga_entry(unsigned char uc, t_vga_entry_color color);
+static inline t_vga_entry vga_entry(unsigned char uc, t_vga_entry_color color)
+{
+  uint8_t entry_color = color.fg | color.bg << 4;
+  return (uint16_t)uc | (uint16_t)entry_color << 8;
+}
+
 void vga_main_frame_update(t_vga_frame frame);
