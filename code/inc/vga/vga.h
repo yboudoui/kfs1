@@ -1,6 +1,9 @@
 #include <stddef.h>
 #include <stdint.h>
-#define VIDEO_MEMORY 0xB8000
+#define VIDEO_MEMORY (uint16_t*)0xB8000
+
+#define VGA_WIDTH 80
+#define VGA_HEIGHT 25
 
 typedef enum {
   VGA_COLOR_BLACK = 0,
@@ -26,4 +29,12 @@ typedef struct {
   t_vga_color bg;
 } t_vga_entry_color;
 
+typedef uint16_t t_vga_entry;
+
+typedef struct {
+  uint16_t buffer[VGA_WIDTH * VGA_HEIGHT];
+  size_t width, height;
+} t_vga_frame;
+
 static inline uint16_t vga_entry(unsigned char uc, t_vga_entry_color color);
+void vga_main_frame_update(t_vga_frame frame);
