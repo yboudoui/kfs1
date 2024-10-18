@@ -14,13 +14,16 @@ SOURCE_DIR=code/src
 INCLUDE_DIR=code/inc
 
 SRCS= $(addprefix $(SOURCE_DIR)/, \
+	keyboard/keyboard.c \
 	terminal/terminal.c \
 	utils/strlen.c \
+	utils/itoa_base.c \
 	vga/vga.c \
 	kernel.c \
 )
 
 INCS = $(addprefix $(INCLUDE_DIR)/, \
+	keyboard \
 	terminal \
 	utils \
 	vga \

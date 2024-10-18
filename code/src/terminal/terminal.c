@@ -3,7 +3,7 @@
 
 void terminal_frame_put_entry_at(t_vga_frame* frame, t_vga_entry entry, t_terminal_position position) 
 {
-	const size_t index = position.row * frame->width + position.column;
+	const size_t index = position.row * VGA_WIDTH + position.column;
 	frame->buffer[index] = entry;
 }
 
@@ -33,6 +33,17 @@ void terminal_clear(void)
 void terminal_putchar(char c) 
 {
 	t_terminal_frame* terminal_frame = current_terminal_frame(NULL);
+	if (terminal_frame->current_position.column >= VGA_WIDTH)
+		terminal_frame->current_position.column = 0;
+	if (terminal_frame->current_position.row >= VGA_HEIGHT)
+		terminal_frame->current_position.row = 0;
+	
+	if (c == '\n') {
+		terminal_frame->current_position.row += 1;
+		terminal_frame->current_position.column = 0;
+		return ;
+	} 
+
 	t_vga_entry entry = vga_entry(c, terminal_frame->default_color);
 
 	terminal_frame_put_entry_at(
@@ -40,6 +51,7 @@ void terminal_putchar(char c)
 		entry,
 		terminal_frame->current_position
 	);
+
 	if (++terminal_frame->current_position.column == VGA_WIDTH) {
 		terminal_frame->current_position.column = 0;
 		if (++terminal_frame->current_position.row == VGA_HEIGHT)

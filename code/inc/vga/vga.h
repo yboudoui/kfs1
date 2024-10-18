@@ -33,7 +33,6 @@ typedef uint16_t t_vga_entry;
 
 typedef struct {
   uint16_t buffer[VGA_WIDTH * VGA_HEIGHT];
-  size_t width, height;
 } t_vga_frame;
 
 static inline t_vga_entry vga_entry(unsigned char uc, t_vga_entry_color color)
