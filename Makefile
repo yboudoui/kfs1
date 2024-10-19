@@ -18,6 +18,7 @@ SRCS= $(addprefix $(SOURCE_DIR)/, \
 	terminal/terminal.c \
 	utils/strlen.c \
 	utils/itoa_base.c \
+	utils/memset.c \
 	vga/vga.c \
 	kernel.c \
 )

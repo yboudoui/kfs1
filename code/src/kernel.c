@@ -17,25 +17,27 @@ void kernel_main(void)
 	terminal_writestring("DYAN OS!\n\n");
 
 	unsigned char scancode;
-	char buffer[64];
-	buffer[0] = '\n';
-	buffer[1] = ' ';
-	buffer[2] = ' ';
-	buffer[3] = '0';
-	buffer[4] = 'x';
+	char buffer[64] = {0};
 	
+	const char* hex_base = "0123456789ABCDEF";
+	const char* dec_base = "0123456789";
+	const char* base = dec_base;
+	size_t base_len = strlen(base);
+
+
+	size_t pos = 0;
+	char c = 0;
+
 	while (1)
 	{
-		buffer[1] = keyboard_handler();
-		if (!buffer[1]) {
-			buffer[1] = ' ';
+		c = keyboard_handler();
+		if (c != 0) {
+			buffer[pos++] = c;
+			terminal_clear();
+			terminal_reset_position();
+			terminal_writestring(buffer);
+			c = 0;
 		}
-		scancode = get_scancode();
-		
-		itoa_base(buffer + 5, scancode,  "0123456789ABCDEF");
-		terminal_writestring(buffer);
-	
-
 		terminal_update_frame();
 	}
 	return ;

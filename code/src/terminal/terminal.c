@@ -30,6 +30,12 @@ void terminal_clear(void)
 	}
 }
 
+void terminal_reset_position(void)
+{
+	t_terminal_frame* terminal_frame = current_terminal_frame(NULL);
+	terminal_frame->current_position = (t_terminal_position){0};
+}
+
 void terminal_putchar(char c) 
 {
 	t_terminal_frame* terminal_frame = current_terminal_frame(NULL);
