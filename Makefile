@@ -19,14 +19,21 @@ SRCS= $(addprefix $(SOURCE_DIR)/, \
 	utils/strlen.c \
 	utils/itoa_base.c \
 	utils/memset.c \
+	readline/readline.c \
+	shell/shell.c \
 	vga/vga.c \
-	kernel.c \
+	kernel/bootloader_screen.c \
+	kernel/kernel.c \
+	main.c \
 )
 
 INCS = $(addprefix $(INCLUDE_DIR)/, \
 	keyboard \
 	terminal \
+	readline \
+	shell \
 	utils \
+	kernel \
 	vga \
 )
 
@@ -38,6 +45,7 @@ KERNEL_BIN=$(BUILD_DIR)/$(NAME).bin
 all: $(KERNEL_BIN)
 
 $(KERNEL_BIN): $(OBJS)
+	echo $(OBJS)
 	$(LD) $(LDFLAGS) -o $(KERNEL_BIN) $(OBJS)
 
 $(OBJECT_DIR)/boot.o: $(SOURCE_DIR)/boot.s
@@ -47,7 +55,8 @@ $(OBJECT_DIR)/boot.o: $(SOURCE_DIR)/boot.s
 
 $(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.c
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(addprefix -I , $(INCS)) -c $< -o $@
+	@$(CC) $(CFLAGS) $(addprefix -I , $(INCS)) -c $< -o $@
+	@echo $@
 
 clean:
 	rm -rf $(BUILD_DIR)

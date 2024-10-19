@@ -5,6 +5,8 @@
 #define VGA_WIDTH 80
 #define VGA_HEIGHT 25
 
+#define VGA_MAX_PRINTABLE_CHARACTER VGA_WIDTH * VGA_HEIGHT
+
 typedef enum {
   VGA_COLOR_BLACK = 0,
   VGA_COLOR_BLUE = 1,
@@ -32,7 +34,7 @@ typedef struct {
 typedef uint16_t t_vga_entry;
 
 typedef struct {
-  uint16_t buffer[VGA_WIDTH * VGA_HEIGHT];
+  uint16_t buffer[VGA_MAX_PRINTABLE_CHARACTER];
 } t_vga_frame;
 
 static inline t_vga_entry vga_entry(unsigned char uc, t_vga_entry_color color)
