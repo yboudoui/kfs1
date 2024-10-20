@@ -14,8 +14,6 @@ typedef struct {
 
 t_shell* current_shell(t_shell* shell);
 
-t_shell shell_init(t_vga_entry_color colors);
-
 int     shell_get_character(char c);
 
 #endif

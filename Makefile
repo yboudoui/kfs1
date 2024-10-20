@@ -30,7 +30,7 @@ SRCS_SHELL		= $(addprefix shell/, \
 )
 
 SRCS_TERMINAL	= $(addprefix terminal/, \
-	string.c \
+	terminal_string.c \
 	terminal.c \
 )
 

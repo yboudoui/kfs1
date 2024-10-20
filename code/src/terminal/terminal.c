@@ -1,32 +1,44 @@
 #include "terminal.h"
 
-t_terminal* terminal_current(t_terminal* terminal_frame)
+t_terminal* terminal_current(t_terminal* terminal)
 {
-	static t_terminal* current_terminal_frame = NULL;
+	static t_terminal* current_terminal = NULL;
 
-	if (terminal_frame != NULL) {
-		current_terminal_frame = terminal_frame;
+	if (terminal != NULL) {
+		terminal = current_terminal;
 	}
-	return current_terminal_frame;
+	return current_terminal;
 }
 
-void terminal_clear(t_terminal* terminal)
+void terminal_clear(void)
 {
-	t_vga_entry_color	color;
-	t_vga_entry			clear_entry;
-	t_vga_frame*		vga_frame;
-	
-	color = terminal->default_color;
-	clear_entry = vga_entry(' ', color);
-	vga_frame = &terminal->vga_frame;
+	t_terminal* terminal = terminal_current(NULL);
 
-	vga_fill(vga_frame, clear_entry);
+	vga_fill(
+		&terminal->vga_frame,
+		vga_entry(' ', terminal->default_color)
+	);
 }
 
 void terminal_reset_position(void)
 {
-	t_terminal* terminal_frame;
+	t_terminal* terminal = terminal_current(NULL);
+	terminal->current_position = (t_vec2){0};
+}
 
-	terminal_frame = terminal_current(NULL);
-	terminal_frame->current_position = (t_vec2){0};
+void terminal_update(void)
+{
+	t_terminal*	terminal = terminal_current(NULL);
+	vga_main_frame_update(terminal->vga_frame);
+}
+
+int terminal_handle_input(char c)
+{
+    t_terminal* terminal = terminal_current(NULL);
+    t_fp_terminal_input_handler handler;
+
+    handler = terminal->handlers[c];
+    if (handler == NULL)
+        handler = terminal->default_handler;
+    return handler(terminal);
 }
