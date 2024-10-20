@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "itoa.h"
 
 void swap(char* a, char* b)
 {
@@ -18,14 +18,14 @@ void reverse_string(char *str, size_t length) {
 }
 
 
-void itoa_base(char *buffer, int nb, char* base, size_t base_len)
+void itoa_base(t_itoa_base base, char *buffer, int nb)
 {
     size_t i = 0;
 
     while (nb > 0)
     {
-        buffer[i++] = base[nb % base_len];
-        nb /= base_len;
+        buffer[i++] = base.buffer[nb % base.len];
+        nb /= base.len;
     }
     buffer[i] = 0;
     reverse_string(buffer, i);

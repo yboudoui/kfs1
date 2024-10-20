@@ -1,5 +1,6 @@
 #ifndef KEYBOARD_MAPPING_H
 #define KEYBOARD_MAPPING_H
+
 typedef enum {
   // KEY_BACK_QUOTE = 1,
   KEY_ESCAPE = 1,

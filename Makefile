@@ -4,7 +4,8 @@ CC=i386-elf-gcc
 LD=i386-elf-ld
 AS=i386-elf-as
 
-CFLAGS=-ffreestanding -O2 -nostdlib -lgcc
+CFLAGS=-ffreestanding -nostdlib -lgcc
+#-O2 
 LDFLAGS=-T linker.ld
 
 BUILD_DIR=build
@@ -13,27 +14,59 @@ OBJECT_DIR=$(BUILD_DIR)/obj
 SOURCE_DIR=code/src
 INCLUDE_DIR=code/inc
 
+######################################################
+
+SRCS_KERNEL		= $(addprefix kernel/, \
+	bootloader_screen.c \
+	kernel.c \
+)
+
+SRCS_KEYBOARD	= $(addprefix keyboard/, \
+	keyboard.c \
+)
+
+SRCS_SHELL		= $(addprefix shell/, \
+	shell.c \
+)
+
+SRCS_TERMINAL	= $(addprefix terminal/, \
+	string.c \
+	terminal.c \
+)
+
+SRCS_UTILS		= $(addprefix utils/, \
+	strlen.c \
+	itoa_base.c \
+	memset.c \
+	memcpy.c \
+)
+
+SRCS_VGA		= 	$(addprefix vga/, \
+	cursor.c \
+	vga.c \
+)
+
+######################################################
+
 SRCS= $(addprefix $(SOURCE_DIR)/, \
-	keyboard/keyboard.c \
-	terminal/terminal.c \
-	utils/strlen.c \
-	utils/itoa_base.c \
-	utils/memset.c \
-	readline/readline.c \
-	shell/shell.c \
-	vga/vga.c \
-	kernel/bootloader_screen.c \
-	kernel/kernel.c \
+	$(SRCS_KERNEL)			\
+	$(SRCS_KEYBOARD)		\
+	$(SRCS_READLINE)		\
+	$(SRCS_SHELL)			\
+	$(SRCS_TERMINAL)		\
+	$(SRCS_UTILS)			\
+	$(SRCS_VGA)				\
 	main.c \
 )
 
 INCS = $(addprefix $(INCLUDE_DIR)/, \
-	keyboard \
-	terminal \
-	readline \
-	shell \
-	utils \
+	io \
 	kernel \
+	keyboard \
+	math \
+	shell \
+	terminal \
+	utils \
 	vga \
 )
 
@@ -43,15 +76,16 @@ KERNEL_BIN=$(BUILD_DIR)/$(NAME).bin
 
 
 all: $(KERNEL_BIN)
+	@echo "Project builted"
 
 $(KERNEL_BIN): $(OBJS)
-	echo $(OBJS)
-	$(LD) $(LDFLAGS) -o $(KERNEL_BIN) $(OBJS)
+	@$(LD) $(LDFLAGS) -o $(KERNEL_BIN) $(OBJS)
+	@echo $(KERNEL_BIN)
 
 $(OBJECT_DIR)/boot.o: $(SOURCE_DIR)/boot.s
-	mkdir -p $(OBJECT_DIR)
-	$(AS) $(SOURCE_DIR)/boot.s -o $(OBJECT_DIR)/boot.o
-
+	@mkdir -p $(OBJECT_DIR)
+	@$(AS) $(SOURCE_DIR)/boot.s -o $(OBJECT_DIR)/boot.o
+	@echo $@
 
 $(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.c
 	@mkdir -p $(dir $@)
@@ -59,7 +93,8 @@ $(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.c
 	@echo $@
 
 clean:
-	rm -rf $(BUILD_DIR)
+	@rm -rf $(BUILD_DIR)
+	@echo "Project cleaned"
 
 re: clean all
 
