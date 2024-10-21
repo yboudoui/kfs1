@@ -10,10 +10,11 @@ typedef struct {
 
 // Define t_readline_buffer with proper alignment
 typedef struct {
-    t_vec2 cursor_position;
-    size_t caret_position;
-    size_t buffer_size;
-    char *buffer; // Pointer for dynamic allocation
+    t_vec2          cursor_position;
+    size_t          caret_position;
+    size_t          size;
+    const size_t    max_size;
+    char            *buffer; // Pointer for dynamic allocation
 } __attribute__((packed, aligned(4))) t_readline_buffer;
 
 // Macro to create a readline buffer with a given size
@@ -22,9 +23,10 @@ typedef struct {
         struct { \
             t_vec2          cursor_position; \
             size_t          caret_position; \
-            const size_t    buffer_size; \
-            const char      buffer[size]; \
-        } __attribute__((packed, aligned(4))) tmp = { .buffer_size = size }; \
+            size_t          size; \
+            const size_t    max_size; \
+            char            buffer[size]; \
+        } __attribute__((packed, aligned(4))) tmp = { .max_size = size }; \
         *((t_readline_buffer*)&tmp); \
     })
 
