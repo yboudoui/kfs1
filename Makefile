@@ -4,8 +4,8 @@ CC=i386-elf-gcc
 LD=i386-elf-ld
 AS=i386-elf-as
 
-CFLAGS=-ffreestanding -nostdlib -lgcc
-#-O2 
+CFLAGS=-ffreestanding -O2 -nostdlib -lgcc
+
 LDFLAGS=-T linker.ld
 
 BUILD_DIR=build
@@ -105,8 +105,8 @@ iso: all
 	@grub-mkrescue -o $(BUILD_DIR)/$(NAME).iso $(BUILD_DIR)/isodir
 
 run: all
-	qemu-system-i386 -kernel $(KERNEL_BIN)
+	qemu-system-i386 -k en-us -kernel $(KERNEL_BIN)
 
 runiso: iso
-	qemu-system-i386 -cdrom $(BUILD_DIR)/$(NAME).iso
+	qemu-system-i386 -k en-us -cdrom $(BUILD_DIR)/$(NAME).iso
 

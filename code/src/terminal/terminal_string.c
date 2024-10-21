@@ -15,11 +15,7 @@ void terminal_putchar_at(t_vec2 position, char c)
 
 	vga_frame_put_entry_at(
 		&terminal->vga_frame,
-		// vga_entry(c, terminal->default_color),
-		vga_entry(c, (t_vga_entry_color){
-			.fg = VGA_COLOR_RED,
-			.bg = VGA_COLOR_BLACK,
-		}),
+		vga_entry(c, terminal->default_color),
 		position
 	);
 }

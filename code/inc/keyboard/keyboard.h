@@ -2,7 +2,7 @@
 #define KEYBOARD_H
 
 #include "io.h"
-#include "keyboard_mapping.h"
+#include "keyboard_scancode.h"
 #include "codepage_437.h"
 #define KEYBOARD_DATA_PORT 0x60
 
@@ -11,9 +11,9 @@ typedef enum {
   KEY_PRESSED,
 } t_key_state;
 
-typedef int (*t_fp_get_character)(char c);
-static t_key_state keyboard_state[MAX_KEYBOARD] = {KEY_RELEASED};
+typedef int (*t_fp_get_key_scancode)(t_key_scancode key);
+static t_key_state keyboard_state[MAX_KEY_SCANCODE] = {KEY_RELEASED};
 
-int           keyboard_handler(t_fp_get_character handler);
+int           keyboard_handler(t_fp_get_key_scancode handler);
 
 #endif

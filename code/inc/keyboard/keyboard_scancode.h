@@ -2,7 +2,6 @@
 #define KEYBOARD_MAPPING_H
 
 typedef enum {
-  // KEY_BACK_QUOTE = 1,
   KEY_ESCAPE = 1,
   KEY_1,
   KEY_2,
@@ -35,7 +34,6 @@ typedef enum {
   KEY_ENTER,
   KEY_RIGHT_CONTROL,
 
-
   KEY_A,
   KEY_S,
   KEY_D,
@@ -66,19 +64,64 @@ typedef enum {
   KEY_SLASH,
   KEY_RIGHT_SHIFT,
 
-  KEY_PAD_START,
+  KEY_PAD_STAR,
   KEY_LEFT_ALT,
   KEY_SPACE,
   KEY_CAPS_LOCK,
 
+  KEY_F1,
+  KEY_F2,
+  KEY_F3,
+  KEY_F4,
+  KEY_F5,
+  KEY_F6,
+  KEY_F7,
+  KEY_F8,
+  KEY_F9,
+  KEY_F10,
+
+  KEY_NUMBER_LOCK,
+  KEY_SCROLL_LOCK,
+
+  KEY_NUMPAD_7,
+  KEY_NUMPAD_8,
+  KEY_NUMPAD_9,
+  KEY_NUMPAD_MINUS,
+  KEY_NUMPAD_4,
+  KEY_NUMPAD_5,
+  KEY_NUMPAD_6,
+  KEY_NUMPAD_PLUS,
+  KEY_NUMPAD_1,
+  KEY_NUMPAD_2,
+  KEY_NUMPAD_3,
+  KEY_NUMPAD_0,
+  KEY_NUMPAD_DOTE,
+
+  EMPTY_0,
+  EMPTY_1,
+
+  KEY_F11,
+  KEY_F12,
 
   KEY_LEFT_WINDOWS,
   KEY_RIGHT_ALT,
   KEY_RIGHT_WINDOWS,
   KEY_BACK_SLASH,
 
-  MAX_KEYBOARD,
-} t_keyboard_mapping;
+  MAX_KEY_SCANCODE,
+
+  // Synonyme of key Scan Code Set 1
+  KEY_DELETE    = KEY_NUMPAD_DOTE,
+  KEY_LEFT      = KEY_NUMPAD_4,
+  KEY_RIGHT     = KEY_NUMPAD_6,
+  KEY_UP        = KEY_NUMPAD_8,
+  KEY_DOWN      = KEY_NUMPAD_2,
+
+  KEY_HOME      = KEY_NUMPAD_7,
+  KEY_END       = KEY_NUMPAD_1,
+  KEY_PAGE_UP   = KEY_NUMPAD_9,
+  KEY_PAGE_DOWN = KEY_NUMPAD_3,
+} t_key_scancode;
 
 
 

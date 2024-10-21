@@ -1,7 +1,7 @@
 #ifndef CODEPAGE_437_H
 #define CODEPAGE_437_H
 
-#include "keyboard_mapping.h"
+#include "keyboard_scancode.h"
 
 static const unsigned char codepage_437[255] = {
   // [KEY_BACK_QUOTE]            = 0x60,

@@ -3,22 +3,23 @@
 
 #include "vga.h"
 #include "utils.h"
+#include "keyboard_scancode.h"
 
 typedef struct s_terminal t_terminal;
 
-typedef int (*t_fp_terminal_input_handler)(t_terminal* terminal);
+typedef int (*t_fp_terminal_input_handler)(t_key_scancode);
 
 struct s_terminal {
   t_vga_entry_color           default_color;
   t_vga_frame                 vga_frame;
   t_vec2                      current_position;
   t_fp_terminal_input_handler default_handler;
-  t_fp_terminal_input_handler handlers[255];
+  t_fp_terminal_input_handler handlers[MAX_KEY_SCANCODE];
 };
 
 t_terminal* terminal_current(t_terminal* frame);
 
-void terminal_return(void);
+void  terminal_return(void);
 
 void  terminal_putchar_at(t_vec2 position, char c);
 void  terminal_putchar(char c);
@@ -28,7 +29,7 @@ void  terminal_write_number(t_itoa_base base, int nb);
 
 void  terminal_clear(void);
 void  terminal_update(void);
-int   terminal_handle_input(char c);
+int   terminal_handle_input(t_key_scancode key_scancode);
 void  terminal_reset_position(void);
 
 #endif

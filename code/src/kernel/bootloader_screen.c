@@ -9,7 +9,7 @@
 "     #+#    #+#          "\
 "    ###   ########.fr    "
 
-int	wait_user_input(t_terminal* terminal)
+int	wait_user_input(t_key_scancode key_scancode)
 {
     return 1;
 }

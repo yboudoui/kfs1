@@ -12,8 +12,8 @@ typedef struct {
     char        buffer[VGA_MAX_PRINTABLE_CHARACTER];
 } t_shell;
 
-t_shell* current_shell(t_shell* shell);
+t_shell*    current_shell(t_shell* shell);
 
-int     shell_get_character(char c);
+int         shell_get_character(t_key_scancode key_scancode);
 
 #endif
