@@ -11,8 +11,6 @@ t_shell* current_shell(t_shell* shell)
 	return current_shell;
 }
 
-    char buffer[64];
-
 int shell_get_character(t_key_scancode key_scancode)
 {
     t_shell* shell = current_shell(NULL);
@@ -21,10 +19,7 @@ int shell_get_character(t_key_scancode key_scancode)
      
     shell->terminal.current_position = (t_vec2){0};
     terminal_clear();
-    terminal_write_number(ITOA_BASE_DECIMAL, key_scancode);
-    terminal_putchar('\n');
-    terminal_write_number(ITOA_BASE_HEXADECIMAL, key_scancode);
-    terminal_write(shell->buffer, shell->pos);
+    terminal_write(shell->buffer, shell->len);
     terminal_update();
     return 0;
 }

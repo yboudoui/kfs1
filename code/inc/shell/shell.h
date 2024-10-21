@@ -8,7 +8,7 @@
 typedef struct {
     t_terminal  terminal;
     char        **commandes;
-	size_t      pos;
+	size_t      pos, len;
     char        buffer[VGA_MAX_PRINTABLE_CHARACTER];
 } t_shell;
 

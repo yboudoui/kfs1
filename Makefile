@@ -39,6 +39,7 @@ SRCS_UTILS		= $(addprefix utils/, \
 	itoa_base.c \
 	memset.c \
 	memcpy.c \
+	memmove.c \
 )
 
 SRCS_VGA		= 	$(addprefix vga/, \

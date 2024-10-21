@@ -4,6 +4,8 @@
 #include "vga.h"
 #include "utils.h"
 #include "keyboard_scancode.h"
+#define TABSIZE 4
+
 
 typedef struct s_terminal t_terminal;
 

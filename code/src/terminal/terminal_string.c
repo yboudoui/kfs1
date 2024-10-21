@@ -35,12 +35,20 @@ void terminal_putchar(char c)
 	t_terminal*	terminal = terminal_current(NULL);
 	terminal_loop_overflow();
 	
-	if (c == '\n') {
-        terminal_return();
-		return ;
+	switch (c) {
+		case '\n':
+			terminal_return();
+			break;
+		case '\t':
+			for (size_t i = 1; i < TABSIZE; i++) {
+				terminal_putchar_at(terminal->current_position, ' ');
+				terminal->current_position.x += 1;
+    		}
+			break;
+		default:
+			terminal_putchar_at(terminal->current_position, c);
+			break;
 	}
-
-	terminal_putchar_at(terminal->current_position, c);
 
 	if (++terminal->current_position.x == VGA_WIDTH) {
 		terminal->current_position.x = 0;
