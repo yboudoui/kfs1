@@ -18,7 +18,7 @@ void bootloader_screen(void)
 {
 	VGA_DISABLE_CURSOR
 	static t_terminal terminal = {
-		.default_handler = wait_user_input,
+		.input_handler = wait_user_input,
 		.default_color = {
 			.fg = VGA_COLOR_RED,
 			.bg = VGA_COLOR_BLACK,

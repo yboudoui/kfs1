@@ -16,4 +16,6 @@ t_shell*    current_shell(t_shell* shell);
 
 int         shell_get_character(t_key_scancode key_scancode);
 
+#define CURRENT_SHELL t_shell* shell = current_shell(NULL);
+
 #endif

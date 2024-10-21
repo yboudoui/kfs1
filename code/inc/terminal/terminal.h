@@ -8,18 +8,25 @@
 
 
 typedef struct s_terminal t_terminal;
-
+typedef struct s_terminal_input_handler t_terminal_input_handler;
 typedef int (*t_fp_terminal_input_handler)(t_key_scancode);
+
+struct s_terminal_input_handler {
+  t_fp_terminal_input_handler default_handler;
+  t_fp_terminal_input_handler handlers[MAX_KEY_SCANCODE];
+};
 
 struct s_terminal {
   t_vga_entry_color           default_color;
   t_vga_frame                 vga_frame;
   t_vec2                      current_position;
-  t_fp_terminal_input_handler default_handler;
-  t_fp_terminal_input_handler handlers[MAX_KEY_SCANCODE];
+  t_terminal_input_handler    input_handler;
 };
 
 t_terminal* terminal_current(t_terminal* frame);
+
+
+#define CURRENT_TERMINAL t_terminal* terminal = terminal_current(NULL);
 
 void  terminal_return(void);
 

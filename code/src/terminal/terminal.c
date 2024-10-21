@@ -1,18 +1,8 @@
 #include "terminal.h"
 
-t_terminal* terminal_current(t_terminal* terminal)
-{
-	static t_terminal* current_terminal = NULL;
-
-	if (terminal != NULL) {
-		current_terminal = terminal;
-	}
-	return current_terminal;
-}
-
 void terminal_clear(void)
 {
-	t_terminal* terminal = terminal_current(NULL);
+	CURRENT_TERMINAL
 
 	vga_fill(
 		&terminal->vga_frame,
@@ -22,7 +12,7 @@ void terminal_clear(void)
 
 void terminal_reset_position(void)
 {
-	t_terminal* terminal = terminal_current(NULL);
+	CURRENT_TERMINAL
 	terminal->current_position = (t_vec2){0};
 }
 
@@ -34,11 +24,11 @@ void terminal_update(void)
 
 int terminal_handle_input(t_key_scancode key_scancode)
 {
-    t_terminal* terminal = terminal_current(NULL);
+    CURRENT_TERMINAL
     t_fp_terminal_input_handler handler;
 
-    handler = terminal->handlers[key_scancode];
+    handler = terminal->input_handler.handlers[key_scancode];
     if (handler == NULL)
-        handler = terminal->default_handler;
+        handler = terminal->input_handler.default_handler;
     return handler(key_scancode);
 }

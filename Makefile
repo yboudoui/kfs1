@@ -17,6 +17,7 @@ INCLUDE_DIR=code/inc
 ######################################################
 
 SRCS_KERNEL		= $(addprefix kernel/, \
+	keyboard_input_handlers.c \
 	bootloader_screen.c \
 	kernel.c \
 )
@@ -26,10 +27,12 @@ SRCS_KEYBOARD	= $(addprefix keyboard/, \
 )
 
 SRCS_SHELL		= $(addprefix shell/, \
+	singleton.c \
 	shell.c \
 )
 
 SRCS_TERMINAL	= $(addprefix terminal/, \
+	terminal_singleton.c \
 	terminal_string.c \
 	terminal.c \
 )
