@@ -1,11 +1,21 @@
 #include "readline.h"
 
-static int update_caret_position(int n)
+t_readline_buffer* current_readline_buffer(t_readline_buffer* readline_buffer)
+{
+	static t_readline_buffer* current_readline_buffer = NULL;
+
+	if (readline_buffer != NULL) {
+		current_readline_buffer = readline_buffer;
+	}
+	return current_readline_buffer;
+};
+
+int readline_update_caret_position(int n)
 {
     CURRENT_READLINE_BUFFER
 
-    int  new_position   = readline_buffer->caret_position + n;
-    int  old_position   = new_position;
+    int  old_position   = readline_buffer->caret_position;
+    int  new_position   = old_position + n;
 
     if (new_position < 0)
         new_position = 0;
@@ -16,39 +26,46 @@ static int update_caret_position(int n)
     return (old_position - new_position);
 }
 
-// readline_move_left = update_caret_position(-n)
-// readline_move_right = update_caret_position(+n)
-
-void terminal_insert(char c)
+int readline_is_character(char c, int position_relatif)
 {
     CURRENT_READLINE_BUFFER
 
-    size_t  position        = readline_buffer->caret_position;
-    char*   buffer_position = readline_buffer->buffer + position;
+    char*   buffer      = readline_buffer->buffer;
+    size_t  position    = readline_buffer->caret_position + position_relatif;
+
+    return (buffer[position] == c);
+}
+
+void readline_insert(char c)
+{
+    CURRENT_READLINE_BUFFER
+
+    char*   buffer      = readline_buffer->buffer;
+    size_t  position    = readline_buffer->caret_position;
 
     memmove(
-        buffer_position + 1,
-        buffer_position,
-        readline_buffer->size - readline_buffer->caret_position + 1
+        &buffer[position + 1],
+        &buffer[position],
+        readline_buffer->size - position + 1
     );
 
-    readline_buffer->buffer[readline_buffer->caret_position] = c;
-    update_caret_position(+1);
+    buffer[position] = c;
+    readline_update_caret_position(+1);
     readline_buffer->size += 1;
 }
 
-void terminal_remove(int nb)
+void readline_remove(size_t nb)
 {
     CURRENT_READLINE_BUFFER
 
-    size_t  position        = readline_buffer->caret_position;
-    char*   buffer_position = readline_buffer->buffer + position;
+    char*   buffer      = readline_buffer->buffer;
+    size_t  position    = readline_buffer->caret_position;
 
     memmove(
-        buffer_position - nb,
-        buffer_position,
-        readline_buffer->size - readline_buffer->caret_position + 1
+        &buffer[position - nb],
+        &buffer[position],
+        readline_buffer->size - position + 1
     );
-    update_caret_position(-nb);
+    readline_update_caret_position(-nb);
     readline_buffer->size -= nb;
 }

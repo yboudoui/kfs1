@@ -8,14 +8,12 @@
 typedef struct {
     t_terminal  terminal;
     char        **commandes;
-	size_t      pos, len;
-    char        buffer[VGA_MAX_PRINTABLE_CHARACTER];
 } t_shell;
 
-t_shell*    current_shell(t_shell* shell);
+
+t_shell* current_shell(t_shell* shell);
+#define CURRENT_SHELL t_shell* shell = current_shell(NULL);
 
 int         shell_get_character(t_key_scancode key_scancode);
-
-#define CURRENT_SHELL t_shell* shell = current_shell(NULL);
 
 #endif

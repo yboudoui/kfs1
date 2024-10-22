@@ -26,8 +26,11 @@ SRCS_KEYBOARD	= $(addprefix keyboard/, \
 	keyboard.c \
 )
 
+SRCS_READLINE	= $(addprefix readline/, \
+	readline_operation.c \
+)
+
 SRCS_SHELL		= $(addprefix shell/, \
-	singleton.c \
 	shell.c \
 )
 
@@ -68,6 +71,7 @@ INCS = $(addprefix $(INCLUDE_DIR)/, \
 	kernel \
 	keyboard \
 	math \
+	readline \
 	shell \
 	terminal \
 	utils \
