@@ -4,9 +4,9 @@ CC=i386-elf-gcc
 LD=i386-elf-ld
 AS=i386-elf-as
 
-# -O2 \
 
 CFLAGS= \
+-O2 \
 -ffreestanding \
 -nostdlib \
 -fno-builtin \

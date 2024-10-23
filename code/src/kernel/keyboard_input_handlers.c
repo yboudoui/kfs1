@@ -19,7 +19,16 @@ int terminal_input_fallback(t_key_scancode key_scancode)
 int terminal_input_on_return(t_key_scancode key_scancode)
 {
     readline_insert(codepage_437[key_scancode]);
-    move_cursor_to_new_line_at(0);
+
+    CURRENT_TERMINAL
+
+    int n = get_char_occurences(terminal->readline_buffer.buffer, '\n');
+    if (n >= VGA_HEIGHT) {
+        *((int*)terminal->user_data) +=1;
+        terminal->vga_frame.cursor.x = 0;
+    }
+    else
+        move_cursor_to_new_line_at(0);
     return 0;
 }
 
@@ -73,7 +82,9 @@ int terminal_input_on_button_up(t_key_scancode key_scancode)
 {
     CURRENT_TERMINAL
 
-    terminal->vga_frame.cursor.y -= 1;
+    // terminal->vga_frame.cursor.y -= 1;
+    if(*((int*)terminal->user_data)>0)
+        *((int*)terminal->user_data) -= 1;
     return 0;
 }
 
@@ -81,6 +92,11 @@ int terminal_input_on_button_down(t_key_scancode key_scancode)
 {
     CURRENT_TERMINAL
 
-    terminal->vga_frame.cursor.y += 1;
+
+    int n = get_char_occurences(terminal->readline_buffer.buffer, '\n');
+
+//    terminal->vga_frame.cursor.y += 1;
+    if(*((int*)terminal->user_data) + 23 < n )
+        *((int*)terminal->user_data) += 1;
     return 0;
 }

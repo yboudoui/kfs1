@@ -47,6 +47,12 @@ void terminal_write_string(const char* data)
 	terminal_write(data, strlen(data));
 }
 
+void terminal_write_substring(const char* data, int start, int end) 
+{
+	for (int i = start; i < end; i++)
+	terminal_putchar(data[i]);
+}
+
 void terminal_write_number(t_itoa_base base, int nb)
 {
     char buffer[64];
