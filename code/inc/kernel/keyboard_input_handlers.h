@@ -1,7 +1,7 @@
 #ifndef KERNEL_KEYBOARD_INPUT_HANDLERS
 #define KERNEL_KEYBOARD_INPUT_HANDLERS
 
-#include "shell.h"
+#include "terminal.h"
 
 int terminal_input_fallback(t_key_scancode key_scancode);
 int terminal_input_on_return(t_key_scancode key_scancode);

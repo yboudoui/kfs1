@@ -18,7 +18,7 @@ void terminal_reset_position(void)
 
 void terminal_update(void)
 {
-	t_terminal*	terminal = terminal_current(NULL);
+	CURRENT_TERMINAL
 	vga_main_frame_update(terminal->vga_frame);
 }
 

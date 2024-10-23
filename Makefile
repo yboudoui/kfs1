@@ -4,7 +4,16 @@ CC=i386-elf-gcc
 LD=i386-elf-ld
 AS=i386-elf-as
 
-CFLAGS=-ffreestanding -O2 -nostdlib -lgcc
+# -O2 \
+
+CFLAGS= \
+-ffreestanding \
+-nostdlib \
+-fno-builtin \
+-fno-exceptions \
+-fno-stack-protector \
+-nodefaultlibs \
+
 
 LDFLAGS=-T linker.ld
 
@@ -26,12 +35,12 @@ SRCS_KEYBOARD	= $(addprefix keyboard/, \
 	keyboard.c \
 )
 
-SRCS_READLINE	= $(addprefix readline/, \
-	readline_operation.c \
+SRCS_MATH		= $(addprefix math/, \
+	vectors.c \
 )
 
-SRCS_SHELL		= $(addprefix shell/, \
-	shell.c \
+SRCS_READLINE	= $(addprefix readline/, \
+	readline_operation.c \
 )
 
 SRCS_TERMINAL	= $(addprefix terminal/, \
@@ -58,6 +67,7 @@ SRCS_VGA		= 	$(addprefix vga/, \
 SRCS= $(addprefix $(SOURCE_DIR)/, \
 	$(SRCS_KERNEL)			\
 	$(SRCS_KEYBOARD)		\
+	$(SRCS_MATH)			\
 	$(SRCS_READLINE)		\
 	$(SRCS_SHELL)			\
 	$(SRCS_TERMINAL)		\
@@ -72,7 +82,6 @@ INCS = $(addprefix $(INCLUDE_DIR)/, \
 	keyboard \
 	math \
 	readline \
-	shell \
 	terminal \
 	utils \
 	vga \

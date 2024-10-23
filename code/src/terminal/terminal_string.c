@@ -3,7 +3,7 @@
 
 void terminal_putchar_at(t_vec2 position, char c) 
 {
-	t_terminal*	terminal = terminal_current(NULL);
+	CURRENT_TERMINAL
 
 	vga_frame_put_entry_at(
 		&terminal->vga_frame,
@@ -53,4 +53,22 @@ void terminal_write_number(t_itoa_base base, int nb)
 
 	itoa_base(base, buffer, nb);
 	terminal_write(buffer, strlen(buffer));
+}
+
+void terminal_put_block_at(char* buffer, t_vec2 position)
+{
+	t_vec2 tmp = {};
+
+	for (size_t index = 0; buffer[index]; index++)
+	{
+		if(buffer[index] == '\n')
+		{
+			tmp.x = 0;
+			tmp.y += 1;
+			continue;
+		}
+
+		terminal_putchar_at(vec2_add(position, tmp), buffer[index]);
+		tmp.x += 1;
+	}
 }

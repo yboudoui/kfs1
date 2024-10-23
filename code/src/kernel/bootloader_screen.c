@@ -1,13 +1,14 @@
-#include "shell.h"
+#include "terminal.h"
+#include "keyboard.h"
 
 #define LOGO \
-"        :::      ::::::::"\
-"      :+:      :+:    :+:"\
-"    +:+ +:+         +:+  "\
-"  +#+  +:+       +#+     "\
-"+#+#+#+#+#+   +#+        "\
-"     #+#    #+#          "\
-"    ###   ########.fr    "
+"        :::      ::::::::\n"\
+"      :+:      :+:    :+:\n"\
+"    +:+ +:+         +:+  \n"\
+"  +#+  +:+       +#+     \n"\
+"+#+#+#+#+#+   +#+        \n"\
+"     #+#    #+#          \n"\
+"    ###   ########.fr    \n"
 
 int	wait_user_input(t_key_scancode key_scancode)
 {
@@ -27,18 +28,11 @@ void bootloader_screen(void)
 	terminal_current(&terminal);
 	terminal_clear();
 	
-	for (size_t y = 0; y < 7; y++) {
-		for (size_t x = 0; x < 25; x++) {
-			const size_t index = y * 25 + x;
-			terminal_putchar_at(
-				(t_vec2){
-					.x = x + (VGA_WIDTH - 25) / 2,
-					.y = y + (VGA_HEIGHT - 7) / 2,
-				},
-				LOGO[index]
-			);
-		}
-	}
+	terminal_put_block_at(LOGO, (t_vec2){
+		.x = (VGA_WIDTH - 25) / 2,
+		.y = (VGA_HEIGHT - 7) / 2,
+	});
+
 	terminal_update();
 	while (keyboard_handler(terminal_handle_input) == 0);
 }
