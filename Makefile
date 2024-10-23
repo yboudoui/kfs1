@@ -25,6 +25,10 @@ INCLUDE_DIR=code/inc
 
 ######################################################
 
+SRCS_FT_PRINTF		= $(addprefix ft_printf/, \
+	ft_printf.c \
+)
+
 SRCS_KERNEL		= $(addprefix kernel/, \
 	keyboard_input_handlers.c \
 	bootloader_screen.c \
@@ -65,6 +69,7 @@ SRCS_VGA		= 	$(addprefix vga/, \
 ######################################################
 
 SRCS= $(addprefix $(SOURCE_DIR)/, \
+	$(SRCS_FT_PRINTF)			\
 	$(SRCS_KERNEL)			\
 	$(SRCS_KEYBOARD)		\
 	$(SRCS_MATH)			\
@@ -77,6 +82,7 @@ SRCS= $(addprefix $(SOURCE_DIR)/, \
 )
 
 INCS = $(addprefix $(INCLUDE_DIR)/, \
+	ft_printf \
 	io \
 	kernel \
 	keyboard \
