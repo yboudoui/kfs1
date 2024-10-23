@@ -10,9 +10,11 @@ int	ft_strlen_int(const char *str)
 	return (i);
 }
 
+#include "terminal.h"
 int	ft_putchar(int c)
 {
-	write(1, &c, 1);
+	terminal_putchar(c);
+	// write(1, &c, 1);
 	return (1);
 }
 
@@ -130,14 +132,14 @@ int	putnbr_ui(unsigned int nb)
 	return (size);
 }
 
-int	putptr(void *ptr)
+int	putptr(unsigned long long int ptr)
 {
 	unsigned long long	add;
 	int					size;
 
 	if (ptr == 0)
 		return (ft_putstr("0x0"));
-	add = (unsigned long long)ptr;
+	add = (unsigned long long int)ptr;
 	ft_putstr("0x");
 	size = putnbr_ptr(add) + 2;
 	return (size);
@@ -153,7 +155,7 @@ int	sortandprint(char index, va_list args)
 	else if (index == 's')
 		len = ft_putstr(va_arg(args, char *));
 	else if (index == 'p')
-		len = putptr(va_arg(args, void *));
+		len = putptr(va_arg(args, unsigned long long int));
 	else if (index == 'i' || index == 'd')
 		len = ft_putnbr(va_arg(args, int));
 	else if (index == 'u')

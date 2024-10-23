@@ -69,7 +69,7 @@ SRCS_VGA		= 	$(addprefix vga/, \
 ######################################################
 
 SRCS= $(addprefix $(SOURCE_DIR)/, \
-	$(SRCS_FT_PRINTF)			\
+	$(SRCS_FT_PRINTF)		\
 	$(SRCS_KERNEL)			\
 	$(SRCS_KEYBOARD)		\
 	$(SRCS_MATH)			\

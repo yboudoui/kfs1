@@ -77,6 +77,7 @@ int shell_get_character(t_key_scancode key_scancode)
     return 0;
 }
 
+#include "ft_printf.h"
 void kernel_main(void)
 {	
 	VGA_ENABLE_CURSOR
@@ -111,6 +112,7 @@ void kernel_main(void)
 
 	terminal_current(&terminals[0]);
 	terminal_clear();
+	ft_printf("%s %p", "hello", &terminals[0]);
 	terminal_update();
 	while (keyboard_handler(shell_get_character) == 0);
 }
