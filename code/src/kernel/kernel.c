@@ -1,7 +1,6 @@
 #include "utils.h"
 #include "keyboard_input_handlers.h"
 
-
 int get_start_index(const char *str, char ch, int scrolling_depth)
 {
     size_t i;
@@ -66,18 +65,15 @@ int shell_get_character(t_key_scancode key_scancode)
     terminal_reset_position();
     terminal_clear();
 	CURRENT_TERMINAL
+
 	int start = get_start_index(terminal->readline_buffer.buffer, '\n',  *((int*)terminal->user_data));
 	int end = get_end_index(terminal->readline_buffer.buffer, '\n', start);
-    terminal_write_substring(
-        terminal->readline_buffer.buffer,
-        start,
-		end
-    );
+
+	terminal_write(terminal->readline_buffer.buffer + start, end);
     terminal_update();
     return 0;
 }
 
-#include "ft_printf.h"
 void kernel_main(void)
 {	
 	VGA_ENABLE_CURSOR
@@ -99,7 +95,7 @@ void kernel_main(void)
 
 	terminals[1] = (t_terminal){
 	    .default_color = (t_vga_entry_color){
-			.fg = VGA_COLOR_WHITE,
+			.fg = VGA_COLOR_LIGHT_MAGENTA,
 			.bg = VGA_COLOR_BLACK,
 		},
 	    .input_handler		= handlers,
@@ -112,7 +108,7 @@ void kernel_main(void)
 
 	terminal_current(&terminals[0]);
 	terminal_clear();
-	ft_printf("%s %p", "hello", &terminals[0]);
+	printf("%d %s", 4243, "hello");
 	terminal_update();
 	while (keyboard_handler(shell_get_character) == 0);
 }

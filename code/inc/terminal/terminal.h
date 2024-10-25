@@ -29,10 +29,8 @@ t_terminal* terminal_current(t_terminal* frame);
 
 void  terminal_putchar_at(t_vec2 position, char c);
 void  terminal_putchar(char c);
-void  terminal_write(const char* data, size_t size);
-void  terminal_write_string(const char* data);
-void  terminal_write_substring(const char* data, int start, int end);
-void  terminal_write_number(t_itoa_base base, int nb);
+int   terminal_write(const char* data, size_t size);
+
 void  terminal_put_block_at(char* buffer, t_vec2 position);
 
 void  terminal_clear(void);
