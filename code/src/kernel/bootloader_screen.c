@@ -15,6 +15,8 @@ int	wait_user_input(t_key_scancode key_scancode)
     return 1;
 }
 
+#include "ui_box.h"
+
 void bootloader_screen(void)
 {
 	VGA_DISABLE_CURSOR
@@ -28,11 +30,15 @@ void bootloader_screen(void)
 	terminal_current(&terminal);
 	terminal_clear();
 	
+	print_ui_box((t_ui_box){
+		.outer_size = {80, 24},
+		.position = {0 , 0},
+	});
 	terminal_put_block_at(LOGO, (t_vec2){
 		.x = (VGA_WIDTH - 25) / 2,
 		.y = (VGA_HEIGHT - 7) / 2,
 	});
 
 	terminal_update();
-	while (keyboard_handler(terminal_handle_input) == 0);
+	keyboard_handler(terminal_handle_input);
 }

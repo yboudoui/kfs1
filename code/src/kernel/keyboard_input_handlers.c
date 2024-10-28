@@ -1,4 +1,4 @@
-#include "keyboard_input_handlers.h"
+    #include "keyboard_input_handlers.h"
 #include "codepage_437.h"
 
 #include "kernel.h"
@@ -18,17 +18,23 @@ int terminal_input_fallback(t_key_scancode key_scancode)
 
 int terminal_input_on_return(t_key_scancode key_scancode)
 {
-    readline_insert(codepage_437[key_scancode]);
+    size_t working_buffer;
 
     CURRENT_TERMINAL
+    readline_insert(codepage_437[key_scancode]);
+    move_cursor_to_new_line_at(0);
 
-    int n = get_char_occurences(terminal->readline_buffer.buffer, '\n');
-    if (n >= VGA_HEIGHT) {
-        *((int*)terminal->user_data) +=1;
-        terminal->vga_frame.cursor.x = 0;
-    }
-    else
-        move_cursor_to_new_line_at(0);
+    if (terminal->readline.current_working_buffer >= VGA_HEIGHT - 1)
+        terminal->readline.scroll_index += 1;
+
+    working_buffer = terminal->readline.current_working_buffer + 1;
+    working_buffer %= TERMINAL_READLINE_BUFFER_SIZE;
+    
+
+
+    terminal->readline.current_working_buffer = working_buffer;
+	memset(t_readline_buffer)(&terminal->readline.readline_buffer[working_buffer], (t_readline_buffer){}, 1);
+
     return 0;
 }
 
@@ -82,21 +88,15 @@ int terminal_input_on_button_up(t_key_scancode key_scancode)
 {
     CURRENT_TERMINAL
 
-    // terminal->vga_frame.cursor.y -= 1;
-    if(*((int*)terminal->user_data)>0)
-        *((int*)terminal->user_data) -= 1;
+    if (terminal->readline.scroll_index)
+        terminal->readline.scroll_index -= 1;
     return 0;
 }
 
 int terminal_input_on_button_down(t_key_scancode key_scancode)
 {
     CURRENT_TERMINAL
-
-
-    int n = get_char_occurences(terminal->readline_buffer.buffer, '\n');
-
-//    terminal->vga_frame.cursor.y += 1;
-    if(*((int*)terminal->user_data) + 23 < n )
-        *((int*)terminal->user_data) += 1;
+    
+    terminal->readline.scroll_index += 1;
     return 0;
 }

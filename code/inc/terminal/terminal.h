@@ -6,6 +6,7 @@
 #include "keyboard_scancode.h"
 #include "readline.h"
 #define TABSIZE 4
+#define TERMINAL_READLINE_BUFFER_SIZE 128
 
 typedef int (*t_fp_terminal_input_handler)(t_key_scancode);
 typedef struct s_terminal_input_handler {
@@ -13,15 +14,20 @@ typedef struct s_terminal_input_handler {
   t_fp_terminal_input_handler handlers[MAX_KEY_SCANCODE];
 } t_terminal_input_handler;
 
+typedef struct s_terminal_readlines {
+  t_readline_buffer           readline_buffer[TERMINAL_READLINE_BUFFER_SIZE];
+  size_t                      scroll_index;
+  size_t                      current_working_buffer;
+} t_terminal_readlines;
+
 typedef struct s_terminal {
+  t_vga_frame                 vga_frame;
   t_vga_entry_color           default_color;
+  t_terminal_input_handler    input_handler;
 
   t_vec2                      current_position;
   
-  t_terminal_input_handler    input_handler;
-  t_readline_buffer           readline_buffer;
-  t_vga_frame                 vga_frame;
-  void*                       user_data;
+  t_terminal_readlines        readline;
 } t_terminal;
 
 t_terminal* terminal_current(t_terminal* frame);

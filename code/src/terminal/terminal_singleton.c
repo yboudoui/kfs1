@@ -6,8 +6,9 @@ t_terminal* terminal_current(t_terminal* terminal)
 
 	if (terminal != NULL) {
 		current_terminal = terminal;
-		current_readline_buffer(&current_terminal->readline_buffer);
 	}
+    size_t working_buffer = current_terminal->readline.current_working_buffer;
+	current_readline_buffer(&current_terminal->readline.readline_buffer[working_buffer]);
 	return current_terminal;
 }
 
@@ -16,7 +17,8 @@ void move_cursor_to_new_line_at(int n)
 {
     CURRENT_TERMINAL
 
-    terminal->vga_frame.cursor.y += 1;
+    if (terminal->vga_frame.cursor.y < VGA_HEIGHT)
+        terminal->vga_frame.cursor.y += 1;
     terminal->vga_frame.cursor.x = n;
 }
 

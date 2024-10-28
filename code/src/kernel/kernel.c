@@ -1,45 +1,6 @@
 #include "utils.h"
 #include "keyboard_input_handlers.h"
 
-int get_start_index(const char *str, char ch, int scrolling_depth)
-{
-    size_t i;
-	for (i = 0; str[i] && scrolling_depth >= 1; i++)
-	{
-		if (str[i] == ch) {
-			scrolling_depth--;
-		}
-	}
-	return(i);
-}
-
-int get_end_index(const char *str, char ch, int start)
-{
-	int tmp=0;
-
-	while(start < strlen(str) && tmp <25){
-		if (str[start] == ch){
-			tmp+=1;
-		}
-		start+=1;
-	}
-    return (start);
-}
-
-int get_char_occurences(const char *str, char ch)
-{
-	int nb = 0;
-	for (size_t i = 0; str[i]; i++)
-	{
-		if (str[i] == ch) {
-			nb += 1;
-		}
-	}
-	return(nb);
-}
-
-static char buffers[2][2048];
-
 static t_terminal_input_handler handlers = {
     .default_handler = terminal_input_fallback,
     .handlers = {
@@ -66,10 +27,15 @@ int shell_get_character(t_key_scancode key_scancode)
     terminal_clear();
 	CURRENT_TERMINAL
 
-	int start = get_start_index(terminal->readline_buffer.buffer, '\n',  *((int*)terminal->user_data));
-	int end = get_end_index(terminal->readline_buffer.buffer, '\n', start);
+	t_terminal_readlines* 	readline =  &terminal->readline;
+	t_readline_buffer*		tmp = NULL;
+	size_t					position = 0;
 
-	terminal_write(terminal->readline_buffer.buffer + start, end);
+	for (size_t i = readline->scroll_index; i < readline->scroll_index + VGA_HEIGHT; i++) {
+		position = i % TERMINAL_READLINE_BUFFER_SIZE;
+		tmp = &readline->readline_buffer[position];
+		terminal_write(tmp->buffer, tmp->size);
+	}
     terminal_update();
     return 0;
 }
@@ -77,20 +43,12 @@ int shell_get_character(t_key_scancode key_scancode)
 void kernel_main(void)
 {	
 	VGA_ENABLE_CURSOR
-
-	int scroll_index[2] = {0, 0};
-
 	terminals[0] = (t_terminal){
 	    .default_color = (t_vga_entry_color){
 			.fg = VGA_COLOR_WHITE,
 			.bg = VGA_COLOR_BLACK,
 		},
 	    .input_handler		= handlers,
-		.readline_buffer	= {
-			.max_size = 2048,
-			.buffer = buffers[0],
-		},
-		.user_data = &scroll_index[0],
 	};
 
 	terminals[1] = (t_terminal){
@@ -99,16 +57,10 @@ void kernel_main(void)
 			.bg = VGA_COLOR_BLACK,
 		},
 	    .input_handler		= handlers,
-		.readline_buffer	= {
-			.max_size = 2048,
-			.buffer = buffers[1],
-		},
-		.user_data = &scroll_index[1],
 	};
 
 	terminal_current(&terminals[0]);
 	terminal_clear();
-	printf("%d %s", 4243, "hello");
 	terminal_update();
-	while (keyboard_handler(shell_get_character) == 0);
+	keyboard_handler(shell_get_character);
 }

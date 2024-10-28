@@ -5,13 +5,16 @@
 #include "vectors.h"
 #include "utils.h"
 
+#define READLINE_BUFFER_SIZE 1024
+
 typedef struct {
     t_vec2          cursor_position;
     size_t          caret_position;
     size_t          size;
-    size_t          max_size;
-    char            *buffer;
+    char            buffer[READLINE_BUFFER_SIZE];
 } t_readline_buffer;
+
+DECLARE_MEMSET(t_readline_buffer);
 
 t_readline_buffer* current_readline_buffer(t_readline_buffer* readline_buffer);
 #define CURRENT_READLINE_BUFFER t_readline_buffer* readline_buffer = current_readline_buffer(NULL);

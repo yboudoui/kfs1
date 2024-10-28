@@ -5,6 +5,7 @@ LD=i386-elf-ld
 AS=i386-elf-as
 
 
+
 CFLAGS= \
 -O2 \
 -ffreestanding \
@@ -49,6 +50,10 @@ SRCS_TERMINAL	= $(addprefix terminal/, \
 	terminal.c \
 )
 
+SRCS_UI			= $(addprefix ui/, \
+	box.c \
+)
+
 SRCS_UTILS		= $(addprefix utils/, \
 	strlen.c \
 	itoa_base.c \
@@ -72,6 +77,7 @@ SRCS= $(addprefix $(SOURCE_DIR)/, \
 	$(SRCS_READLINE)		\
 	$(SRCS_SHELL)			\
 	$(SRCS_TERMINAL)		\
+	$(SRCS_UI)				\
 	$(SRCS_UTILS)			\
 	$(SRCS_VGA)				\
 	main.c \
@@ -85,6 +91,7 @@ INCS = $(addprefix $(INCLUDE_DIR)/, \
 	math \
 	readline \
 	terminal \
+	ui \
 	utils \
 	vga \
 )

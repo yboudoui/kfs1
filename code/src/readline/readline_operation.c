@@ -19,8 +19,8 @@ int readline_update_caret_position(int n)
 
     if (new_position < 0)
         new_position = 0;
-    if (new_position > readline_buffer->max_size)
-        new_position = readline_buffer->max_size;
+    if (new_position > READLINE_BUFFER_SIZE)
+        new_position = READLINE_BUFFER_SIZE;
 
     readline_buffer->caret_position = new_position;
     return (old_position - new_position);

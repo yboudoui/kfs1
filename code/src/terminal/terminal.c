@@ -5,8 +5,8 @@ void terminal_clear(void)
 	CURRENT_TERMINAL
 
 	vga_fill(
-		&terminal->vga_frame,
-		vga_entry(' ', terminal->default_color)
+		&terminal->vga_frame, 
+		vga_entry(0, terminal->default_color)
 	);
 }
 
