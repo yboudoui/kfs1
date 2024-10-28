@@ -96,7 +96,7 @@ int terminal_input_on_button_up(t_key_scancode key_scancode)
 int terminal_input_on_button_down(t_key_scancode key_scancode)
 {
     CURRENT_TERMINAL
-    
-    terminal->readline.scroll_index += 1;
+    if (terminal->readline.scroll_index + 25 <= terminal->readline.current_working_buffer)
+        terminal->readline.scroll_index += 1;
     return 0;
 }

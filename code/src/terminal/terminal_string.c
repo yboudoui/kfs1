@@ -3,13 +3,24 @@
 
 void terminal_putchar_at(t_vec2 position, char c) 
 {
-	CURRENT_TERMINAL
+	CURRENT_TERMINAL //bootloader fait trop tot, current terminal pas initialise, j'ai mis ca en dur ici pour que ce soit beau, probleme a remonter
 
-	vga_frame_put_entry_at(
-		&terminal->vga_frame,
-		vga_entry(c, terminal->default_color),
-		position
-	);
+	//printf("Terminal bg:%d\nTerminal fg:%d", terminal->default_color.bg, terminal->default_color.fg); //marche pas ni en %x ni en %d
+	if (!terminal->default_color.bg){
+		vga_frame_put_entry_at(
+			&terminal->vga_frame,
+			vga_entry(c, terminal->default_color),
+			position
+		);
+	}
+	else
+	{
+		vga_frame_put_entry_at(
+			&terminal->vga_frame,
+			vga_entry(c, (t_vga_entry_color){.bg=VGA_COLOR_BLACK,.fg=VGA_COLOR_RED}),
+			position
+		);
+	}
 }
 
 void terminal_putchar(char c) 

@@ -17,7 +17,7 @@ void move_cursor_to_new_line_at(int n)
 {
     CURRENT_TERMINAL
 
-    if (terminal->vga_frame.cursor.y < VGA_HEIGHT)
+    if (terminal->vga_frame.cursor.y < VGA_HEIGHT - 1)
         terminal->vga_frame.cursor.y += 1;
     terminal->vga_frame.cursor.x = n;
 }

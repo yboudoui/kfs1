@@ -24,7 +24,7 @@ void bootloader_screen(void)
 		.input_handler = wait_user_input,
 		.default_color = {
 			.fg = VGA_COLOR_RED,
-			.bg = VGA_COLOR_BLACK,
+			.bg = VGA_COLOR_GREEN, //tout sauf black pour la condition dans le print block
 		}
 	};
 	terminal_current(&terminal);
