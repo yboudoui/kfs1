@@ -15,35 +15,13 @@ static t_terminal_input_handler handlers = {
 };
 static t_terminal terminals[2];
 
-void shell(void)
-{
-	CURRENT_TERMINAL
-	t_terminal_readlines* 	readline =  &terminal->readline;
-	t_readline_buffer*		tmp = NULL;
-
-	size_t start = readline->scroll_index;
-	size_t end = start + VGA_HEIGHT;
-
-
-	while (start < end)
-	{
-		tmp = &readline->readline_buffer[start % TERMINAL_READLINE_BUFFER_SIZE];
-		// printf("%d %d\n", start % TERMINAL_READLINE_BUFFER_SIZE, readline->current_working_buffer);
-		terminal_write(tmp->buffer, tmp->size);
-		start += 1;
-	}
-
-}
-
 int shell_get_character(t_key_scancode key_scancode)
 {
     if (key_scancode == KEY_1 || key_scancode == KEY_2) {
-        terminal_current(&terminals[key_scancode - KEY_1]);
+        current_terminal(&terminals[key_scancode - KEY_1]);
     } else {
     	terminal_handle_input(key_scancode);
 	}
-
-	CURRENT_TERMINAL
     terminal_clear();
 	shell();
     terminal_update();
@@ -69,7 +47,7 @@ void kernel_main(void)
 	    .input_handler = handlers,
 	};
 
-	terminal_current(&terminals[0]);
+	current_terminal(&terminals[0]);
 	terminal_clear();
 	terminal_update();
 	keyboard_handler(shell_get_character);

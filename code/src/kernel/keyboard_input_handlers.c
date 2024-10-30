@@ -26,10 +26,12 @@ int terminal_input_on_return(t_key_scancode key_scancode)
 
     size_t working_buffer = terminal->readline.current_working_buffer;
 
-	memset(t_readline_buffer)(&terminal->readline.readline_buffer[working_buffer], (t_readline_buffer){0}, 1);
+    readline_buffer_reset(&terminal->readline.readline_buffer[working_buffer]);
     current_readline_buffer(&terminal->readline.readline_buffer[working_buffer]);
-    if (!move_cursor_to_new_line_at(0))
-        terminal->readline.scroll_index += 1;
+
+    if (!move_cursor_down())
+        shell_scroll_down();
+    terminal->vga_frame.cursor.x = 0;
     return 0;
 }
 
@@ -81,21 +83,14 @@ int terminal_input_on_button_right(t_key_scancode key_scancode)
 
 int terminal_input_on_button_up(t_key_scancode key_scancode)
 {
-    CURRENT_TERMINAL
-
     if (!move_cursor_up())
-    {
-        if(terminal->readline.scroll_index)
-           terminal->readline.scroll_index -= 1;
-    }
+        shell_scroll_up();
     return 0;
 }
 
 int terminal_input_on_button_down(t_key_scancode key_scancode)
 {
-    CURRENT_TERMINAL
-
     if (!move_cursor_down())
-        terminal->readline.scroll_index += 1;
+        shell_scroll_down();
     return 0;
 }

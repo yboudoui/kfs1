@@ -24,4 +24,5 @@ int     readline_is_character(char c, int position_relatif);
 void    readline_insert(char c);
 void    readline_remove(size_t nb);
 
+void    readline_buffer_reset(t_readline_buffer* readline_buffer);
 #endif

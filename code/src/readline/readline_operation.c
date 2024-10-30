@@ -69,3 +69,8 @@ void readline_remove(size_t nb)
     readline_update_caret_position(-nb);
     readline_buffer->size -= nb;
 }
+
+void    readline_buffer_reset(t_readline_buffer* readline_buffer)
+{
+	memset(t_readline_buffer)(readline_buffer, (t_readline_buffer){0}, 1);
+}

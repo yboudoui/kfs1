@@ -1,19 +1,14 @@
 #include "terminal.h"
 
-t_terminal* terminal_current(t_terminal* terminal)
+t_terminal* current_terminal(t_terminal* terminal)
 {
 	static t_terminal* current_terminal = NULL;
 
 	if (terminal != NULL) {
 		current_terminal = terminal;
-        size_t working_buffer = current_terminal->readline.current_working_buffer;
-	    current_readline_buffer(&current_terminal->readline.readline_buffer[working_buffer]);
 	}
 	return current_terminal;
 }
-
-
-
 
 void move_cursor_position_by(int n)
 {
@@ -45,18 +40,6 @@ bool move_cursor_down(void)
     if (terminal->vga_frame.cursor.y < VGA_HEIGHT - 1)
     {
         terminal->vga_frame.cursor.y += 1;
-        return true;
-    }
-    return false;
-}
-
-bool move_cursor_to_new_line_at(int n)
-{
-    CURRENT_TERMINAL
-
-    if (move_cursor_down())
-    {
-        terminal->vga_frame.cursor.x = n;
         return true;
     }
     return false;

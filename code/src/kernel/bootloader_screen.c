@@ -29,7 +29,7 @@ void bootloader_screen(void)
 		}
 	};
 
-	terminal_current(&terminal);
+	current_terminal(&terminal);
 	terminal_clear();
 	
 	// print_ui_box((t_ui_box){
