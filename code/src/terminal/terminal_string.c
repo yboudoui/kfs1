@@ -3,24 +3,15 @@
 
 void terminal_putchar_at(t_vec2 position, char c) 
 {
-	CURRENT_TERMINAL //bootloader fait trop tot, current terminal pas initialise, j'ai mis ca en dur ici pour que ce soit beau, probleme a remonter
+	// if (!c) return ; 
 
-	//printf("Terminal bg:%d\nTerminal fg:%d", terminal->default_color.bg, terminal->default_color.fg); //marche pas ni en %x ni en %d
-	if (!terminal->default_color.bg){
-		vga_frame_put_entry_at(
-			&terminal->vga_frame,
-			vga_entry(c, terminal->default_color),
-			position
-		);
-	}
-	else
-	{
-		vga_frame_put_entry_at(
-			&terminal->vga_frame,
-			vga_entry(c, (t_vga_entry_color){.bg=VGA_COLOR_BLACK,.fg=VGA_COLOR_RED}),
-			position
-		);
-	}
+	CURRENT_TERMINAL
+
+	vga_frame_put_entry_at(
+		&terminal->vga_frame,
+		vga_entry(c, terminal->default_color),
+		position
+	);
 }
 
 void terminal_putchar(char c) 
@@ -54,11 +45,11 @@ int terminal_write(const char* data, size_t size)
 	return (size);
 }
 
-void terminal_put_block_at(char* buffer, t_vec2 position)
+void terminal_put_block_at(size_t size, char* buffer, t_vec2 position)
 {
-	t_vec2 tmp = {};
+	t_vec2 tmp = {0};
 
-	for (size_t index = 0; buffer[index]; index++)
+	for (size_t index = 0; index < size; index++)
 	{
 		if(buffer[index] == '\n')
 		{
@@ -67,7 +58,7 @@ void terminal_put_block_at(char* buffer, t_vec2 position)
 			continue;
 		}
 
-		terminal_putchar_at(vec2_add(position, tmp), buffer[index]);
+		terminal_putchar_at(vec2_add(position, tmp), buffer[index]);	
 		tmp.x += 1;
 	}
 }

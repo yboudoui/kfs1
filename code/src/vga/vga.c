@@ -3,9 +3,7 @@
 
 void vga_frame_put_entry_at(t_vga_frame* vga_frame, t_vga_entry entry, t_vec2 position) 
 {
-	size_t        index;
-
-	index = position.y * VGA_WIDTH + position.x;
+	size_t index = position.y * VGA_WIDTH + position.x;
 	vga_frame->buffer[index] = entry;
 }
 

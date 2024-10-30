@@ -18,18 +18,15 @@ void print_ui_box(t_ui_box ui_box)
     char *line = buffer;
     char box_border_set[3][3] = {
         {0xDA, 0xC4, 0xBF},
-        {0xB3, 0x20, 0xB3},
+        {0xB3, 0x00, 0xB3},
         {0xC0, 0xC4, 0xD9},
     };
 
     dump_line(&line, ui_box.outer_size.x, box_border_set[0]);
     for (size_t y = 0; y < ui_box.outer_size.y - 1; y++) {
         dump_line(&line, ui_box.outer_size.x, box_border_set[1]);
-        // buffer[] = box_border_set[1][0];
-        // memcpy(buffer + 1, )
-        // buffer[] = box_border_set[1][2];
     }
     dump_line(&line, ui_box.outer_size.x, box_border_set[2]);
 
-    terminal_put_block_at(buffer, ui_box.position);
+    terminal_put_block_at(VGA_MAX_PRINTABLE_CHARACTER, buffer, ui_box.position);
 }

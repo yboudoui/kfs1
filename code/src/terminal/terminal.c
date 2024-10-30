@@ -8,11 +8,6 @@ void terminal_clear(void)
 		&terminal->vga_frame, 
 		vga_entry(0, terminal->default_color)
 	);
-}
-
-void terminal_reset_position(void)
-{
-	CURRENT_TERMINAL
 	terminal->current_position = (t_vec2){0};
 }
 
