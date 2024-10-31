@@ -6,5 +6,4 @@
 void bootloader_screen(void);
 void kernel_main(void);
 
-void *global_data_pointer(void *data);
 #endif

@@ -7,11 +7,8 @@ void terminal_putchar_at(t_vec2 position, char c)
 
 	CURRENT_TERMINAL
 
-	vga_frame_put_entry_at(
-		&terminal->vga_frame,
-		vga_entry(c, terminal->default_color),
-		position
-	);
+	t_vga_entry entry = vga_entry(c, terminal->default_color);
+	vga_frame_put_entry_at(entry, position);
 }
 
 void terminal_putchar(char c) 

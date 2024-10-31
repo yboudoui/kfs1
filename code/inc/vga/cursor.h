@@ -6,6 +6,8 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
+
 
 /*
 * Sources:
@@ -20,5 +22,10 @@ t_vec2 get_cursor_position(void);
 
 #define VGA_DISABLE_CURSOR vga_disable_cursor();
 #define VGA_ENABLE_CURSOR vga_enable_cursor(14, 15);
+
+
+bool vga_frame_move_cursor_up(void);
+bool vga_frame_move_cursor_down(void);
+void vga_frame_move_cursor_position_by(int n);
 
 #endif

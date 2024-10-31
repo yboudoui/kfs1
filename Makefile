@@ -27,7 +27,6 @@ INCLUDE_DIR=code/inc
 ######################################################
 
 SRCS_KERNEL		= $(addprefix kernel/, \
-	keyboard_input_handlers.c \
 	bootloader_screen.c \
 	kernel.c \
 )
@@ -44,8 +43,13 @@ SRCS_READLINE	= $(addprefix readline/, \
 	readline_operation.c \
 )
 
+SRCS_SHELL		= $(addprefix shell/, \
+	shell_input_handlers.c \
+	shell.c \
+)
+
 SRCS_TERMINAL	= $(addprefix terminal/, \
-	terminal_singleton.c \
+	terminal_keyboard_input_handlers.c \
 	terminal_string.c \
 	terminal.c \
 )
@@ -90,6 +94,7 @@ INCS = $(addprefix $(INCLUDE_DIR)/, \
 	keyboard \
 	math \
 	readline \
+	shell \
 	terminal \
 	ui \
 	utils \

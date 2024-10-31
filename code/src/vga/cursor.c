@@ -1,5 +1,6 @@
-#include "cursor.h"
+#include "vga.h"
 #include "io.h"
+
 
 void vga_disable_cursor(void)
 {
@@ -44,4 +45,40 @@ t_vec2 get_cursor_position(void)
     position.y = pos / VGA_WIDTH;
     position.x = pos % VGA_WIDTH;
     return position;
+}
+
+
+bool vga_frame_move_cursor_up(void)
+{
+    CURRENT_VGA_FRAME
+    if (vga_frame->cursor.y > 0)
+    {
+        vga_frame->cursor.y -= 1;
+        return true;
+    }
+    return false;
+}
+
+bool vga_frame_move_cursor_down(void)
+{
+    CURRENT_VGA_FRAME
+    if (vga_frame->cursor.y < VGA_HEIGHT - 1)
+    {
+        vga_frame->cursor.y += 1;
+        return true;
+    }
+    return false;
+}
+
+void vga_frame_move_cursor_position_by(int n)
+{
+    CURRENT_VGA_FRAME
+
+    size_t position = vga_frame->cursor.x + n;
+
+    if (position < 0)
+        position = 0;
+    if (position > VGA_WIDTH)
+        position = VGA_WIDTH;
+    vga_frame->cursor.x = position;
 }

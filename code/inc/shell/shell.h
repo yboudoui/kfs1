@@ -19,5 +19,10 @@ t_shell* current_shell(t_shell* terminal);
 void shell_scroll_up(void);
 void shell_scroll_down(void);
 
+void shell(void);
+
+
+//
+void shell_init_color(t_vga_color foreground, t_vga_color background);
 
 #endif

@@ -17,21 +17,8 @@ int	wait_user_input(t_key_scancode key_scancode)
 
 #include "ui_box.h"
 
-void bootloader_screen(void)
+void show(void)
 {
-	VGA_DISABLE_CURSOR
-	
-	t_terminal terminal = {
-		.input_handler = wait_user_input,
-		.default_color = {
-			.fg = VGA_COLOR_RED,
-			.bg = VGA_COLOR_BLACK,
-		}
-	};
-
-	current_terminal(&terminal);
-	terminal_clear();
-	
 	// print_ui_box((t_ui_box){
 	// 	.outer_size = {80, 24},
 	// 	.position = {0 , 0},
@@ -40,7 +27,18 @@ void bootloader_screen(void)
 		.x = (VGA_WIDTH - 25) / 2,
 		.y = (VGA_HEIGHT - 7) / 2,
 	});
+}
 
-	terminal_update();
-	keyboard_handler(terminal_handle_input);
+void bootloader_screen(void)
+{
+	VGA_DISABLE_CURSOR
+
+	t_terminal terminal;
+	current_terminal(&terminal);
+	terminal_init(
+		(t_vga_entry_color){VGA_COLOR_RED, VGA_COLOR_BLACK},
+		wait_user_input
+	);
+
+	keyboard_handler();
 }

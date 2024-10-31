@@ -1,4 +1,6 @@
 #include "shell.h"
+#include "codepage_437.h"
+
 
 t_shell* current_shell(t_shell* shell)
 {
@@ -44,19 +46,13 @@ void shell_scroll_down(void)
     shell->scroll_index += 1;
 }
 
-void shell_next_line(void)
+///
+
+void shell_init_color(t_vga_color foreground, t_vga_color background)
 {
 	CURRENT_SHELL
-
-    shell->current_working_buffer += 1;
-    shell->current_working_buffer %= TERMINAL_READLINE_BUFFER_SIZE;
-
-    size_t working_buffer = shell->current_working_buffer;
-
-    readline_buffer_reset(&shell->readline_buffer[working_buffer]);
-    current_readline_buffer(&shell->readline_buffer[working_buffer]);
-
-    if (!move_cursor_down())
-        shell_scroll_down();
-    shell->terminal.vga_frame.cursor.x = 0;
+	terminal_init(
+		(t_vga_entry_color){foreground, background},
+		NULL
+	);
 }

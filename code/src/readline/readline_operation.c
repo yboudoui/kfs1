@@ -74,3 +74,36 @@ void    readline_buffer_reset(t_readline_buffer* readline_buffer)
 {
 	memset(t_readline_buffer)(readline_buffer, (t_readline_buffer){0}, 1);
 }
+
+#include "keyboard.h"
+#define TABSIZE 4
+int readline_keyboard_handler(t_key_scancode key_scancode)
+{
+    char    character = codepage_437[key_scancode];
+    int     move_by = (character == '\t') ? TABSIZE : 1;
+
+    switch (key_scancode)
+    {
+        case KEY_BACKSPACE:
+            readline_remove(1);
+            vga_frame_move_cursor_position_by(-move_by);
+            break;
+        case KEY_DELETE:
+            if (readline_update_caret_position(+1))
+                readline_remove(1);
+            break;
+        case KEY_LEFT:
+            if (readline_update_caret_position(-1))
+                vga_frame_move_cursor_position_by(-move_by);
+            break;
+        case KEY_RIGHT:
+            if (readline_update_caret_position(+1))
+                vga_frame_move_cursor_position_by(move_by);
+            break;
+        default:
+            readline_insert(character);
+            vga_frame_move_cursor_position_by(move_by);
+            break;
+    }
+    return 0;
+}

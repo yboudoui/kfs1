@@ -1,54 +1,30 @@
-#include "utils.h"
-#include "keyboard_input_handlers.h"
+#include "shell.h"
 
-static t_terminal_input_handler handlers = {
-    .default_handler = terminal_input_fallback,
-    .handlers = {
-        [KEY_ENTER]     = terminal_input_on_return,
-        [KEY_BACKSPACE] = terminal_input_on_backspace,
-        [KEY_DELETE]    = terminal_input_on_del,
-        [KEY_LEFT]      = terminal_input_on_button_left,
-        [KEY_RIGHT]     = terminal_input_on_button_right,
-        [KEY_UP]        = terminal_input_on_button_up,
-        [KEY_DOWN]      = terminal_input_on_button_down,
-    }
-};
-static t_terminal terminals[2];
+static t_shell shells[2];
 
 int shell_get_character(t_key_scancode key_scancode)
 {
     if (key_scancode == KEY_1 || key_scancode == KEY_2) {
-        current_terminal(&terminals[key_scancode - KEY_1]);
+        current_shell(&shells[key_scancode - KEY_1]);
     } else {
-    	terminal_handle_input(key_scancode);
+    	keyboard_handle_input(key_scancode);
 	}
     terminal_clear();
 	shell();
-    terminal_update();
+	vga_main_frame_update();
     return 0;
 }
 
 void kernel_main(void)
 {	
 	VGA_ENABLE_CURSOR
-	terminals[0] = (t_terminal){
-	    .default_color = (t_vga_entry_color){
-			.fg = VGA_COLOR_WHITE,
-			.bg = VGA_COLOR_BLACK,
-		},
-	    .input_handler = handlers,
-	};
 
-	terminals[1] = (t_terminal){
-	    .default_color = (t_vga_entry_color){
-			.fg = VGA_COLOR_LIGHT_MAGENTA,
-			.bg = VGA_COLOR_BLACK,
-		},
-	    .input_handler = handlers,
-	};
+	current_shell(&shells[0]);
+	shell_init_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
 
-	current_terminal(&terminals[0]);
-	terminal_clear();
-	terminal_update();
-	keyboard_handler(shell_get_character);
+	current_shell(&shells[1]);
+	shell_init_color(VGA_COLOR_LIGHT_MAGENTA, VGA_COLOR_BLACK);
+
+	current_shell(&shells[0]);
+	keyboard_handler();
 }

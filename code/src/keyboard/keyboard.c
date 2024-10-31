@@ -1,29 +1,32 @@
 #include "keyboard.h"
-#include <stddef.h>
 
-typedef int (*t_fp_input_handler)(t_key_scancode);
-typedef struct s_input_handler {
-  t_fp_input_handler default_handler;
-  t_fp_input_handler handlers[MAX_KEY_SCANCODE];
-} t_input_handler;
-
-t_input_handler* current_input_handler(t_input_handler* handler)
+t_fp_input_handler current_keyboard_handler(t_fp_input_handler handler)
 {
-    static t_input_handler* current_input_handler = NULL;
+    static t_fp_input_handler current_input_handler = NULL;
     if (handler != NULL) {
         current_input_handler = handler;
     }
     return current_input_handler;
 }
 
-int handle_input(t_key_scancode key_scancode)
+
+t_keyboard_handlers* current_keyboard_handlers(t_keyboard_handlers* handlers)
 {
-    t_input_handler* input_handler = current_input_handler(NULL);
+    static t_keyboard_handlers* current_input_handlers = NULL;
+    if (handlers != NULL) {
+        current_input_handlers = handlers;
+    }
+    return current_input_handlers;
+}
+
+int keyboard_handle_input(t_key_scancode key_scancode)
+{
+    CURRENT_KEYBOARD_HANDLERS
     t_fp_input_handler handler;
 
-    handler = input_handler->handlers[key_scancode];
+    handler = keyboard_handlers->handlers[key_scancode];
     if (handler == NULL)
-        handler = input_handler->default_handler;
+        handler = keyboard_handlers->default_handler;
     return handler(key_scancode);
 }
 
@@ -41,8 +44,9 @@ t_key_scancode get_key_on_pressed(void)
     return 0;
 }
 
-int keyboard_handler(t_fp_get_key_scancode handler)
+int keyboard_handler(void)
 {
+    KEYBOARD_HANDLER
     t_key_scancode  scancode;
     int             handler_output;
     
@@ -50,7 +54,7 @@ int keyboard_handler(t_fp_get_key_scancode handler)
     {
         scancode = get_key_on_pressed();
         if (scancode) {
-            handler_output = handler(scancode);
+            handler_output = input_handler(scancode);
             if (handler_output)
                 return handler_output;
         }

@@ -121,6 +121,8 @@ typedef enum {
   KEY_END       = KEY_NUMPAD_1,
   KEY_PAGE_UP   = KEY_NUMPAD_9,
   KEY_PAGE_DOWN = KEY_NUMPAD_3,
+
+  KEY_IS_NUMBER = KEY_0 | KEY_1 | KEY_2 | KEY_3 | KEY_4 | KEY_5 | KEY_6 | KEY_7 | KEY_8 | KEY_9,
 } t_key_scancode;
 
 
