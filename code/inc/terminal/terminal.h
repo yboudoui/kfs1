@@ -3,14 +3,16 @@
 
 #include "vga.h"
 #include "utils.h"
-#include "terminal_keyboard_handlers.h"
+#include "keyboard.h"
+#include "std_io.h"
 
 typedef struct s_terminal {
-  t_vga_frame                 vga_frame;
-  t_vga_entry_color           default_color;
-  t_fp_input_handler          input_handler;
+  t_vga_frame         vga_frame;
+  t_vga_entry_color   default_color;
+  t_fp_input_handler  input_handler;
+  t_stdio             stdio;
 
-  t_vec2                      current_position;
+  t_vec2              current_position;
 } t_terminal;
 
 t_terminal* current_terminal(t_terminal* frame);
@@ -26,5 +28,28 @@ void  terminal_clear(void);
 
 //
 void terminal_init(t_vga_entry_color default_color, t_fp_input_handler input_handler);
+
+
+#define ESCAPE_SEQUENCE "\033"
+#define CONTROL_SEQUENCE_INTRODUCER ESCAPE_SEQUENCE"["
+
+typedef struct {
+    t_key_scancode  scancode;
+    const char*     sequence;
+} EscapeSequenceMapping;
+
+static EscapeSequenceMapping sequence_to_scancode[] = {
+    {KEY_UP,        CONTROL_SEQUENCE_INTRODUCER "1A"},
+    {KEY_DOWN,      CONTROL_SEQUENCE_INTRODUCER "1B"},
+    {KEY_RIGHT,     CONTROL_SEQUENCE_INTRODUCER "1C"},
+    {KEY_LEFT,      CONTROL_SEQUENCE_INTRODUCER "1D"},
+    {KEY_BACKSPACE, "\b"},
+    {KEY_ENTER,     "\n"},
+    {KEY_TAB,       "\t"},
+	  {KEY_DELETE,	  {0x7F, 0x00}},
+    {NULL, -1}  // End of array marker
+};
+
+t_key_scancode get_scancode_from_sequence(const char* sequence);
 
 #endif

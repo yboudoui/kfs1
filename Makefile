@@ -49,7 +49,6 @@ SRCS_SHELL		= $(addprefix shell/, \
 )
 
 SRCS_TERMINAL	= $(addprefix terminal/, \
-	terminal_keyboard_input_handlers.c \
 	terminal_string.c \
 	terminal.c \
 )
@@ -89,12 +88,13 @@ SRCS= $(addprefix $(SOURCE_DIR)/, \
 
 INCS = $(addprefix $(INCLUDE_DIR)/, \
 	ft_printf \
-	io \
+	hardware_io \
 	kernel \
 	keyboard \
 	math \
 	readline \
 	shell \
+	std_io \
 	terminal \
 	ui \
 	utils \

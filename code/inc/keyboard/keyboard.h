@@ -1,7 +1,7 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
-#include "io.h"
+#include "hardware_io.h"
 #include "keyboard_scancode.h"
 #include "codepage_437.h"
 #include <stddef.h>

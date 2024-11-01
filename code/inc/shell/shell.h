@@ -16,9 +16,6 @@ typedef struct s_shell {
 t_shell* current_shell(t_shell* terminal);
 #define CURRENT_SHELL t_shell* shell = current_shell(NULL);
 
-void shell_scroll_up(void);
-void shell_scroll_down(void);
-
 void shell(void);
 
 

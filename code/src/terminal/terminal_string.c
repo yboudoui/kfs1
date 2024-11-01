@@ -3,15 +3,13 @@
 
 void terminal_putchar_at(t_vec2 position, char c) 
 {
-	// if (!c) return ; 
-
 	CURRENT_TERMINAL
 
 	t_vga_entry entry = vga_entry(c, terminal->default_color);
 	vga_frame_put_entry_at(entry, position);
 }
 
-void terminal_putchar(char c) 
+void terminal_putchar(char c)
 {
 	CURRENT_TERMINAL
 	
@@ -35,7 +33,7 @@ void terminal_putchar(char c)
 	}
 }
 
-int terminal_write(const char* data, size_t size) 
+int terminal_write(const char* data, size_t size)
 {
 	for (size_t i = 0; i < size; i++)
 		terminal_putchar(data[i]);

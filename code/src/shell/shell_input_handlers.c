@@ -17,21 +17,26 @@ int shell_input_on_return(t_key_scancode key_scancode)
     current_readline_buffer(&shell->readline_buffer[working_buffer]);
 
     if (!vga_frame_move_cursor_down())
-        shell_scroll_down();
+        shell->scroll_index += 1;
     shell->terminal.vga_frame.cursor.x = 0;
     return 0;
 }
 
 int shell_input_on_button_up(t_key_scancode key_scancode)
 {
-    if (!vga_frame_move_cursor_up())
-        shell_scroll_up();
+    CURRENT_SHELL
+    if (!vga_frame_move_cursor_up()) {
+        if(shell->scroll_index)
+            shell->scroll_index -= 1;
+    }
     return 0;
 }
 
 int shell_input_on_button_down(t_key_scancode key_scancode)
 {
+	CURRENT_SHELL
+
     if (!vga_frame_move_cursor_down())
-        shell_scroll_down();
+        shell->scroll_index += 1;
     return 0;
 }

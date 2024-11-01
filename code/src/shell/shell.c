@@ -1,7 +1,6 @@
 #include "shell.h"
 #include "codepage_437.h"
 
-
 t_shell* current_shell(t_shell* shell)
 {
 	static t_shell* current_shell = NULL;
@@ -30,20 +29,6 @@ void shell(void)
 		terminal_write(tmp->buffer, tmp->size);
 		start += 1;
 	}
-}
-
-void shell_scroll_up(void)
-{
-	CURRENT_SHELL
-
-    if(shell->scroll_index)
-       shell->scroll_index -= 1;
-}
-
-void shell_scroll_down(void)
-{
-	CURRENT_SHELL
-    shell->scroll_index += 1;
 }
 
 ///
