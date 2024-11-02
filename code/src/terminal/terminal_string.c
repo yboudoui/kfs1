@@ -35,8 +35,22 @@ void terminal_putchar(char c)
 
 int terminal_write(const char* data, size_t size)
 {
+	char buffer[STD_IO_BUFFER_SIZE] = {0};
+
+    t_key_scancode key_scancode;
+    size_t read_size = read(STDOUT, buffer, STD_IO_BUFFER_SIZE);
+
+    char character;
+    int move_by;
+
 	for (size_t i = 0; i < size; i++)
+	{
+		if (get_scancode_from_sequence(&read_size, (char**)&buffer, &key_scancode))
+		{
+
+		}
 		terminal_putchar(data[i]);
+	}
 	return (size);
 }
 

@@ -49,6 +49,7 @@ SRCS_SHELL		= $(addprefix shell/, \
 )
 
 SRCS_TERMINAL	= $(addprefix terminal/, \
+	ecma48.c \
 	terminal_string.c \
 	terminal.c \
 )
@@ -58,12 +59,13 @@ SRCS_UI			= $(addprefix ui/, \
 )
 
 SRCS_UTILS		= $(addprefix utils/, \
-	strlen.c \
 	itoa_base.c \
 	memset.c \
 	memcpy.c \
 	memmove.c \
 	printf.c \
+	strcmp.c \
+	strlen.c \
 )
 
 SRCS_VGA		= 	$(addprefix vga/, \

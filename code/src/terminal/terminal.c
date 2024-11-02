@@ -22,28 +22,14 @@ void terminal_clear(void)
 	terminal->current_position = (t_vec2){0};
 }
 
-t_key_scancode get_scancode_from_sequence(const char* sequence)
-{
-    for (int i = 0; sequence_to_scancode[i].sequence != NULL; i++) {
-        if (strcmp(sequence, sequence_to_scancode[i].sequence) == 0) {
-            return sequence_to_scancode[i].scancode;
-        }
-    }
-    return -1;  // Indicate no match
-}
-
 static int terminal_input_handler(t_key_scancode key_scancode)
 {
 	CURRENT_TERMINAL
 
-	char* control = NULL;
+	char control[128] = {0};
 
-	control = sequence_to_scancode[key_scancode];
-	if (control == NULL) {
-		control = codepage_437[key_scancode];
-	}
-	if (control)
-		write(STDOUT, control, strlen(control));
+	get_sequence_from_scancode(key_scancode, &control);
+	write(STDOUT, control, strlen(control));
 	return 0;
 }
 
