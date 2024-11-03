@@ -1,5 +1,5 @@
 #include "vga.h"
-#include "io.h"
+#include "hardware_io.h"
 
 
 void vga_disable_cursor(void)

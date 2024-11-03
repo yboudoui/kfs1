@@ -72,16 +72,13 @@ static const t_fp_dump a[128] = {
 	NULL,
 };
 
-int	printf(const char *str, ...)
+int vdprintf(int fd, const char *str, va_list tab)
 {
-	va_list	tab;
 	int		len = 0;
+	char buffer[2048] = {0};
 
 	if (!str)
 		return (-1);
-	char buffer[2048] = {0};
-	
-	va_start(tab, str);
 	while (*str)
 	{
 		if (str[0] == '%' && str[1][a]) {
@@ -91,6 +88,66 @@ int	printf(const char *str, ...)
 			buffer[len++] = *str++;
 		}
 	}
+	return (write(fd, buffer, len));
+}
+
+int	vsprintf(char* buffer, const char *str, va_list	tab)
+{
+	int		len = 0;
+
+	if (!str)
+		return (-1);
+	while (*str)
+	{
+		if (str[0] == '%' && str[1][a]) {
+			len += str[1][a](&buffer[len], &tab);
+			str += 2;
+		} else {
+			buffer[len++] = *str++;
+		}
+	}
+	return (write(STDOUT, buffer, len));
+}
+
+int dprintf(int fd, const char *str, ...)
+{
+	va_list	tab;
+	int		len = 0;
+	if (!str)
+		return (-1);
+
+	va_start(tab, str);
+	len = vdprintf(fd, str, tab);
 	va_end(tab);
-	return (terminal_write(buffer, len));
+	return len;
+}
+
+int	sprintf(char* buffer, const char *str, ...)
+{
+	va_list	tab;
+	int		len = 0;
+
+	if (!str)
+		return (-1);
+
+	va_start(tab, str);
+	len = vsprintf(buffer, str, tab);
+	va_end(tab);
+	return len;
+}
+
+int	printf(const char *str, ...)
+{
+	va_list	tab;
+	int		len = 0;
+
+	if (!str)
+		return (-1);
+	char buffer[2048] = {0};
+
+
+	va_start(tab, str);
+	len = vsprintf(buffer, str, tab);
+	va_end(tab);
+	return len;
 }

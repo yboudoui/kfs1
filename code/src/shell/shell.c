@@ -31,8 +31,6 @@ void shell(void)
 	}
 }
 
-///
-
 void shell_init_color(t_vga_color foreground, t_vga_color background)
 {
 	CURRENT_SHELL

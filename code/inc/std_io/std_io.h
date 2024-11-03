@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-#define STD_IO_BUFFER_SIZE 256
+#define STD_IO_BUFFER_SIZE 1024
 
 typedef enum s_stdio_fd {
   STDOUT,

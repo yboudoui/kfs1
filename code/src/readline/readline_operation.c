@@ -1,4 +1,6 @@
 #include "readline.h"
+#include "ecma48.h"
+#include "std_io.h"
 #include "terminal.h"
 
 t_readline_buffer* current_readline_buffer(t_readline_buffer* readline_buffer)
@@ -10,6 +12,25 @@ t_readline_buffer* current_readline_buffer(t_readline_buffer* readline_buffer)
 	}
 	return current_readline_buffer;
 };
+
+void    readline_move_cursor(int n)
+{
+    CURRENT_READLINE_BUFFER
+
+    int inc = (n > 0) ? -1 : 1;
+    size_t pos = readline_buffer->caret_position;
+
+    // TODO: check limit
+    
+    while (n)
+    {
+        char c = readline_buffer->buffer[pos];
+        int dir = (c == '\t') ? TABSIZE : 1; 
+        readline_buffer->cursor_movement += dir * -inc;
+        n += inc;
+        pos += inc;
+    }
+}
 
 int     readline_update_caret_position(int n)
 {
@@ -66,43 +87,63 @@ void    readline_buffer_reset(t_readline_buffer* readline_buffer)
 	memset(t_readline_buffer)(readline_buffer, (t_readline_buffer){0}, 1);
 }
 
-void     readline_update(void)
+void on_character(t_ecma48_sequence_data data)
 {
-    char buffer[STD_IO_BUFFER_SIZE] = {0};
-
-    t_key_scancode key_scancode;
-    size_t read_size = read(STDOUT, buffer, STD_IO_BUFFER_SIZE);
-
-    char character;
-    int move_by;
-
-    while (get_scancode_from_sequence(&read_size, (char**)&buffer, &key_scancode))
+    switch (data.character)
     {
-        switch (key_scancode)
-        {
-            case KEY_BACKSPACE:
-                readline_remove(1);
-                move_cursor(-1);
-                break;
-            case KEY_DELETE:
-                if (readline_update_caret_position(+1))
-                    readline_remove(1);
-                break;
-            case KEY_LEFT:
-                if (readline_update_caret_position(-1))
-                    move_cursor(-1);
-                break;
-            case KEY_RIGHT:
-                if (readline_update_caret_position(+1))
-                    move_cursor(+1);
-                break;
-            default:
-                character = codepage_437[key_scancode];
-                readline_insert(character);
-                move_by = (character == '\t')? TABSIZE : 1;
-                move_cursor(move_by);
-                break;
-        }
+    case '\b':
+        readline_remove(1);
+        readline_move_cursor(-1);
+        break;
+    case '\177':
+        if (readline_update_caret_position(+1))
+            readline_remove(1);
+        break;
+    default:
+        readline_insert(data.character);
+        readline_move_cursor(+1);
+        break;
+    }
+}
+
+void on_cursor_mouvement(t_ecma48_sequence_data data)
+{
+    t_vec2 vec = data.cursor_movement;
+
+    readline_update_caret_position(vec.x);
+    readline_move_cursor(vec.x);
+}
+
+typedef void (*t_fp_on_ecma48_sequence_type)(t_ecma48_sequence_data data);
+
+static t_fp_on_ecma48_sequence_type dispatcher[] = {
+    [CHARACTER]         = on_character,
+    [CURSOR_MOVEMENT]   = on_cursor_mouvement,
+};
+ 
+void readline(void)
+{
+    CURRENT_READLINE_BUFFER
+    readline_buffer->cursor_movement = 0;
+
+    t_ecma48_sequence   current_sequence;
+    char                read_buffer[STD_IO_BUFFER_SIZE] = {0};
+    size_t              read_size;
+    char                write_buffer[STD_IO_BUFFER_SIZE] = {0};
+    
+    read_size = read(STDIN, read_buffer, STD_IO_BUFFER_SIZE);
+
+    for (size_t i = 0; i < read_size; i++)
+    {
+        i += parse_sequence(&read_buffer[i], &current_sequence);
+        dispatcher[current_sequence.type](current_sequence.data);
     }
 
+
+    if (readline_buffer->cursor_movement > 0)
+        dprintf(STDOUT, "%s"CURSOR_MOVE_RIGHT, readline_buffer->buffer, readline_buffer->cursor_movement);
+    else if (readline_buffer->cursor_movement < 0)
+        dprintf(STDOUT, "%s"CURSOR_MOVE_LEFT, readline_buffer->buffer, readline_buffer->cursor_movement);
+    else
+        dprintf(STDOUT, "%s", readline_buffer->buffer);
 }

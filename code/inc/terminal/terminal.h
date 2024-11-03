@@ -26,6 +26,7 @@ int   terminal_write(const char* data, size_t size);
 void  terminal_put_block_at(size_t size, char* buffer, t_vec2 position);
 
 void  terminal_clear(void);
+void	terminal_update(void);
 
 //
 void terminal_init(t_vga_entry_color default_color, t_fp_input_handler input_handler);

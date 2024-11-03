@@ -15,10 +15,11 @@ typedef void (*t_fp_move_cursor_by)(int);
 static t_fp_move_cursor_by move_cursor = vga_frame_move_cursor_position_by;
 
 typedef struct {
-    t_vec2              cursor_position;
-    size_t              caret_position;
-    size_t              size;
-    char                buffer[READLINE_BUFFER_SIZE];
+    int     cursor_movement;
+    size_t  caret_position;
+    
+    size_t  size;
+    char    buffer[READLINE_BUFFER_SIZE];
 } t_readline_buffer;
 
 DECLARE_MEMSET(t_readline_buffer);

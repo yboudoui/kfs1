@@ -59,6 +59,8 @@ static const unsigned char codepage_437[255] = {
   [KEY_SLASH]                 = 0x2F,
 
   [KEY_SPACE]                 = ' ',
+
+  [KEY_DELETE]                = '\177',
   0,
 };
 

@@ -3,5 +3,6 @@
 
 #include <stdbool.h>
 
-void atoi(int* result, char**buffer);
+int     basic_atoi(int* result, const char* buffer);
+void    atoi(int* result, char**buffer);
 #endif

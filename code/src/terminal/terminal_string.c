@@ -13,12 +13,13 @@ void terminal_putchar(char c)
 {
 	CURRENT_TERMINAL
 	
-	if (c == '\t') {
-		for (size_t i = 1; i < TABSIZE; i++) {
-			terminal_putchar_at(terminal->current_position, ' ');
-			terminal->current_position.x += 1;
-    	}
-	} else if (c == '\n') {
+	// if (c == '\t') {
+	// 	for (size_t i = 1; i < TABSIZE; i++) {
+	// 		terminal_putchar_at(terminal->current_position, ' ');
+	// 		terminal->current_position.x += 1;
+    // 	}
+	// } else
+	if (c == '\n') {
 		terminal->current_position.x = 0;
 		terminal->current_position.y += 1;
 		return ;
@@ -35,23 +36,35 @@ void terminal_putchar(char c)
 
 int terminal_write(const char* data, size_t size)
 {
-	char buffer[STD_IO_BUFFER_SIZE] = {0};
+	CURRENT_TERMINAL
 
-    t_key_scancode key_scancode;
-    size_t read_size = read(STDOUT, buffer, STD_IO_BUFFER_SIZE);
-
-    char character;
-    int move_by;
+	t_ecma48_sequence 	seq;
 
 	for (size_t i = 0; i < size; i++)
 	{
-		if (get_scancode_from_sequence(&read_size, (char**)&buffer, &key_scancode))
-		{
+		i += parse_sequence(&data[i], &seq);
+		if (seq.type == CHARACTER) {
+			terminal_putchar_at(terminal->current_position, seq.data.character);
+			terminal->current_position.x += 1;
+		}
+		else if (seq.type == CURSOR_MOVEMENT) {
+			vga_frame_move_cursor_position_by(seq.data.cursor_movement.x);
+			// terminal->current_position.x += seq.data.cursor_movement.x;
 
 		}
-		terminal_putchar(data[i]);
 	}
 	return (size);
+}
+
+void	terminal_update(void)
+{
+	char	read_buffer[STD_IO_BUFFER_SIZE] = {0};
+    size_t	read_size;
+
+	read_size = read(STDOUT, read_buffer, STD_IO_BUFFER_SIZE);
+
+	terminal_write(read_buffer, read_size);
+	vga_main_frame_update();
 }
 
 void terminal_put_block_at(size_t size, char* buffer, t_vec2 position)

@@ -10,7 +10,18 @@ bool    is_space(int c)
     return (c >= '\t' && c <= '\r') || c == ' ';
 }
 
-void atoi(int* result, char**buffer)
+int basic_atoi(int* result, const char* buffer)
+{
+    int index;
+    (*result) = 0;
+
+    for(index = 0; is_digit(buffer[index]); index++) {
+        (*result) = (*result * 10) + (buffer[index] - '0');
+    }
+    return index;
+}
+
+void atoi(int* result, char** buffer)
 {
 	int	sign;
     char* tmp = (*buffer);

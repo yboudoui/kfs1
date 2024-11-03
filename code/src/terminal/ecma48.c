@@ -1,53 +1,42 @@
 #include "ecma48.h"
+#include "std_io.h"
 
-#define ESCAPE_SEQUENCE "\033"
-#define CONTROL_SEQUENCE_INTRODUCER ESCAPE_SEQUENCE"["
-
-typedef struct {
-    t_key_scancode  scancode;
-    const char*     sequence;
-} EscapeSequenceMapping;
-
-static EscapeSequenceMapping sequence_to_scancode[] = {
-    {KEY_UP,        CONTROL_SEQUENCE_INTRODUCER "1A"},
-    {KEY_DOWN,      CONTROL_SEQUENCE_INTRODUCER "1B"},
-    {KEY_RIGHT,     CONTROL_SEQUENCE_INTRODUCER "1C"},
-    {KEY_LEFT,      CONTROL_SEQUENCE_INTRODUCER "1D"},
-    {KEY_BACKSPACE, "\b"},
-    {KEY_ENTER,     "\n"},
-    {KEY_TAB,       "\t"},
-	{KEY_DELETE,	"\177"},
-    {-1, NULL}  // End of array marker
-};
-
-
-bool get_scancode_from_sequence(size_t* size, char** sequence, t_key_scancode* key_scancode)
+int parse_sequence(const char* input, t_ecma48_sequence* seq)
 {
-    size_t sequence_size;
-    for (int i = 0; sequence_to_scancode[i].sequence != NULL; i++)
+    int index = 0;
+
+    if (input[index] == '\033')
     {
-        if (strcmp(*sequence, sequence_to_scancode[i].sequence) == 0)
+        index += 1;
+        if (input[index] == '[')
         {
-            (*key_scancode) = sequence_to_scancode[i].scancode;
-            sequence_size = strlen(sequence_to_scancode[i].sequence);
-            (*sequence) += sequence_size;
-            (*size) -= sequence_size;
-            return true;
+            index += 1;
+            int mouvement;
+            index += basic_atoi(&mouvement, &input[index]);
+
+            (*seq).type = CURSOR_MOVEMENT;
+            switch (input[index])
+            {
+            case 'A':
+                (*seq).data.cursor_movement.y -= mouvement;
+                break;
+            case 'B':
+                (*seq).data.cursor_movement.y += mouvement;
+                break;
+            case 'C':
+                (*seq).data.cursor_movement.x += mouvement;
+                break;
+            case 'D':
+                (*seq).data.cursor_movement.x -= mouvement;
+                break;
+            }
+            return index;
         }
     }
-    return false;
-}
-
-bool get_sequence_from_scancode(t_key_scancode key_scancode, char** sequence)
-{
-    for (int i = 0; sequence_to_scancode[i].sequence != NULL; i++)
+    else
     {
-        if (key_scancode == sequence_to_scancode[i].scancode)
-        {
-            memcpy(*sequence, sequence_to_scancode[i].sequence, strlen(sequence_to_scancode[i].sequence));
-            return true;
-        }
+        (*seq).type = CHARACTER;
+        (*seq).data.character = *input;
+        return 0;
     }
-    (**sequence) = codepage_437[key_scancode];
-    return true;
 }

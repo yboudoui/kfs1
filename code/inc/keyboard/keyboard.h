@@ -29,12 +29,12 @@ typedef struct s_keyboard_input_handler {
   t_fp_input_handler handlers[MAX_KEY_SCANCODE];
 } t_keyboard_handlers;
 
-t_keyboard_handlers* current_keyboard_handlers(t_keyboard_handlers* handlers);
-#define CURRENT_KEYBOARD_HANDLERS t_keyboard_handlers* keyboard_handlers = current_keyboard_handlers(NULL);
+// t_keyboard_handlers* current_keyboard_handlers(t_keyboard_handlers* handlers);
+// #define CURRENT_KEYBOARD_HANDLERS t_keyboard_handlers* keyboard_handlers = current_keyboard_handlers(NULL);
 
 static t_key_state keyboard_state[MAX_KEY_SCANCODE] = {KEY_RELEASED};
 
-int keyboard_handle_input(t_key_scancode key_scancode);
+// int keyboard_handle_input(t_key_scancode key_scancode);
 int keyboard_handler(void);
 
 

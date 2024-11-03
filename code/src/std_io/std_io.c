@@ -14,7 +14,13 @@ t_stdio* current_stdio(t_stdio* stdio)
 int read(t_stdio_fd fd, char *buffer, size_t size)
 {
     CURRENT_STDIO
-    memcpy(buffer, stdio->std_io[fd], size);
+
+    size_t bytes = strlen(stdio->std_io[fd]);
+    if (bytes >= size)
+        bytes = size;
+
+    memcpy(buffer, stdio->std_io[fd], bytes);
+    return bytes;
 }
 
 int write(t_stdio_fd fd, char *buffer, size_t size)

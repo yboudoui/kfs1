@@ -7,9 +7,8 @@ t_terminal* current_terminal(t_terminal* terminal)
 	if (terminal != NULL) {
 		current_terminal = terminal;
         current_vga_frame(&current_terminal->vga_frame);
+		current_keyboard_handler(current_terminal->input_handler);
 		current_stdio(&current_terminal->stdio);
-        // if (current_terminal->input_handler == keyboard_handle_input)
-        //     current_keyboard_handlers(&terminal_keyboard_handlers);
 	}
 	return current_terminal;
 }
@@ -24,12 +23,17 @@ void terminal_clear(void)
 
 static int terminal_input_handler(t_key_scancode key_scancode)
 {
-	CURRENT_TERMINAL
-
-	char control[128] = {0};
-
-	get_sequence_from_scancode(key_scancode, &control);
-	write(STDOUT, control, strlen(control));
+	static char* ops[] = {
+	    [KEY_UP]    = ESCAPE_SEQUENCE CONTROL_SEQUENCE_INTRODUCER "%dA",
+	    [KEY_DOWN]  = ESCAPE_SEQUENCE CONTROL_SEQUENCE_INTRODUCER "%dB",
+	    [KEY_RIGHT] = ESCAPE_SEQUENCE CONTROL_SEQUENCE_INTRODUCER "%dC",
+	    [KEY_LEFT]  = ESCAPE_SEQUENCE CONTROL_SEQUENCE_INTRODUCER "%dD",
+	    NULL,
+	};
+    if(ops[key_scancode])
+        dprintf(STDIN, ops[key_scancode], 1);
+    else
+        dprintf(STDIN, "%c", codepage_437[key_scancode]);
 	return 0;
 }
 

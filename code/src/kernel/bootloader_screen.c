@@ -40,5 +40,13 @@ void bootloader_screen(void)
 		wait_user_input
 	);
 
-	keyboard_handler();
+	current_terminal(&terminal);
+
+	while(42)
+	{
+		terminal_clear();
+		if (keyboard_handler()) return;
+		show();
+		terminal_update();
+	}
 }

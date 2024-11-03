@@ -4,7 +4,7 @@
 #include <stddef.h>
 
 typedef struct {
-  size_t x, y;
+  int x, y;
 } t_vec2;
 
 t_vec2 vec2_add(t_vec2 a, t_vec2 b);

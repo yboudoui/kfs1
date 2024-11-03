@@ -48,6 +48,10 @@ SRCS_SHELL		= $(addprefix shell/, \
 	shell.c \
 )
 
+SRCS_STD_IO		= $(addprefix std_io/, \
+	std_io.c \
+)
+
 SRCS_TERMINAL	= $(addprefix terminal/, \
 	ecma48.c \
 	terminal_string.c \
@@ -60,6 +64,7 @@ SRCS_UI			= $(addprefix ui/, \
 
 SRCS_UTILS		= $(addprefix utils/, \
 	itoa_base.c \
+	atoi.c \
 	memset.c \
 	memcpy.c \
 	memmove.c \
@@ -81,6 +86,7 @@ SRCS= $(addprefix $(SOURCE_DIR)/, \
 	$(SRCS_MATH)			\
 	$(SRCS_READLINE)		\
 	$(SRCS_SHELL)			\
+	$(SRCS_STD_IO)			\
 	$(SRCS_TERMINAL)		\
 	$(SRCS_UI)				\
 	$(SRCS_UTILS)			\
