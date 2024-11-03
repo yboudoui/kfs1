@@ -31,4 +31,7 @@ void    readline_insert(char c);
 void    readline_remove(int nb);
 
 void    readline_buffer_reset(t_readline_buffer* readline_buffer);
+
+void readline(void);
+
 #endif

@@ -52,14 +52,8 @@ int keyboard_handler(void)
 
     scancode = get_key_on_pressed();
     if (scancode) {
-        if (input_handler == NULL) {
-            printf("%p", input_handler);
-        }
         handler_output = input_handler(scancode);
-        if (handler_output) {
-            return handler_output;
-        }
-
+        if (handler_output) return handler_output;
     }
     
     return 0;

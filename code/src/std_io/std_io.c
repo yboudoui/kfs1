@@ -20,6 +20,9 @@ int read(t_stdio_fd fd, char *buffer, size_t size)
         bytes = size;
 
     memcpy(buffer, stdio->std_io[fd], bytes);
+
+    // TODO: memmove before memset remaining size
+    memset(char)(stdio->std_io[fd], 0, STD_IO_BUFFER_SIZE);
     return bytes;
 }
 

@@ -31,6 +31,12 @@ void shell(void)
 	}
 }
 
+int shell_get_character(t_key_scancode key_scancode)
+{
+	shell();
+    return 0;
+}
+
 void shell_init_color(t_vga_color foreground, t_vga_color background)
 {
 	CURRENT_SHELL
