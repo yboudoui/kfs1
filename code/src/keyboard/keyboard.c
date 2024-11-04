@@ -30,18 +30,32 @@ t_fp_input_handler current_keyboard_handler(t_fp_input_handler handler)
 //     return handler(key_scancode);
 // }
 
-t_key_scancode get_key_on_pressed(void)
-{
-    t_key_scancode scancode = get_key_scancode();
 
-    if (scancode & 0x80) {
+t_key_scancode set_keyboard_state(t_key_scancode scancode)
+{
+    if (scancode & 0x80)
+    {
         scancode ^= 0x80;
         keyboard_state[scancode] = KEY_RELEASED;
-    } else if (keyboard_state[scancode] == KEY_RELEASED) {
-        keyboard_state[scancode] = KEY_PRESSED;
-        return scancode;
     }
-    return 0;
+    else {
+        keyboard_state[scancode] = KEY_PRESSED;
+    }
+    return scancode;
+}
+
+t_key_scancode get_key_on_pressed(void)
+{
+    static t_key_scancode last_scancode = 0;
+    t_key_scancode scancode = set_keyboard_state(get_key_scancode());
+
+    if (keyboard_state[scancode] == KEY_RELEASED) {
+        last_scancode = 0;
+        return 0;
+    }
+    if (last_scancode == scancode) return 0;
+    last_scancode = scancode;
+    return scancode;
 }
 
 int keyboard_handler(void)

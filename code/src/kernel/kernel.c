@@ -27,10 +27,13 @@ void kernel_main(void)
 
 	current_shell(&shells[0]);
 
-	while(42)
+	bool stop = false;
+	while(stop == false)
 	{
 		terminal_clear();
-		if (keyboard_handler()) break;
+		if (keyboard_handler()) {
+			stop = true;
+		}
 		readline();
 		terminal_update();
 	}

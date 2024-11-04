@@ -11,23 +11,26 @@ t_stdio* current_stdio(t_stdio* stdio)
     return current_stdio;
 }
 
-int read(t_stdio_fd fd, char *buffer, size_t size)
+int read(int fd, char *buffer, size_t size)
 {
     CURRENT_STDIO
 
-    size_t bytes = strlen(stdio->std_io[fd]);
+    int bytes = strlen(stdio->std_io[fd]);
     if (bytes >= size)
         bytes = size;
 
     memcpy(buffer, stdio->std_io[fd], bytes);
-
+  
     // TODO: memmove before memset remaining size
     memset(char)(stdio->std_io[fd], 0, STD_IO_BUFFER_SIZE);
     return bytes;
 }
 
-int write(t_stdio_fd fd, char *buffer, size_t size)
+int write(int fd, char *buffer, size_t size)
 {
     CURRENT_STDIO
+    // TODO:have to drop the memset
+    memset(char)(stdio->std_io[fd], 0, STD_IO_BUFFER_SIZE);
     memcpy(stdio->std_io[fd], buffer, size);
+    return size;
 }

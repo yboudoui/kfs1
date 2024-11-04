@@ -17,19 +17,23 @@ void    readline_move_cursor(int n)
 {
     CURRENT_READLINE_BUFFER
 
-    int inc = (n > 0) ? -1 : 1;
-    size_t pos = readline_buffer->caret_position;
+    int sign = 1;
+    if (n < 0) {
+        sign = -1;
+        n *= -1;
+    }
+
+    int pos = readline_buffer->caret_position;
 
     // TODO: check limit
-    
-    while (n)
+
+    for (size_t i = 0; i < n; i++)
     {
-        char c = readline_buffer->buffer[pos];
-        int dir = (c == '\t') ? TABSIZE : 1; 
-        readline_buffer->cursor_movement += dir * -inc;
-        n += inc;
-        pos += inc;
-    }
+        char c = readline_buffer->buffer[pos + (sign * i)];
+        int dir = (c == '\t') ? TABSIZE : 1;
+        dir *= sign;
+        readline_buffer->cursor_movement += dir;
+    } 
 }
 
 int     readline_update_caret_position(int n)
@@ -120,30 +124,29 @@ static t_fp_on_ecma48_sequence_type dispatcher[] = {
     [CHARACTER]         = on_character,
     [CURSOR_MOVEMENT]   = on_cursor_mouvement,
 };
- 
+
 void readline(void)
 {
     CURRENT_READLINE_BUFFER
-    readline_buffer->cursor_movement = 0;
 
     t_ecma48_sequence   current_sequence;
     char                read_buffer[STD_IO_BUFFER_SIZE] = {0};
     size_t              read_size;
     char                write_buffer[STD_IO_BUFFER_SIZE] = {0};
     
-    read_size = read(STDIN, read_buffer, STD_IO_BUFFER_SIZE);
+    read_size = read(STD_IN, read_buffer, STD_IO_BUFFER_SIZE);
 
     for (size_t i = 0; i < read_size; i++)
     {
+        current_sequence = (t_ecma48_sequence){0};
         i += parse_sequence(&read_buffer[i], &current_sequence);
         dispatcher[current_sequence.type](current_sequence.data);
     }
 
-
     if (readline_buffer->cursor_movement > 0)
-        dprintf(STDOUT, "%s"CURSOR_MOVE_RIGHT, readline_buffer->buffer, readline_buffer->cursor_movement);
+        dprintf(STD_OUT, "%s"CURSOR_MOVE_RIGHT, readline_buffer->buffer, readline_buffer->cursor_movement);
     else if (readline_buffer->cursor_movement < 0)
-        dprintf(STDOUT, "%s"CURSOR_MOVE_LEFT, readline_buffer->buffer, readline_buffer->cursor_movement);
+        dprintf(STD_OUT, "%s"CURSOR_MOVE_LEFT, readline_buffer->buffer, -readline_buffer->cursor_movement);
     else
-        dprintf(STDOUT, "%s", readline_buffer->buffer);
+        dprintf(STD_OUT, "%s", readline_buffer->buffer);
 }

@@ -30,10 +30,10 @@ static int terminal_input_handler(t_key_scancode key_scancode)
 	    [KEY_LEFT]  = ESCAPE_SEQUENCE CONTROL_SEQUENCE_INTRODUCER "%dD",
 	    NULL,
 	};
-    if(ops[key_scancode])
-        dprintf(STDIN, ops[key_scancode], 1);
+    if(ops[key_scancode] != NULL)
+        dprintf(STD_IN, ops[key_scancode], 1);
     else
-        dprintf(STDIN, "%c", codepage_437[key_scancode]);
+        dprintf(STD_IN, "%c", codepage_437[key_scancode]);
 	return 0;
 }
 

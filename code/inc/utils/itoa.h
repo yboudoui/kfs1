@@ -13,14 +13,27 @@ typedef struct {
 
 int    itoa_base(t_itoa_base base, char *buffer, int nb);
 
+// #define DECLARE_ITOA_BASE(name, base) \
+// inline static int itoa_##name(char *buffer, int nb) { \
+//     if (nb == 0) return 0; \
+//     int place = itoa_##name(buffer, nb / (sizeof(base) - 1)); \
+//     buffer[place] = base[nb % (sizeof(base) - 1)]; \
+//     return 1 + place; \
+// }
 
 #define DECLARE_ITOA_BASE(name, base) \
 inline static int itoa_##name(char *buffer, int nb) { \
-    if (nb == 0) return 0; \
-    int place = itoa_##name(buffer, nb / (sizeof(base) - 1)); \
+    if (nb == 0) { \
+        buffer[0] = base[0]; \
+        return 1; \
+    } \
+    int next = nb / (sizeof(base) - 1); \
+    int place = itoa_##name(buffer, next); \
+    if (next == 0) place -= 1; \
     buffer[place] = base[nb % (sizeof(base) - 1)]; \
     return 1 + place; \
-}
+} \
+
 
 DECLARE_ITOA_BASE(lower_hexa, "0123456789abcdef")
 DECLARE_ITOA_BASE(upper_hexa, "0123456789ABCDEF")

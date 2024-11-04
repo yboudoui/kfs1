@@ -12,7 +12,7 @@
 
 int	wait_user_input(t_key_scancode key_scancode)
 {
-    return 1;
+    return 42;
 }
 
 #include "ui_box.h"

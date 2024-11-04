@@ -19,7 +19,7 @@ int dump_string(char *buffer, va_list *args)
 
 int dump_pointer(char *buffer, va_list *args)
 {
-	unsigned long long	address = va_arg(*args, unsigned long long int);
+	unsigned long int	address = va_arg(*args, unsigned long int);
 
 	if (address == 0) {
 		memcpy(buffer, "0x0", 3);
@@ -32,7 +32,17 @@ int dump_pointer(char *buffer, va_list *args)
 int dump_number(char *buffer, va_list *args)
 {
 	int number = va_arg(*args, int);
-	return (itoa_decimal(buffer, number));
+
+// TODO: Clean this
+	int is_negative = 0;
+	if (number < 0) {
+		number *= -1;
+		buffer[0] = '-';
+		// memcpy(buffer, "-", 1);
+		is_negative = 1;
+	}
+
+	return (itoa_decimal(&buffer[is_negative], number)) + is_negative;
 }
 
 int dump_unsigned_number(char *buffer, va_list *args)
@@ -75,7 +85,7 @@ static const t_fp_dump a[128] = {
 int vdprintf(int fd, const char *str, va_list tab)
 {
 	int		len = 0;
-	char buffer[2048] = {0};
+	char	buffer[2048] = {0};
 
 	if (!str)
 		return (-1);
@@ -106,7 +116,7 @@ int	vsprintf(char* buffer, const char *str, va_list	tab)
 			buffer[len++] = *str++;
 		}
 	}
-	return (write(STDOUT, buffer, len));
+	return (write(STD_OUT, buffer, len));
 }
 
 int dprintf(int fd, const char *str, ...)
@@ -143,11 +153,34 @@ int	printf(const char *str, ...)
 
 	if (!str)
 		return (-1);
-	char buffer[2048] = {0};
-
 
 	va_start(tab, str);
-	len = vsprintf(buffer, str, tab);
+	len = vdprintf(STD_IN, str, tab);
 	va_end(tab);
 	return len;
+}
+
+int	printk(const char *str, ...)
+{
+	va_list	tab;
+	int		len = 0;
+	char	buffer[2048] = {0};
+
+	if (!str)
+		return (-1);
+
+	va_start(tab, str);
+
+	while (*str)
+	{
+		if (str[0] == '%' && str[1][a]) {
+			len += str[1][a](&buffer[len], &tab);
+			str += 2;
+		} else {
+			buffer[len++] = *str++;
+		}
+	}
+	terminal_write(buffer, len);
+	va_end(tab);
+	return (len);
 }

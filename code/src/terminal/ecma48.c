@@ -11,7 +11,7 @@ int parse_sequence(const char* input, t_ecma48_sequence* seq)
         if (input[index] == '[')
         {
             index += 1;
-            int mouvement;
+            int mouvement = 0;
             index += basic_atoi(&mouvement, &input[index]);
 
             (*seq).type = CURSOR_MOVEMENT;
@@ -32,6 +32,7 @@ int parse_sequence(const char* input, t_ecma48_sequence* seq)
             }
             return index;
         }
+
     }
     else
     {
