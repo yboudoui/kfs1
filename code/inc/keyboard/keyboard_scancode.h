@@ -126,5 +126,19 @@ typedef enum {
 } t_key_scancode;
 
 
+  // Synonyme of key Scan Code Set 1
+// #define KEY_DELETE    KEY_NUMPAD_DOTE
+// #define KEY_LEFT      KEY_NUMPAD_4
+// #define KEY_RIGHT     KEY_NUMPAD_6
+// #define KEY_UP        KEY_NUMPAD_8
+
+
+// #define KEY_DOWN      KEY_NUMPAD_2
+// #define KEY_HOME      KEY_NUMPAD_7
+// #define KEY_END       KEY_NUMPAD_1
+// #define KEY_PAGE_UP   KEY_NUMPAD_9
+// #define KEY_PAGE_DOWN KEY_NUMPAD_3
+// #define KEY_IS_NUMBER (KEY_0 | KEY_1 | KEY_2 | KEY_3 | KEY_4 | KEY_5 | KEY_6 | KEY_7 | KEY_8 | KEY_9)
+
 
 #endif

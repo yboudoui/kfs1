@@ -1,6 +1,6 @@
 #include "shell.h"
 
-static t_shell shells[2];
+static t_shell shells[2] = {0};
 
 // int shell_get_character(t_key_scancode key_scancode)
 // {
@@ -28,6 +28,7 @@ void kernel_main(void)
 	current_shell(&shells[0]);
 
 	bool stop = false;
+	
 	while(stop == false)
 	{
 		terminal_clear();

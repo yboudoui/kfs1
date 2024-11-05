@@ -2,7 +2,7 @@
 
 void main(void) 
 {
-	bootloader_screen();
+	// bootloader_screen();
 	kernel_main();
 	return ;
 }

@@ -47,7 +47,13 @@ t_key_scancode set_keyboard_state(t_key_scancode scancode)
 t_key_scancode get_key_on_pressed(void)
 {
     static t_key_scancode last_scancode = 0;
-    t_key_scancode scancode = set_keyboard_state(get_key_scancode());
+    t_key_scancode scancode;
+    
+    scancode = get_key_scancode();
+    if (scancode == 0xE0)
+        scancode = set_keyboard_state(get_key_scancode());
+    else
+        scancode = set_keyboard_state(scancode);
 
     if (keyboard_state[scancode] == KEY_RELEASED) {
         last_scancode = 0;
@@ -61,14 +67,10 @@ t_key_scancode get_key_on_pressed(void)
 int keyboard_handler(void)
 {
     KEYBOARD_HANDLER
-    t_key_scancode  scancode;
-    int             handler_output;
+    int             handler_output = 0;
+    t_key_scancode  scancode = get_key_on_pressed();
 
-    scancode = get_key_on_pressed();
-    if (scancode) {
+    if (scancode) 
         handler_output = input_handler(scancode);
-        if (handler_output) return handler_output;
-    }
-    
-    return 0;
+    return handler_output;
 }

@@ -14,6 +14,9 @@ t_vga_frame* current_vga_frame(t_vga_frame* vga_frame)
 void vga_frame_put_entry_at(t_vga_entry entry, t_vec2 position) 
 {
 	CURRENT_VGA_FRAME
+
+	position.x %= VGA_WIDTH;
+	position.y %= VGA_HEIGHT;
 	size_t index = position.y * VGA_WIDTH + position.x;
 	vga_frame->buffer[index] = entry;
 }
@@ -21,6 +24,7 @@ void vga_frame_put_entry_at(t_vga_entry entry, t_vec2 position)
 void vga_fill(t_vga_entry entry)
 {
 	CURRENT_VGA_FRAME
+
 	memset(t_vga_entry)(vga_frame->buffer, entry,  VGA_MAX_PRINTABLE_CHARACTER);
 }
 

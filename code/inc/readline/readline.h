@@ -9,11 +9,6 @@
 
 #define TABSIZE 4
 
-typedef void (*t_fp_move_cursor_by)(int);
-
-#include "cursor.h"
-static t_fp_move_cursor_by move_cursor = vga_frame_move_cursor_position_by;
-
 typedef struct {
     int     cursor_movement;
     size_t  caret_position;

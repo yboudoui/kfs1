@@ -8,4 +8,5 @@ typedef struct {
 } t_vec2;
 
 t_vec2 vec2_add(t_vec2 a, t_vec2 b);
+void vec2_increment(t_vec2* a, t_vec2 b);
 #endif

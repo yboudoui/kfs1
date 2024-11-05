@@ -33,7 +33,7 @@ void    readline_move_cursor(int n)
         int dir = (c == '\t') ? TABSIZE : 1;
         dir *= sign;
         readline_buffer->cursor_movement += dir;
-    } 
+    }
 }
 
 int     readline_update_caret_position(int n)
@@ -91,9 +91,10 @@ void    readline_buffer_reset(t_readline_buffer* readline_buffer)
 	memset(t_readline_buffer)(readline_buffer, (t_readline_buffer){0}, 1);
 }
 
-void on_character(t_ecma48_sequence_data data)
+void on_character(t_ecma48_sequence* data)
 {
-    switch (data.character)
+    if (data->is_controle) return;
+    switch (data->character)
     {
     case '\b':
         readline_remove(1);
@@ -104,49 +105,38 @@ void on_character(t_ecma48_sequence_data data)
             readline_remove(1);
         break;
     default:
-        readline_insert(data.character);
+        readline_insert(data->character);
         readline_move_cursor(+1);
         break;
     }
 }
 
-void on_cursor_mouvement(t_ecma48_sequence_data data)
+void on_cursor_mouvement(t_ecma48_sequence* data)
 {
-    t_vec2 vec = data.cursor_movement;
+    if (data->is_controle == false) return ;
+    t_vec2 vec = data->cursor_movement;
 
-    readline_update_caret_position(vec.x);
-    readline_move_cursor(vec.x);
+    if(readline_update_caret_position(vec.x))
+        readline_move_cursor(vec.x);
 }
-
-typedef void (*t_fp_on_ecma48_sequence_type)(t_ecma48_sequence_data data);
-
-static t_fp_on_ecma48_sequence_type dispatcher[] = {
-    [CHARACTER]         = on_character,
-    [CURSOR_MOVEMENT]   = on_cursor_mouvement,
-};
 
 void readline(void)
 {
     CURRENT_READLINE_BUFFER
+    readline_buffer->cursor_movement = 0;
 
-    t_ecma48_sequence   current_sequence;
+    t_ecma48_sequence   current_sequence = {0};
     char                read_buffer[STD_IO_BUFFER_SIZE] = {0};
-    size_t              read_size;
-    char                write_buffer[STD_IO_BUFFER_SIZE] = {0};
-    
-    read_size = read(STD_IN, read_buffer, STD_IO_BUFFER_SIZE);
+    size_t              read_size = read(STD_IN, read_buffer, STD_IO_BUFFER_SIZE);
 
     for (size_t i = 0; i < read_size; i++)
     {
-        current_sequence = (t_ecma48_sequence){0};
-        i += parse_sequence(&read_buffer[i], &current_sequence);
-        dispatcher[current_sequence.type](current_sequence.data);
+        i += ecma48_parse_sequence(&read_buffer[i], &current_sequence);
+        on_character(&current_sequence);
+        on_cursor_mouvement(&current_sequence);
     }
-
-    if (readline_buffer->cursor_movement > 0)
-        dprintf(STD_OUT, "%s"CURSOR_MOVE_RIGHT, readline_buffer->buffer, readline_buffer->cursor_movement);
-    else if (readline_buffer->cursor_movement < 0)
-        dprintf(STD_OUT, "%s"CURSOR_MOVE_LEFT, readline_buffer->buffer, -readline_buffer->cursor_movement);
-    else
-        dprintf(STD_OUT, "%s", readline_buffer->buffer);
+    char tmp[64] = {0};
+    if (readline_buffer->cursor_movement)
+        ecma48_move_cursor(tmp, readline_buffer->cursor_movement, 0);
+    dprintf(STD_OUT, "%s%s", readline_buffer->buffer, tmp);
 }

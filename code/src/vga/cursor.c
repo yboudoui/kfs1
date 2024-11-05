@@ -1,14 +1,13 @@
 #include "vga.h"
 #include "hardware_io.h"
 
-
-void vga_disable_cursor(void)
+void    vga_disable_cursor(void)
 {
 	outb(VGA_COMMAND_PORT, 0x0A);
 	outb(VGA_DATA_PORT, 0x20);
 }
 
-void vga_enable_cursor(uint8_t cursor_start, uint8_t cursor_end)
+void    vga_enable_cursor(uint8_t cursor_start, uint8_t cursor_end)
 {
 	outb(VGA_COMMAND_PORT, 0x0A);
 	outb(VGA_DATA_PORT, (inb(VGA_DATA_PORT) & 0xC0) | cursor_start);
@@ -18,8 +17,12 @@ void vga_enable_cursor(uint8_t cursor_start, uint8_t cursor_end)
 }
 
 // Sets the cursor position to (row, col) in the VGA text buffer
-void vga_set_cursor_position(t_vec2 position)
+void    vga_set_cursor_position(t_vec2 position)
 {
+    position.x %= VGA_WIDTH;
+    position.y %= VGA_HEIGHT;
+
+
     // Calculate the linear index in the VGA buffer
     uint16_t linear_position = position.y * VGA_WIDTH + position.x;
 
@@ -32,7 +35,7 @@ void vga_set_cursor_position(t_vec2 position)
     outb(VGA_DATA_PORT, linear_position & 0xFF);  // Low byte
 }
 
-t_vec2 get_cursor_position(void)
+t_vec2  get_cursor_position(void)
 {
     t_vec2 position;
     uint16_t pos = 0;
@@ -48,27 +51,30 @@ t_vec2 get_cursor_position(void)
 }
 
 
-bool vga_frame_move_cursor_up(void)
-{
-    CURRENT_VGA_FRAME
-    if (vga_frame->cursor.y > 0)
-    {
-        vga_frame->cursor.y -= 1;
-        return true;
-    }
-    return false;
-}
 
-bool vga_frame_move_cursor_down(void)
-{
-    CURRENT_VGA_FRAME
-    if (vga_frame->cursor.y < VGA_HEIGHT - 1)
-    {
-        vga_frame->cursor.y += 1;
-        return true;
-    }
-    return false;
-}
+
+
+// bool vga_frame_move_cursor_up(void)
+// {
+//     CURRENT_VGA_FRAME
+//     if (vga_frame->cursor.y > 0)
+//     {
+//         vga_frame->cursor.y -= 1;
+//         return true;
+//     }
+//     return false;
+// }
+
+// bool vga_frame_move_cursor_down(void)
+// {
+//     CURRENT_VGA_FRAME
+//     if (vga_frame->cursor.y < VGA_HEIGHT - 1)
+//     {
+//         vga_frame->cursor.y += 1;
+//         return true;
+//     }
+//     return false;
+// }
 
 void vga_frame_move_cursor_position_by(int n)
 {

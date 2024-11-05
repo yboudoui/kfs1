@@ -7,6 +7,8 @@
 #include <stdint.h>
 #include <stdarg.h>
 
+int abs(int n);
+
 
 size_t  strlen(const char* str);
 
