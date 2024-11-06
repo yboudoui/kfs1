@@ -63,6 +63,7 @@ SRCS_UI			= $(addprefix ui/, \
 )
 
 SRCS_UTILS		= $(addprefix utils/, \
+	buffer.c \
 	abs.c \
 	itoa_base.c \
 	atoi.c \

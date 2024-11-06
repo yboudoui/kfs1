@@ -19,35 +19,20 @@ void terminal_putchar(char c)
 	};
 
 	terminal_putchar_at(position, c);
-	terminal->caret_position += 1;
+	
 }
 
 int terminal_write(const char* data, size_t size)
 {
-	for (size_t i = 0; i < size; i++)
-		terminal_putchar(data[i]);
-	return (size);
-}
-
-int terminal_write_2(const char* data, size_t size)
-{
 	CURRENT_TERMINAL
-
-	t_ecma48_sequence 	seq = {0};
-
-	for (size_t i = 0; i < size; i++)
+	for (size_t i = 0; i <= size; i++)
 	{
-		i += ecma48_parse_sequence(&data[i], &seq);
-		if (seq.is_printable) {
-			terminal_putchar(seq.character);
-		} else {
-			terminal->caret_position -= seq.cursor_movement.x;
-		}
-		vga_frame_move_cursor_position_by(seq.cursor_movement.x);
+		terminal_putchar(data[i]);
+		terminal->caret_position += 1;
 	}
+
 	return (size);
 }
-
 
 void	terminal_put_block_at(size_t size, char* buffer, t_vec2 position)
 {

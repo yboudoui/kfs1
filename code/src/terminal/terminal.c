@@ -46,6 +46,7 @@ void terminal_init(t_vga_entry_color default_color, t_fp_input_handler input_han
 	(*terminal) = (t_terminal){0};
 	terminal->default_color = default_color;
 	terminal->input_handler = terminal_input_handler;
+	vga_fill(vga_entry(' ', default_color));
 	if (input_handler)
 		terminal->input_handler = input_handler;
 }
@@ -57,6 +58,53 @@ void	terminal_update(void)
 
 	read_size = read(STD_OUT, read_buffer, STD_IO_BUFFER_SIZE);
 
-	terminal_write_2(read_buffer, read_size);
+
+	CURRENT_TERMINAL
+
+	t_ecma48_sequence 	seq = {0};
+	size_t index = 0;
+
+	t_buffer vga = {
+		.type_size	= sizeof(t_vga_entry),
+		.data		= terminal->vga_frame.buffer,
+		.len		= VGA_MAX_PRINTABLE_CHARACTER,
+	};
+
+	t_vga_entry default_vga_entry, character;
+	default_vga_entry = vga_entry(' ', terminal->default_color);
+
+	t_buffer fill = {
+		.type_size	= sizeof(t_vga_entry),
+		.len		= 1
+	};
+
+	while (index < read_size)
+	{
+		index += ecma48_parse_sequence(&read_buffer[index], &seq);
+		if (seq.is_printable == true) {
+			character =  vga_entry(seq.character, terminal->default_color);
+			fill.data = &character;
+			buffer_insert(&vga,
+				terminal->caret_position,
+				fill
+			);
+		}
+		if (seq.character == '\b') {
+			fill.data = &default_vga_entry;
+			buffer_remove(&vga,
+				window_from_position(terminal->caret_position, seq.cursor_movement.x),
+				fill);
+		}
+		if (seq.character == '\177') {
+			fill.data = &default_vga_entry;
+			buffer_remove(&vga,
+				window_from_position(terminal->caret_position, 1),
+				fill);
+			continue;
+		}
+		printk("%d ", seq.cursor_movement.x);
+		terminal->caret_position += seq.cursor_movement.x;
+		vga_frame_move_cursor_position_by(seq.cursor_movement.x);
+	}
 	vga_main_frame_update();
 }

@@ -16,6 +16,11 @@ typedef struct s_ecma48_sequence {
     
     char    character;
     t_vec2  cursor_movement;
+
+    struct {
+        int parameters[16];
+        size_t pos;
+    } parameters;
 } t_ecma48_sequence;
 
 int ecma48_parse_sequence(const char* input, t_ecma48_sequence* seq);

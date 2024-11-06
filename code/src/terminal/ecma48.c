@@ -26,8 +26,8 @@ int ecma48_parse_sequence(const char* input, t_ecma48_sequence* seq)
         index += 1;
         if (input[index] == CONTROL_SEQUENCE_INTRODUCER)
         {
-            seq->is_controle = true;
             index += 1;
+            seq->is_controle = true;
             int mouvement;
             index += basic_atoi(&mouvement, &input[index]);
 
@@ -46,18 +46,32 @@ int ecma48_parse_sequence(const char* input, t_ecma48_sequence* seq)
                 seq->cursor_movement.x -= mouvement;
                 break;
             }
-            return index;
+            return index + 1;
         }
     }
     else
     {
-        seq->character = input[index];
-        seq->is_printable = true;
+        if (input[index] == '\b') {
+            seq->is_printable = false;
+            seq->character = input[index];
+            seq->cursor_movement.x -= 1;
+            return 1;
+        }
+        if (input[index] == '\177') {
+            seq->is_printable = false;
+            seq->character = input[index];
+            seq->cursor_movement.x += 1;
+            return 1;
+        }
         if (input[index] == '\t') {
             seq->is_printable = false;
-            // seq->cursor_movement.x += 4;
+            // seq->character = input[index];
+            // seq->cursor_movement.x += 10;
+            return 1;
         }
-        return 0;
+        seq->character = input[index];
+        seq->is_printable = true;
+        return 1;
     }
 }
 

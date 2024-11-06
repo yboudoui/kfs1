@@ -31,7 +31,7 @@ void kernel_main(void)
 	
 	while(stop == false)
 	{
-		terminal_clear();
+		// terminal_clear();
 		if (keyboard_handler()) {
 			stop = true;
 		}

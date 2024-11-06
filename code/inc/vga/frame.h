@@ -2,7 +2,7 @@
 #define VGA_FRAME_H
 
 #include "constant.h"
-#include "memset.h"
+#include "memory.h"
 #include "color.h"
 
 #include <stdint.h>
