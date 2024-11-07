@@ -1,15 +1,5 @@
 #include "atoi.h"
 
-bool    is_digit(int c)
-{
-	return (c >= '0' && c <= '9');
-}
-
-bool    is_space(int c)
-{
-    return (c >= '\t' && c <= '\r') || c == ' ';
-}
-
 int basic_atoi(int* result, const char* buffer)
 {
     int index;

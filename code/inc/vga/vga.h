@@ -9,6 +9,7 @@
 
 typedef struct {
   t_vec2      cursor;
+  // size_t      caret;
   t_vga_entry buffer[VGA_MAX_PRINTABLE_CHARACTER];
 } t_vga_frame;
 

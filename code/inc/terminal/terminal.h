@@ -7,12 +7,16 @@
 #include "ecma48.h"
 #include "std_io.h"
 
+#define TERMINAL_BUFFER_SIZE 512
+#define TABSIZE 4
 
 typedef struct s_terminal {
   t_vga_frame         vga_frame;
   t_vga_entry_color   default_color;
   t_fp_input_handler  input_handler;
   t_stdio             stdio;
+
+  char    buffer[TERMINAL_BUFFER_SIZE];
 
   size_t              caret_position;
 } t_terminal;

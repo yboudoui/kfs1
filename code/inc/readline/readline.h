@@ -7,12 +7,8 @@
 
 #define READLINE_BUFFER_SIZE 1024
 
-#define TABSIZE 4
-
 typedef struct {
-    size_t  caret_position;
-    
-    size_t  size;
+    size_t  size, caret_position;
     char    buffer[READLINE_BUFFER_SIZE];
 } t_readline_buffer;
 

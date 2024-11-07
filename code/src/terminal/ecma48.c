@@ -44,29 +44,7 @@ int ecma48_parse_sequence(const char* input, t_ecma48_sequence* seq)
             return index + 1;
         }
     }
-    else
-    {
-        if (input[index] == '\b') {
-            seq->is_printable = false;
-            seq->character = input[index];
-            seq->cursor_movement.x -= 1;
-            return 1;
-        }
-        if (input[index] == '\177') {
-            seq->is_printable = false;
-            seq->character = input[index];
-            // seq->cursor_movement.x += 1;
-            return 1;
-        }
-        if (input[index] == '\t') {
-            seq->is_printable = false;
-            seq->character = input[index];
-            // seq->cursor_movement.x += 10;
-            return 1;
-        }
-        seq->character = input[index];
-        seq->is_printable = true;
-        return 1;
-    }
+    seq->character = input[index];
+    return 1;
 }
 

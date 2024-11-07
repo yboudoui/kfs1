@@ -51,18 +51,30 @@ void terminal_init(t_vga_entry_color default_color, t_fp_input_handler input_han
 		terminal->input_handler = input_handler;
 }
 
+
+DECLARE_BUFFER_INSERT(t_vga_entry)
+DECLARE_BUFFER_REMOVE(t_vga_entry)
+DECLARE_BUFFER_INSERT(char)
+DECLARE_BUFFER_REMOVE(char)
+
+
 void	terminal_update(void)
 {
 	char	read_buffer[STD_IO_BUFFER_SIZE] = {0};
     size_t	read_size = read(STD_OUT, read_buffer, STD_IO_BUFFER_SIZE);
+
 
 	CURRENT_TERMINAL
 
 	t_ecma48_sequence 	seq = {0};
 	size_t index = 0;
 
+	t_buffer buffer = {
+		.data		= terminal->buffer,
+		.len		= TERMINAL_BUFFER_SIZE,
+	};
+
 	t_buffer vga = {
-		.type_size	= sizeof(t_vga_entry),
 		.data		= terminal->vga_frame.buffer,
 		.len		= VGA_MAX_PRINTABLE_CHARACTER,
 	};
@@ -71,38 +83,90 @@ void	terminal_update(void)
 	default_vga_entry = vga_entry(' ', terminal->default_color);
 
 	t_buffer fill = {
-		.type_size	= sizeof(t_vga_entry),
 		.len		= 1
 	};
 
 	while (index < read_size)
 	{
 		index += ecma48_parse_sequence(&read_buffer[index], &seq);
-		if (seq.is_printable == true)
-		{
-			character =  vga_entry(seq.character, terminal->default_color);
-			fill.data = &character;
-			buffer_insert(&vga,
-				terminal->caret_position,
-				fill
-			);
+
+		if (seq.is_controle) {
+			terminal->caret_position += seq.cursor_movement.x;
+			vga_frame_move_cursor_position_by(seq.cursor_movement.x);
+			continue;
 		}
-		if (seq.character == '\b')
+
+		switch (seq.character)
 		{
-			fill.data = &default_vga_entry;
-			buffer_remove(&vga,
-				window_from_position(terminal->caret_position, seq.cursor_movement.x),
-				fill);
+			case '\t':
+				character =  vga_entry(seq.character, terminal->default_color);
+				fill.data = &character;
+				m_buffer_insert(t_vga_entry)(
+					&vga,
+					terminal->caret_position,
+					fill
+				);
+				m_buffer_insert(char)(
+					&buffer,
+					terminal->caret_position,
+					(t_buffer){"\t", 1}
+				);
+
+				terminal->caret_position += 1;
+				vga_frame_move_cursor_position_by(+TABSIZE);
+				break;
+			case '\b':
+				if (terminal->caret_position <= 0)
+					break;
+				int len = -1;
+				if (terminal->buffer[terminal->caret_position - 1] == '\t')
+					len = -TABSIZE;
+				fill.data = &default_vga_entry;
+
+				m_buffer_remove(t_vga_entry)(
+					&vga,
+					window_from_position(terminal->caret_position, len),
+					fill
+				);
+				m_buffer_remove(char)(
+					&buffer,
+					window_from_position(terminal->caret_position, -1),
+					(t_buffer){" ", 1}
+				);
+
+				terminal->caret_position -= 1;
+				vga_frame_move_cursor_position_by(len);
+				break;
+			case '\177':
+				fill.data = &default_vga_entry;
+				m_buffer_remove(t_vga_entry)(
+					&vga,
+					window_from_position(terminal->caret_position, 1),
+					fill
+				);
+				m_buffer_remove(char)(
+					&buffer,
+					window_from_position(terminal->caret_position, -1),
+					(t_buffer){" ", 1}
+				);
+				break;
+			default:
+				character =  vga_entry(seq.character, terminal->default_color);
+				fill.data = &character;
+				m_buffer_insert(t_vga_entry)(
+					&vga,
+					terminal->caret_position,
+					fill
+				);
+				m_buffer_insert(char)(
+					&buffer,
+					terminal->caret_position,
+					(t_buffer){(char[]){seq.character}, 1}
+				);
+				terminal->caret_position += 1;
+				vga_frame_move_cursor_position_by(+1);
+				break;
 		}
-		if (seq.character == '\177')
-		{
-			fill.data = &default_vga_entry;
-			buffer_remove(&vga,
-				window_from_position(terminal->caret_position, 1),
-				fill);
-		}
-		terminal->caret_position += seq.cursor_movement.x;
-		vga_frame_move_cursor_position_by(seq.cursor_movement.x);
 	}
 	vga_main_frame_update();
 }

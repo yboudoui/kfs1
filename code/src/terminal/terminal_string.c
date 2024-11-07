@@ -17,9 +17,7 @@ void terminal_putchar(char c)
 		.x = terminal->caret_position % VGA_WIDTH,
 		.y = terminal->caret_position / VGA_WIDTH,
 	};
-
 	terminal_putchar_at(position, c);
-	
 }
 
 int terminal_write(const char* data, size_t size)

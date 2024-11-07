@@ -29,6 +29,8 @@ int     readline_update_caret_position(int n)
     return (old_position - new_position);
 }
 
+DECLARE_MEMMOVE(char)
+
 void    readline_insert(char c)
 {
     CURRENT_READLINE_BUFFER
@@ -36,7 +38,7 @@ void    readline_insert(char c)
     char*   buffer      = readline_buffer->buffer;
     size_t  position    = readline_buffer->caret_position;
 
-    memmove(
+    memmove(char)(
         &buffer[position + 1],
         &buffer[position],
         readline_buffer->size - position + 1
@@ -51,10 +53,11 @@ void    readline_remove(int nb)
 {
     CURRENT_READLINE_BUFFER
 
+    if (readline_buffer->caret_position <= 0) return;
     char*   buffer      = readline_buffer->buffer;
     size_t  position    = readline_buffer->caret_position;
 
-    memmove(
+    memmove(char)(
         &buffer[position - nb],
         &buffer[position],
         readline_buffer->size - position + 1
@@ -68,9 +71,29 @@ void    readline_buffer_reset(t_readline_buffer* readline_buffer)
 	memset(t_readline_buffer)(readline_buffer, (t_readline_buffer){0}, 1);
 }
 
+
+// void on_backspace(int fd, char c)
+// {
+//     readline_remove(1);
+//     dprintf(fd, "%c", '\b');
+// }
+
+// void on_delete(int fd, char c)
+// {
+//     if (readline_update_caret_position(+1)){
+//         readline_remove(1);
+//         dprintf(fd, "%c", '\177');
+//     }
+// }
+
+// void on_default(int fd, char c)
+// {
+//     readline_insert(c);
+//     dprintf(fd, "%c", c);
+// }
+
 void on_character(int fd, t_ecma48_sequence* data)
 {
-    CURRENT_READLINE_BUFFER
     if (data->is_controle) {
         t_vec2 vec = data->cursor_movement;
 
@@ -81,30 +104,20 @@ void on_character(int fd, t_ecma48_sequence* data)
 
     switch (data->character)
     {
-    case '\b':
-        readline_remove(1);
-        if (readline_buffer->buffer[readline_buffer->caret_position] == '\t')
-            dprintf(fd, "%s", "\b\b\b\b");
-        else
-            dprintf(fd, "%s", "\b");
-        break;
-    case '\177':
-        if (readline_update_caret_position(+1)){
+        case '\b':
             readline_remove(1);
-            dprintf(fd, "%s", "\177");
-        }
-        break;
-    case '\t':
-        // printk("k");
-        readline_insert(data->character);
-        // dprintf(fd, "PPPP");
-        ecma48_move_cursor(fd, +TABSIZE, 0);
-        break;
-    default:
-        readline_insert(data->character);
-        dprintf(fd, "%c", data->character);
-        ecma48_move_cursor(fd, +1, 0);
-        break;
+            dprintf(fd, "%c", '\b');
+            break;
+        case '\177':
+            if (readline_update_caret_position(+1)){
+                readline_remove(1);
+                dprintf(fd, "%c", '\177');
+            }
+            break;
+        default:
+            readline_insert(data->character);
+            dprintf(fd, "%c", data->character);
+            break;
     }
 }
 
