@@ -54,10 +54,7 @@ void terminal_init(t_vga_entry_color default_color, t_fp_input_handler input_han
 void	terminal_update(void)
 {
 	char	read_buffer[STD_IO_BUFFER_SIZE] = {0};
-    size_t	read_size;
-
-	read_size = read(STD_OUT, read_buffer, STD_IO_BUFFER_SIZE);
-
+    size_t	read_size = read(STD_OUT, read_buffer, STD_IO_BUFFER_SIZE);
 
 	CURRENT_TERMINAL
 
@@ -81,7 +78,8 @@ void	terminal_update(void)
 	while (index < read_size)
 	{
 		index += ecma48_parse_sequence(&read_buffer[index], &seq);
-		if (seq.is_printable == true) {
+		if (seq.is_printable == true)
+		{
 			character =  vga_entry(seq.character, terminal->default_color);
 			fill.data = &character;
 			buffer_insert(&vga,
@@ -89,20 +87,20 @@ void	terminal_update(void)
 				fill
 			);
 		}
-		if (seq.character == '\b') {
+		if (seq.character == '\b')
+		{
 			fill.data = &default_vga_entry;
 			buffer_remove(&vga,
 				window_from_position(terminal->caret_position, seq.cursor_movement.x),
 				fill);
 		}
-		if (seq.character == '\177') {
+		if (seq.character == '\177')
+		{
 			fill.data = &default_vga_entry;
 			buffer_remove(&vga,
 				window_from_position(terminal->caret_position, 1),
 				fill);
-			continue;
 		}
-		printk("%d ", seq.cursor_movement.x);
 		terminal->caret_position += seq.cursor_movement.x;
 		vga_frame_move_cursor_position_by(seq.cursor_movement.x);
 	}

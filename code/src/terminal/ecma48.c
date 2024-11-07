@@ -3,17 +3,12 @@
 
 #include "utils.h"
 
-int ecma48_move_cursor(char* buffer, int x, int y)
+int ecma48_move_cursor(int fd, int x, int y)
 {
-    int index = 0;
-
-    if (buffer == NULL) return index;
-
     if (y)
-        index += sprintf(&buffer[index], "\033[%d%c", abs(y), (y < 0) ? 'A' : 'B');
+        dprintf(fd, "\033[%d%c", abs(y), (y < 0) ? 'A' : 'B');
     if (x)
-        index += sprintf(&buffer[index], "\033[%d%c", abs(x), (x < 0) ? 'D' : 'C');
-    return index;
+        dprintf(fd, "\033[%d%c", abs(x), (x < 0) ? 'D' : 'C');
 }
 
 int ecma48_parse_sequence(const char* input, t_ecma48_sequence* seq)
@@ -60,12 +55,12 @@ int ecma48_parse_sequence(const char* input, t_ecma48_sequence* seq)
         if (input[index] == '\177') {
             seq->is_printable = false;
             seq->character = input[index];
-            seq->cursor_movement.x += 1;
+            // seq->cursor_movement.x += 1;
             return 1;
         }
         if (input[index] == '\t') {
             seq->is_printable = false;
-            // seq->character = input[index];
+            seq->character = input[index];
             // seq->cursor_movement.x += 10;
             return 1;
         }

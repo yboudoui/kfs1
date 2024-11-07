@@ -9,8 +9,13 @@
 #define STD_IN  1
 #define STD_ERR 2
 
+typedef struct s_io {
+  char    buffer[STD_IO_BUFFER_SIZE];
+  size_t  caret;
+} t_io;
+
 typedef struct s_stdio {
-  char std_io[3][STD_IO_BUFFER_SIZE];
+  t_io fds[3];
 } t_stdio;
 
 t_stdio* current_stdio(t_stdio* stdio);

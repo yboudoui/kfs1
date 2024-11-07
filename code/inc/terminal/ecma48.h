@@ -25,6 +25,6 @@ typedef struct s_ecma48_sequence {
 
 int ecma48_parse_sequence(const char* input, t_ecma48_sequence* seq);
 
-int ecma48_move_cursor(char* buffer, int x, int y);
+int ecma48_move_cursor(int fd, int x, int y);
 
 #endif

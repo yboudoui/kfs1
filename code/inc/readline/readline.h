@@ -10,7 +10,6 @@
 #define TABSIZE 4
 
 typedef struct {
-    int     cursor_movement;
     size_t  caret_position;
     
     size_t  size;

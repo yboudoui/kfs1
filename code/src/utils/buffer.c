@@ -17,6 +17,7 @@ void  buffer_remove(t_buffer* src, t_window window, const t_buffer fill)
     if (window.start > window.end) return ;
     if (src->type_size != fill.type_size) return;
     
+    size_t          win_size;
     size_t          type_size;
     size_t          len, fill_len;
     unsigned char   *buffer, *fill_buffer;
@@ -28,6 +29,7 @@ void  buffer_remove(t_buffer* src, t_window window, const t_buffer fill)
     window.end      = type_size * window.end;
     fill_buffer     = fill.data;
     fill_len        = type_size * fill.len;
+    win_size        = window_size(window);
 
     memmove(
         buffer + window.start,
@@ -35,7 +37,7 @@ void  buffer_remove(t_buffer* src, t_window window, const t_buffer fill)
         len - window.end);
 
     size_t index_fill = 0;
-    size_t index = (len - window_size(window));
+    size_t index = (len - win_size);
 
     while (index < len)
     {
@@ -44,6 +46,7 @@ void  buffer_remove(t_buffer* src, t_window window, const t_buffer fill)
         index_fill  += 1;
         index       += 1;
     }
+    src->len -= win_size;
 }
 
 void  buffer_insert(t_buffer* src, size_t position, const t_buffer fill)
@@ -72,9 +75,10 @@ void  buffer_insert(t_buffer* src, size_t position, const t_buffer fill)
 
     while (index < position + fill_len)
     {
-        index_fill %= fill_len;
-        buffer[index] = fill_buffer[index_fill];
-        index_fill  += 1;
-        index       += 1;
+        index_fill      %= fill_len;
+        buffer[index]   = fill_buffer[index_fill];
+        index_fill      += 1;
+        index           += 1;
     }
+    src->len += fill.len;
 }

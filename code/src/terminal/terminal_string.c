@@ -30,7 +30,6 @@ int terminal_write(const char* data, size_t size)
 		terminal_putchar(data[i]);
 		terminal->caret_position += 1;
 	}
-
 	return (size);
 }
 
