@@ -1,5 +1,6 @@
 #include "vga.h"
 #include "hardware_io.h"
+#include "buffer.h"
 
 void    vga_disable_cursor(void)
 {
@@ -52,29 +53,8 @@ t_vec2  get_cursor_position(void)
 
 
 
-
-
-// bool vga_frame_move_cursor_up(void)
-// {
-//     CURRENT_VGA_FRAME
-//     if (vga_frame->cursor.y > 0)
-//     {
-//         vga_frame->cursor.y -= 1;
-//         return true;
-//     }
-//     return false;
-// }
-
-// bool vga_frame_move_cursor_down(void)
-// {
-//     CURRENT_VGA_FRAME
-//     if (vga_frame->cursor.y < VGA_HEIGHT - 1)
-//     {
-//         vga_frame->cursor.y += 1;
-//         return true;
-//     }
-//     return false;
-// }
+DECLARE_BUFFER_INSERT(t_vga_entry)
+DECLARE_BUFFER_REMOVE(t_vga_entry)
 
 void vga_frame_move_cursor_position_by(int n)
 {
@@ -87,4 +67,32 @@ void vga_frame_move_cursor_position_by(int n)
     if (position > VGA_WIDTH)
         position = VGA_WIDTH;
     vga_frame->cursor.x = position;
+}
+
+void vga_frame_remove(int nb, t_vga_entry default_entry)
+{
+    CURRENT_VGA_FRAME
+
+	t_buffer vga = {
+		.data		= vga_frame->buffer,
+		.len		= VGA_MAX_PRINTABLE_CHARACTER,
+	};
+
+    m_buffer_remove(t_vga_entry)(
+        &vga,
+        window_from_position(vga_frame->cursor.x, nb),
+        (t_buffer){1, &default_entry}
+    );
+}
+
+void vga_frame_put_entry(t_vga_entry entry)
+{
+    CURRENT_VGA_FRAME
+
+	t_buffer vga = {
+		.data		= vga_frame->buffer,
+		.len		= VGA_MAX_PRINTABLE_CHARACTER,
+	};
+
+    m_buffer_insert_one(t_vga_entry)(&vga, vga_frame->cursor.x, entry);
 }

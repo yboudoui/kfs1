@@ -28,6 +28,6 @@ static type* memmove_##type(void *dest, const void *src, size_t n) {        \
 
 #define memmove(type) memmove_##type
 
-DECLARE_MEMSET(char)
+// DECLARE_MEMSET(char)
 
 #endif

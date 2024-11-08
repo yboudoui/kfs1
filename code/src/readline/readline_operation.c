@@ -9,6 +9,7 @@ t_readline_buffer* current_readline_buffer(t_readline_buffer* readline_buffer)
 
 	if (readline_buffer != NULL) {
 		current_readline_buffer = readline_buffer;
+        current_readline_buffer->buffer.len = READLINE_BUFFER_SIZE;
 	}
 	return current_readline_buffer;
 };
@@ -22,114 +23,78 @@ int     readline_update_caret_position(int n)
 
     if (new_position < 0)
         new_position = 0;
-    if (new_position > readline_buffer->size)
-        new_position = readline_buffer->size;
+    if (new_position > readline_buffer->buffer.len)
+        new_position = readline_buffer->buffer.len;
 
     readline_buffer->caret_position = new_position;
     return (old_position - new_position);
 }
 
-DECLARE_MEMMOVE(char)
-
-void    readline_insert(char c)
-{
-    CURRENT_READLINE_BUFFER
-
-    char*   buffer      = readline_buffer->buffer;
-    size_t  position    = readline_buffer->caret_position;
-
-    memmove(char)(
-        &buffer[position + 1],
-        &buffer[position],
-        readline_buffer->size - position + 1
-    );
-
-    buffer[position] = c;
-    readline_buffer->size += 1;
-    readline_update_caret_position(+1);
-}
-
-void    readline_remove(int nb)
-{
-    CURRENT_READLINE_BUFFER
-
-    if (readline_buffer->caret_position <= 0) return;
-    char*   buffer      = readline_buffer->buffer;
-    size_t  position    = readline_buffer->caret_position;
-
-    memmove(char)(
-        &buffer[position - nb],
-        &buffer[position],
-        readline_buffer->size - position + 1
-    );
-    readline_buffer->size -= nb;
-    readline_update_caret_position(-nb);
-}
+DECLARE_BUFFER_INSERT(char)
+DECLARE_BUFFER_REMOVE(char)
 
 void    readline_buffer_reset(t_readline_buffer* readline_buffer)
 {
 	memset(t_readline_buffer)(readline_buffer, (t_readline_buffer){0}, 1);
 }
 
+int fd = STD_OUT;
 
-// void on_backspace(int fd, char c)
-// {
-//     readline_remove(1);
-//     dprintf(fd, "%c", '\b');
-// }
-
-// void on_delete(int fd, char c)
-// {
-//     if (readline_update_caret_position(+1)){
-//         readline_remove(1);
-//         dprintf(fd, "%c", '\177');
-//     }
-// }
-
-// void on_default(int fd, char c)
-// {
-//     readline_insert(c);
-//     dprintf(fd, "%c", c);
-// }
-
-void on_character(int fd, t_ecma48_sequence* data)
+static void on_backspace(char c)
 {
-    if (data->is_controle) {
-        t_vec2 vec = data->cursor_movement;
+    CURRENT_READLINE_BUFFER
+    if (readline_buffer->caret_position <= 0) return;
 
-        if(readline_update_caret_position(vec.x))
-            ecma48_move_cursor(fd, vec.x, 0);
-        return;
-    };
-
-    switch (data->character)
-    {
-        case '\b':
-            readline_remove(1);
-            dprintf(fd, "%c", '\b');
-            break;
-        case '\177':
-            if (readline_update_caret_position(+1)){
-                readline_remove(1);
-                dprintf(fd, "%c", '\177');
-            }
-            break;
-        default:
-            readline_insert(data->character);
-            dprintf(fd, "%c", data->character);
-            break;
-    }
+    m_buffer_remove(char)(
+        &readline_buffer->buffer,
+        window_from_position(readline_buffer->caret_position, -1),
+        (t_buffer){1, " "}
+    );
+    readline_update_caret_position(-1);
+    dprintf(fd, "%c", c);
 }
+
+static void on_delete(char c)
+{
+    CURRENT_READLINE_BUFFER
+    if (readline_buffer->caret_position <= 0) return;
+
+    m_buffer_remove(char)(
+        &readline_buffer->buffer,
+        window_from_position(readline_buffer->caret_position, 1),
+        (t_buffer){1, " "}
+    );
+    dprintf(fd, "%c", c);
+}
+
+static void on_default(char c)
+{
+    CURRENT_READLINE_BUFFER
+
+    m_buffer_insert_one(char)(&readline_buffer->buffer, readline_buffer->caret_position, c);
+    readline_update_caret_position(+1);
+    dprintf(fd, "%c", c);
+
+}
+
+static void on_cursor_mouvement(t_vec2 mouvement)
+{
+    if(readline_update_caret_position(mouvement.x))
+        ecma48_move_cursor(fd, mouvement.x, 0);
+}
+
+static t_ecma48_handlers handlers = {
+    .on_cursor_mouvement = on_cursor_mouvement,
+    .default_char_handler = on_default,
+    .char_handlers = {
+        ['\b']      = on_backspace,
+        ['\177']    = on_delete, 
+    }
+};
 
 void readline(void)
 {
-    t_ecma48_sequence   current_sequence = {0};
     char                read_buffer[STD_IO_BUFFER_SIZE] = {0};
     size_t              read_size = read(STD_IN, read_buffer, STD_IO_BUFFER_SIZE);
-
-    for (size_t i = 0; i < read_size; i++)
-    {
-        i += ecma48_parse_sequence(&read_buffer[i], &current_sequence);
-        on_character(STD_OUT, &current_sequence);
-    }
+    for (size_t i = 0; i < read_size; i += ecma48_hooks(&read_buffer[i], &handlers));
 }

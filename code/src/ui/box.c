@@ -3,6 +3,9 @@
 #include "utils.h"
 #include "terminal.h"
 
+DECLARE_MEMSET(char)
+
+
 static void dump_line(char** buffer, size_t size, char border_set[3])
 {
     (*buffer)[0] = border_set[0];

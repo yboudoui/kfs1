@@ -16,7 +16,7 @@ typedef struct s_terminal {
   t_fp_input_handler  input_handler;
   t_stdio             stdio;
 
-  char    buffer[TERMINAL_BUFFER_SIZE];
+  DECLARE_BUFFER_TYPE(char, TERMINAL_BUFFER_SIZE) buffer;
 
   size_t              caret_position;
 } t_terminal;

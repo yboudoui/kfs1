@@ -11,10 +11,9 @@ int ecma48_move_cursor(int fd, int x, int y)
         dprintf(fd, "\033[%d%c", abs(x), (x < 0) ? 'D' : 'C');
 }
 
-int ecma48_parse_sequence(const char* input, t_ecma48_sequence* seq)
+int ecma48_hooks(const char* input, t_ecma48_handlers* handlers)
 {
     int index = 0;
-    (*seq) = (t_ecma48_sequence){0};
 
     if (input[index] == ESCAPE_SEQUENCE)
     {
@@ -22,29 +21,30 @@ int ecma48_parse_sequence(const char* input, t_ecma48_sequence* seq)
         if (input[index] == CONTROL_SEQUENCE_INTRODUCER)
         {
             index += 1;
-            seq->is_controle = true;
             int mouvement;
             index += basic_atoi(&mouvement, &input[index]);
 
             switch (input[index])
             {
             case 'A':
-                seq->cursor_movement.y -= mouvement;
+                handlers->on_cursor_mouvement((t_vec2){.x = 0, .y = -mouvement});
                 break;
             case 'B':
-                seq->cursor_movement.y += mouvement;
+                handlers->on_cursor_mouvement((t_vec2){.x = 0, .y = +mouvement});
                 break;
             case 'C':
-                seq->cursor_movement.x += mouvement;
+                handlers->on_cursor_mouvement((t_vec2){.x = +mouvement, .y = 0});
                 break;
             case 'D':
-                seq->cursor_movement.x -= mouvement;
+                handlers->on_cursor_mouvement((t_vec2){.x = -mouvement, .y = 0});
                 break;
             }
             return index + 1;
         }
     }
-    seq->character = input[index];
+    char c = input[index];
+    t_fp_ecma48_char_handler char_handler = handlers->char_handlers[c];
+    if (char_handler) char_handler(c);
+    else if (handlers->default_char_handler) handlers->default_char_handler(c);
     return 1;
 }
-

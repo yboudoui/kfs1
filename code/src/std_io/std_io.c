@@ -1,6 +1,7 @@
 #include "std_io.h"
 #include "utils.h"
 
+DECLARE_MEMSET(char)
 t_stdio* current_stdio(t_stdio* stdio)
 {
     static t_stdio* current_stdio = NULL;
