@@ -46,10 +46,8 @@ void terminal_init(t_vga_entry_color default_color, t_fp_input_handler input_han
 
 	(*terminal) = (t_terminal){0};
 	terminal->default_color = default_color;
-	terminal->input_handler = terminal_input_handler;
+	terminal->input_handler = input_handler ? input_handler : terminal_input_handler;
 	vga_fill(vga_entry(' ', default_color));
-	if (input_handler)
-		terminal->input_handler = input_handler;
 }
 
 
@@ -59,24 +57,18 @@ DECLARE_BUFFER_REMOVE(char)
 static void on_backspace(char c)
 {
 	CURRENT_TERMINAL
-
-	t_vga_entry default_vga_entry = vga_entry(' ', terminal->default_color);
-
-
 	if (terminal->caret_position <= 0) return;
 
-	int len = -1;
-	if (terminal->buffer.data[terminal->caret_position - 1] == '\t')
-		len = -TABSIZE;
+	int len = (terminal->buffer.data[terminal->caret_position - 1] == '\t') ? -TABSIZE : -1;
 
-	vga_frame_remove(len, default_vga_entry);
 	m_buffer_remove(char)(
 		&terminal->buffer,
-		window_from_position(terminal->caret_position, -1),
-		(t_buffer){1, " "}
+		window_from_position(terminal->caret_position, 1),
+		(t_buffer){1, 0, " "}
 	);
-
 	terminal->caret_position -= 1;
+
+	vga_frame_remove(len, vga_entry(' ', terminal->default_color));
 	vga_frame_move_cursor_position_by(len);
 }
 
@@ -84,48 +76,80 @@ static void on_delete(char c)
 {
 	CURRENT_TERMINAL
 
-	t_vga_entry default_vga_entry = vga_entry(' ', terminal->default_color);
+	int len = (terminal->buffer.data[terminal->caret_position] == '\t') ? TABSIZE : 1;
 
-	vga_frame_remove(1, default_vga_entry);
 	m_buffer_remove(char)(
 		&terminal->buffer,
-		window_from_position(terminal->caret_position, -1),
-		(t_buffer){1, " "}
+		window_from_position(terminal->caret_position, 1),
+		(t_buffer){1, 0, " "}
 	);
+
+	vga_frame_remove(len, vga_entry(' ', terminal->default_color));
 }
 
 static void on_default(char c)
 {
 	CURRENT_TERMINAL
 
-	m_buffer_insert_one(char)(&terminal->buffer, terminal->caret_position, c);
+	t_buffer buffer = {TERMINAL_BUFFER_SIZE, terminal->buffer.size, terminal->buffer.data};
+	m_buffer_insert_one(char)(&buffer, terminal->caret_position, c);
+	terminal->buffer.size = buffer.size;
 	terminal->caret_position += 1;
-	int move_by = +1;
-	if (c == '\t') move_by = +TABSIZE;
-	else vga_frame_put_entry(vga_entry(c, terminal->default_color));
-	vga_frame_move_cursor_position_by(move_by);
+
+	if (c == '\t') {
+		for (size_t i = 0; i < TABSIZE; i++)
+			vga_frame_put_entry(vga_entry(' ', terminal->default_color));
+		vga_frame_move_cursor_position_by(+TABSIZE);
+	}
+	else {
+		vga_frame_put_entry(vga_entry(c, terminal->default_color));
+		vga_frame_move_cursor_position_by(+1);
+	}
+}
+
+static void on_enter(char c)
+{
+}
+
+static bool loot_at(int nb, char c)
+{
+	CURRENT_TERMINAL
+	return terminal->buffer.data[terminal->caret_position + nb] == c;
 }
 
 static void on_cursor_mouvement(t_vec2 mouvement)
 {
 	CURRENT_TERMINAL
+
+	if (terminal->caret_position == terminal->buffer.size && mouvement.x > 0) return;
+
+    int sign = (mouvement.x < 0) ? -1 : 1;
+	int len = mouvement.x * sign;
+
+    // TODO: check limit
+    for (size_t i = 0; i < len; i++)
+    {
+		int index = (sign * i);
+		index -= (sign < 0);
+		vga_frame_move_cursor_position_by(sign * (loot_at(index, '\t') ? TABSIZE : 1));
+    }
 	terminal->caret_position += mouvement.x;
-	vga_frame_move_cursor_position_by(mouvement.x);
 }
 
-static t_ecma48_handlers handlers = {
-    .on_cursor_mouvement = on_cursor_mouvement,
-    .default_char_handler = on_default,
-    .char_handlers = {
-        ['\b']      = on_backspace,
-        ['\177']    = on_delete, 
-    }
-};
 
 void	terminal_update(void)
 {
+	static t_ecma48_handlers handlers = {
+		.on_cursor_mouvement	= on_cursor_mouvement,
+		.default_char_handler	= on_default,
+		.char_handlers = {
+			['\b']      		= on_backspace,
+			['\177']    		= on_delete,
+			['\n']				= on_enter,
+		}
+	};
     char                read_buffer[STD_IO_BUFFER_SIZE] = {0};
     size_t              read_size = read(STD_OUT, read_buffer, STD_IO_BUFFER_SIZE);
-    for (size_t i = 0; i < read_size; i += ecma48_hooks(&read_buffer[i], &handlers));
+    for (size_t i = 0; i < read_size; i+= ecma48_hooks(&read_buffer[i], &handlers));
 	vga_main_frame_update();
 }

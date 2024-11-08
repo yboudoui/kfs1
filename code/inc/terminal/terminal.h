@@ -14,11 +14,12 @@ typedef struct s_terminal {
   t_vga_frame         vga_frame;
   t_vga_entry_color   default_color;
   t_fp_input_handler  input_handler;
+  size_t              caret_position;
+  
   t_stdio             stdio;
 
   DECLARE_BUFFER_TYPE(char, TERMINAL_BUFFER_SIZE) buffer;
 
-  size_t              caret_position;
 } t_terminal;
 
 t_terminal* current_terminal(t_terminal* frame);

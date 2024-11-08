@@ -15,22 +15,6 @@ t_shell* current_shell(t_shell* shell)
 	return current_shell;
 }
 
-// void shell(void)
-// {
-// 	CURRENT_SHELL
-// 	t_readline_buffer*		tmp = NULL;
-
-// 	size_t start = shell->scroll_index;
-// 	size_t end = start + VGA_HEIGHT;
-
-// 	while (start < end)
-// 	{
-// 		tmp = &shell->readline_buffer[start % TERMINAL_READLINE_BUFFER_SIZE];
-// 		terminal_write(tmp->buffer, tmp->size);
-// 		start += 1;
-// 	}
-// }
-
 void shell_init_color(t_vga_color foreground, t_vga_color background)
 {
 	terminal_init(

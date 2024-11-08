@@ -9,7 +9,7 @@
 
 typedef struct {
   t_vec2      cursor;
-  // size_t      caret;
+  size_t      caret;
   // t_vga_entry_color   default_color;
   t_vga_entry         buffer[VGA_MAX_PRINTABLE_CHARACTER];
 } t_vga_frame;
@@ -27,5 +27,9 @@ void vga_frame_put_entry(t_vga_entry entry);
 void vga_frame_remove(int nb, t_vga_entry default_entry);
 
 // void vga_frame_putchar(char c);
+void vga_frame_update_caret(void);
+
+bool vga_frame_next_line(void);
+
 
 #endif

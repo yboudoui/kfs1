@@ -56,6 +56,12 @@ t_vec2  get_cursor_position(void)
 DECLARE_BUFFER_INSERT(t_vga_entry)
 DECLARE_BUFFER_REMOVE(t_vga_entry)
 
+void vga_frame_update_caret(void)
+{
+    CURRENT_VGA_FRAME
+    vga_frame->caret = vga_frame->cursor.y * VGA_WIDTH + vga_frame->cursor.x;
+}
+
 void vga_frame_move_cursor_position_by(int n)
 {
     CURRENT_VGA_FRAME
@@ -67,6 +73,7 @@ void vga_frame_move_cursor_position_by(int n)
     if (position > VGA_WIDTH)
         position = VGA_WIDTH;
     vga_frame->cursor.x = position;
+    vga_frame_update_caret();
 }
 
 void vga_frame_remove(int nb, t_vga_entry default_entry)
@@ -81,7 +88,7 @@ void vga_frame_remove(int nb, t_vga_entry default_entry)
     m_buffer_remove(t_vga_entry)(
         &vga,
         window_from_position(vga_frame->cursor.x, nb),
-        (t_buffer){1, &default_entry}
+        (t_buffer){1, 0, &default_entry}
     );
 }
 
@@ -94,5 +101,41 @@ void vga_frame_put_entry(t_vga_entry entry)
 		.len		= VGA_MAX_PRINTABLE_CHARACTER,
 	};
 
-    m_buffer_insert_one(t_vga_entry)(&vga, vga_frame->cursor.x, entry);
+    m_buffer_insert_one(t_vga_entry)(&vga, vga_frame->caret, entry);
+}
+
+bool vga_frame_next_line(void)
+{
+    CURRENT_VGA_FRAME
+    if (vga_frame->cursor.y < VGA_HEIGHT - 1)
+    {
+        vga_frame->cursor.x = 0;
+        vga_frame->cursor.y += 1;
+        vga_frame_update_caret();
+        return true;
+    }
+    return false;
+}
+
+bool vga_frame_move_cursor_up(void)
+{
+    CURRENT_VGA_FRAME
+    if (vga_frame->cursor.y > 0)
+    {
+        vga_frame->cursor.y -= 1;
+        vga_frame_update_caret();
+        return true;
+    }
+    return false;
+}
+bool vga_frame_move_cursor_down(void)
+{
+    CURRENT_VGA_FRAME
+    if (vga_frame->cursor.y < VGA_HEIGHT - 1)
+    {
+        vga_frame->cursor.y += 1;
+        vga_frame_update_caret();
+        return true;
+    }
+    return false;
 }

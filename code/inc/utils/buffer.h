@@ -11,23 +11,25 @@ typedef struct s_window {
 t_window    window_from_position(int position, int relative);
 size_t      window_size(t_window win);
 
-
-typedef struct s_buffer {
+struct s_buffer {
     size_t  len;
+    size_t  size;
     void*   data;
-}   t_buffer;
+};
+typedef  struct s_buffer  t_buffer;
                           
-#define DECLARE_BUFFER_TYPE(type, size) \
+#define DECLARE_BUFFER_TYPE(type, size_lol) \
 struct {                    \
     size_t  len;            \
-    type    data[size];     \
+    size_t  size;           \
+    type    data[size_lol];     \
 }
 
 
 #define DECLARE_BUFFER_INSERT(type)                                                     \
 DECLARE_MEMMOVE(type)                                                                   \
-static void buffer_insert_##type(void* src, size_t position, const t_buffer fill) {     \
-    t_buffer* buffer = src;                                                             \
+static void buffer_insert_##type(t_buffer* src, size_t position, const t_buffer fill) { \
+    t_buffer* buffer = (t_buffer*)src;                                                  \
     if (position > buffer->len) return;                                                 \
     memmove(type)(                                                                      \
         ((type*)(buffer->data)) + position + fill.len,                                  \
@@ -38,10 +40,10 @@ static void buffer_insert_##type(void* src, size_t position, const t_buffer fill
         index_fill      %= fill.len;                                                    \
         ((type*)(buffer->data))[index]   = ((type*)(fill.data))[index_fill++];          \
     }                                                                                   \
-    buffer->len += fill.len;                                                            \
+    buffer->size += fill.len;                                                           \
 }                                                                                       \
 static void buffer_insert_one_##type(void* src, size_t position, type fill) {           \
-    buffer_insert_##type(src, position, (t_buffer){.len = 1, .data = &fill});           \
+    buffer_insert_##type(src, position, (t_buffer){.len = 1, .data = (type[]){fill}});  \
 }
 
 #define m_buffer_insert(type) buffer_insert_##type
@@ -63,7 +65,7 @@ static void buffer_remove_##type(void* src, t_window window, const t_buffer fill
         index_fill %= fill.len;                                                         \
         ((type*)(buffer->data))[index] = ((type*)(fill.data))[index_fill++];            \
     }                                                                                   \
-    buffer->len -= win_size;                                                            \
+    buffer->size -= win_size;                                                           \
 }
 
 #define m_buffer_remove(type) buffer_remove_##type

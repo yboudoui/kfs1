@@ -16,10 +16,22 @@ typedef struct s_shell {
 t_shell* current_shell(t_shell* terminal);
 #define CURRENT_SHELL t_shell* shell = current_shell(NULL);
 
-void shell(void);
-
-
 //
 void shell_init_color(t_vga_color foreground, t_vga_color background);
+
+
+// this is for scrolling shell
+
+int shell_input_on_return(t_key_scancode key_scancode);
+int shell_input_on_button_up(t_key_scancode key_scancode);
+int shell_input_on_button_down(t_key_scancode key_scancode);
+
+static t_keyboard_handlers shell_scroll = {
+    .handlers = {
+        [KEY_ENTER] = shell_input_on_return,
+        [KEY_UP] = shell_input_on_button_up,
+        [KEY_DOWN] = shell_input_on_button_down,
+    }
+};
 
 #endif

@@ -23,8 +23,8 @@ int     readline_update_caret_position(int n)
 
     if (new_position < 0)
         new_position = 0;
-    if (new_position > readline_buffer->buffer.len)
-        new_position = readline_buffer->buffer.len;
+    if (new_position > readline_buffer->buffer.size)
+        new_position = readline_buffer->buffer.size;
 
     readline_buffer->caret_position = new_position;
     return (old_position - new_position);
@@ -48,7 +48,7 @@ static void on_backspace(char c)
     m_buffer_remove(char)(
         &readline_buffer->buffer,
         window_from_position(readline_buffer->caret_position, -1),
-        (t_buffer){1, " "}
+        (t_buffer){1, 0, " "}
     );
     readline_update_caret_position(-1);
     dprintf(fd, "%c", c);
@@ -57,12 +57,12 @@ static void on_backspace(char c)
 static void on_delete(char c)
 {
     CURRENT_READLINE_BUFFER
-    if (readline_buffer->caret_position <= 0) return;
+    if (readline_buffer->caret_position < 0) return;
 
     m_buffer_remove(char)(
         &readline_buffer->buffer,
         window_from_position(readline_buffer->caret_position, 1),
-        (t_buffer){1, " "}
+        (t_buffer){1, 0," "}
     );
     dprintf(fd, "%c", c);
 }
@@ -71,10 +71,16 @@ static void on_default(char c)
 {
     CURRENT_READLINE_BUFFER
 
-    m_buffer_insert_one(char)(&readline_buffer->buffer, readline_buffer->caret_position, c);
+    t_buffer buffer = {READLINE_BUFFER_SIZE, readline_buffer->buffer.size, readline_buffer->buffer.data};
+    m_buffer_insert_one(char)(&buffer, readline_buffer->caret_position, c);
+    readline_buffer->buffer.size = buffer.size;
     readline_update_caret_position(+1);
     dprintf(fd, "%c", c);
+}
 
+static void on_enter(char c)
+{
+    dprintf(fd, "%c", c);
 }
 
 static void on_cursor_mouvement(t_vec2 mouvement)
@@ -89,6 +95,7 @@ static t_ecma48_handlers handlers = {
     .char_handlers = {
         ['\b']      = on_backspace,
         ['\177']    = on_delete, 
+        ['\n']      = on_enter,
     }
 };
 
