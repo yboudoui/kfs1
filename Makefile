@@ -68,9 +68,7 @@ SRCS_UTILS		= $(addprefix utils/, \
 	abs.c \
 	itoa_base.c \
 	atoi.c \
-	memset.c \
 	memcpy.c \
-	memmove.c \
 	printf.c \
 	strcmp.c \
 	strlen.c \

@@ -11,7 +11,7 @@ int ecma48_move_cursor(int fd, int x, int y)
         dprintf(fd, "\033[%d%c", abs(x), (x < 0) ? 'D' : 'C');
 }
 
-int ecma48_hooks(const char* input, t_ecma48_handlers* handlers)
+int ecma48_hooks_handler(const char* input, t_ecma48_handlers* handlers)
 {
     int index = 0;
 
@@ -38,6 +38,11 @@ int ecma48_hooks(const char* input, t_ecma48_handlers* handlers)
             case 'D':
                 handlers->on_cursor_mouvement((t_vec2){.x = -mouvement, .y = 0});
                 break;
+            case 'J':
+                if (mouvement == 2 && handlers->on_clear_screen) {
+                    handlers->on_clear_screen();
+                }
+                break;
             }
             return index + 1;
         }
@@ -47,4 +52,9 @@ int ecma48_hooks(const char* input, t_ecma48_handlers* handlers)
     if (char_handler) char_handler(c);
     else if (handlers->default_char_handler) handlers->default_char_handler(c);
     return 1;
+}
+
+void ecma48_hooks(const char* buffer, size_t size, t_ecma48_handlers* handlers)
+{
+    for (size_t i = 0; i < size; i+= ecma48_hooks_handler(&buffer[i], handlers));
 }

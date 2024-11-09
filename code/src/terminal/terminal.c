@@ -17,8 +17,7 @@ t_terminal* current_terminal(t_terminal* terminal)
 void terminal_clear(void)
 {
 	CURRENT_TERMINAL
-
-	vga_fill(vga_entry(0, terminal->default_color));
+	vga_fill(vga_entry(' ', terminal->default_color));
 	terminal->caret_position = 0;
 }
 
@@ -47,9 +46,10 @@ void terminal_init(t_vga_entry_color default_color, t_fp_input_handler input_han
 	(*terminal) = (t_terminal){0};
 	terminal->default_color = default_color;
 	terminal->input_handler = input_handler ? input_handler : terminal_input_handler;
+
+	vga_frame_init(&terminal->vga_frame);
 	vga_fill(vga_entry(' ', default_color));
 }
-
 
 DECLARE_BUFFER_INSERT(char)
 DECLARE_BUFFER_REMOVE(char)
@@ -76,14 +76,22 @@ static void on_delete(char c)
 {
 	CURRENT_TERMINAL
 
-	int len = (terminal->buffer.data[terminal->caret_position] == '\t') ? TABSIZE : 1;
-
 	m_buffer_remove(char)(
 		&terminal->buffer,
 		window_from_position(terminal->caret_position, 1),
 		(t_buffer){1, 0, " "}
 	);
 
+	int len;
+	switch (terminal->buffer.data[terminal->caret_position])
+	{
+	case '\t':
+		len = TABSIZE;
+		break;
+	default:
+		len = 1;
+		break;
+	}
 	vga_frame_remove(len, vga_entry(' ', terminal->default_color));
 }
 
@@ -109,6 +117,8 @@ static void on_default(char c)
 
 static void on_enter(char c)
 {
+		printk("loo\bl\033[2J");
+
 }
 
 static bool loot_at(int nb, char c)
@@ -136,11 +146,11 @@ static void on_cursor_mouvement(t_vec2 mouvement)
 	terminal->caret_position += mouvement.x;
 }
 
-
-void	terminal_update(void)
+int terminal_write(const char* buffer, size_t size)
 {
 	static t_ecma48_handlers handlers = {
 		.on_cursor_mouvement	= on_cursor_mouvement,
+		.on_clear_screen		= terminal_clear,
 		.default_char_handler	= on_default,
 		.char_handlers = {
 			['\b']      		= on_backspace,
@@ -148,8 +158,14 @@ void	terminal_update(void)
 			['\n']				= on_enter,
 		}
 	};
-    char                read_buffer[STD_IO_BUFFER_SIZE] = {0};
-    size_t              read_size = read(STD_OUT, read_buffer, STD_IO_BUFFER_SIZE);
-    for (size_t i = 0; i < read_size; i+= ecma48_hooks(&read_buffer[i], &handlers));
+	ecma48_hooks(buffer, size, &handlers);
+	return size;
+}
+
+void	terminal_update(void)
+{
+    char  	read_buffer[STD_IO_BUFFER_SIZE] = {0};
+    size_t	read_size = read(STD_OUT, read_buffer, STD_IO_BUFFER_SIZE);
+	terminal_write(read_buffer, read_size);
 	vga_main_frame_update();
 }

@@ -16,13 +16,9 @@
 
 void vga_disable_cursor(void);
 void vga_enable_cursor(uint8_t cursor_start, uint8_t cursor_end);
-void vga_set_cursor_position(t_vec2 position);
 
-t_vec2 get_cursor_position(void);
-
-#define VGA_DISABLE_CURSOR vga_disable_cursor();
-#define VGA_ENABLE_CURSOR vga_enable_cursor(14, 15);
-
+#define VGA_DISABLE_CURSOR  vga_disable_cursor();
+#define VGA_ENABLE_CURSOR   vga_enable_cursor(14, 15);
 
 bool vga_frame_move_cursor_up(void);
 bool vga_frame_move_cursor_down(void);

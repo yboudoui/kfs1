@@ -4,7 +4,8 @@
 #include <stddef.h>
 
 void	*memcpy(void *dest, const void *src, size_t n);
-// void	*memmove(void *dest, const void *src, size_t n);
+int		memcmp(const void *s1, const void *s2, size_t n);
+
 
 #define DECLARE_MEMSET(type) \
 inline static void memset_##type(type* dest, type value, size_t count) {    \
@@ -27,7 +28,5 @@ static type* memmove_##type(void *dest, const void *src, size_t n) {        \
 }
 
 #define memmove(type) memmove_##type
-
-// DECLARE_MEMSET(char)
 
 #endif

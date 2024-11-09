@@ -103,5 +103,5 @@ void readline(void)
 {
     char                read_buffer[STD_IO_BUFFER_SIZE] = {0};
     size_t              read_size = read(STD_IN, read_buffer, STD_IO_BUFFER_SIZE);
-    for (size_t i = 0; i < read_size; i += ecma48_hooks(&read_buffer[i], &handlers));
+    ecma48_hooks(read_buffer, read_size, &handlers);
 }

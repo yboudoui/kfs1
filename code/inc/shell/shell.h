@@ -29,8 +29,8 @@ int shell_input_on_button_down(t_key_scancode key_scancode);
 static t_keyboard_handlers shell_scroll = {
     .handlers = {
         [KEY_ENTER] = shell_input_on_return,
-        [KEY_UP] = shell_input_on_button_up,
-        [KEY_DOWN] = shell_input_on_button_down,
+        [KEY_UP]    = shell_input_on_button_up,
+        [KEY_DOWN]  = shell_input_on_button_down,
     }
 };
 

@@ -29,12 +29,13 @@ void kernel_main(void)
 
 	current_shell(&shells[0]);
 
-	current_keyboard_handler(shell_get_character);
+	// current_keyboard_handler(shell_get_character);
 	bool stop = false;
 	
 	while(stop == false)
 	{
 		if (keyboard_handler()) stop = true;
+		readline();
 		terminal_update();
 	}
 }

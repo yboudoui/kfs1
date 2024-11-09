@@ -16,13 +16,13 @@ static void dummy_handler(char c) {(void)c;}
 
 typedef struct s_ecma48_handlers {
     void (*on_cursor_mouvement)(t_vec2);
+    void (*on_clear_screen)(void);
     t_fp_ecma48_char_handler    default_char_handler;
     t_fp_ecma48_char_handler    char_handlers[255];
 } t_ecma48_handlers;
 
-int ecma48_hooks(const char* input, t_ecma48_handlers* handlers);
-
-int ecma48_move_cursor(int fd, int x, int y);
+void    ecma48_hooks(const char* buffer, size_t size, t_ecma48_handlers* handlers);
+int     ecma48_move_cursor(int fd, int x, int y);
 
 
 #endif

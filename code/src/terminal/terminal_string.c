@@ -9,28 +9,6 @@ void terminal_putchar_at(t_vec2 position, char c)
 	vga_frame_put_entry_at(entry, position);
 }
 
-void terminal_putchar(char c)
-{
-	CURRENT_TERMINAL
-
-	t_vec2 position = {
-		.x = terminal->caret_position % VGA_WIDTH,
-		.y = terminal->caret_position / VGA_WIDTH,
-	};
-	terminal_putchar_at(position, c);
-}
-
-int terminal_write(const char* data, size_t size)
-{
-	CURRENT_TERMINAL
-	for (size_t i = 0; i <= size; i++)
-	{
-		terminal_putchar(data[i]);
-		terminal->caret_position += 1;
-	}
-	return (size);
-}
-
 void	terminal_put_block_at(size_t size, char* buffer, t_vec2 position)
 {
 	t_vec2 tmp = {0};
