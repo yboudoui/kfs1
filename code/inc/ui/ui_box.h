@@ -1,8 +1,8 @@
 #ifndef UI_BOX_H
 #define UI_BOX_H
 
-#include "vectors.h"
-#include "vga.h"
+// #include "vectors.h"
+// #include "vga.h"
 /*
 typedef enum {
     SIMPLE,
