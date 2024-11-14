@@ -1,4 +1,4 @@
-module vga::color;
+module vga;
 
 enum Color : int 
 {

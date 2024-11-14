@@ -30,25 +30,39 @@ LDFLAGS=-T linker.ld
 BUILD_DIR=./build
 OBJECT_DIR=$(BUILD_DIR)/obj
 
-SOURCE_DIR=code/src
-INCLUDE_DIR=code/inc
+SOURCE_DIR=code
 
 ######################################################
+# Core
+######################################################
 
-SRCS_HARDWARE		= $(addprefix hardware/, \
-	io.c3 \
+SRCS_HARDWARE_IO		+= io.c
+SRCS_HARDWARE_IO		+= imported_io.c3
+
+SRCS_HARDWARE_KEYBOARD	+= codepage347.c3
+SRCS_HARDWARE_KEYBOARD	+= scancode.c3
+SRCS_HARDWARE_KEYBOARD	+= handler.c3
+SRCS_HARDWARE_KEYBOARD	+= keyboard.c3
+
+SRCS_HARDWARE_VGA		+= color.c3
+SRCS_HARDWARE_VGA		+= frame.c3
+SRCS_HARDWARE_VGA		+= cursor.c3
+
+SRCS_KERNEL				+= kernel.c3
+
+SRCS_CORE = \
+	$(addprefix core/, \
+		$(addprefix hardware/, \
+			$(addprefix io/, $(SRCS_HARDWARE_IO))		\
+			$(addprefix keyboard/, $(SRCS_HARDWARE_KEYBOARD))	\
+			$(addprefix vga/, $(SRCS_HARDWARE_VGA))				\
+		) \
+		$(addprefix kernel/, $(SRCS_KERNEL)) \
 )
 
-SRCS_KERNEL		= $(addprefix kernel/, \
-	bootloader_screen.c3 \
-	entry.c3 \
-)
-
-SRCS_KEYBOARD	= $(addprefix keyboard/, \
-	codepage347.c3 \
-	scancode.c3 \
-	keyboard.c3 \
-)
+######################################################
+# Lib
+######################################################
 
 SRCS_READLINE	= $(addprefix readline/, \
 	readline.c3 \
@@ -58,8 +72,38 @@ SRCS_SHELL		= $(addprefix shell/, \
 	shell.c3 \
 )
 
-SRCS_STD_IO		= $(addprefix std_io/, \
+SRCS_UI			= $(addprefix ui/, \
+	box.c3 \
+)
+
+SRCS_LIB			= $(addprefix lib/, \
+	$(SRCS_READLINE) \
+	$(SRCS_SHELL) \
+	$(SRCS_UI) \
+)
+
+######################################################
+# Std
+######################################################
+
+SRCS_STD_IO		= $(addprefix io/, \
 	std_io.c3 \
+)
+
+SRCS_STD_MATH		= $(addprefix math/, \
+	math.c3 \
+	window.c3 \
+	vector.c3 \
+)
+
+SRCS_STD_MEMORY		= $(addprefix memory/, \
+	buffer.c3 \
+	memory.c3 \
+)
+
+SRCS_STD_STRING		= $(addprefix string/, \
+	printf.c3 \
+	string.c3 \
 )
 
 SRCS_TERMINAL	= $(addprefix terminal/, \
@@ -67,57 +111,23 @@ SRCS_TERMINAL	= $(addprefix terminal/, \
 	terminal.c3 \
 )
 
-SRCS_UI			= $(addprefix ui/, \
-	box.c \
+SRCS_STD		= $(addprefix std/, \
+	$(SRCS_STD_IO) \
+	$(SRCS_STD_MATH) \
+	$(SRCS_STD_MEMORY) \
+	$(SRCS_STD_STRING) \
+	$(SRCS_TERMINAL) \
 )
-
-SRCS_UTILS		= $(addprefix utils/, \
-	buffer.c3 \
-	math.c3 \
-	memory.c3 \
-	printf.c3 \
-	string.c3 \
-	vector.c3 \
-	window.c3 \
-)
-
-SRCS_VGA		= 	$(addprefix vga/, \
-	color.c3 \
-	frame.c3 \
-	cursor.c3 \
-	constante.c3 \
-)
-
 
 ######################################################
 
 SRCS= $(addprefix $(SOURCE_DIR)/, \
-	$(SRCS_HARDWARE)		\
-	$(SRCS_KERNEL)			\
-	$(SRCS_KEYBOARD)		\
-	$(SRCS_READLINE)		\
-	$(SRCS_SHELL)			\
-	$(SRCS_STD_IO)			\
-	$(SRCS_TERMINAL)		\
-	$(SRCS_UI)				\
-	$(SRCS_UTILS)			\
-	$(SRCS_VGA)				\
+	$(SRCS_CORE)		\
+	$(SRCS_LIB)		\
+	$(SRCS_STD)			\
 	main.c3 \
-)
-
-INCS = $(addprefix $(INCLUDE_DIR)/, \
-	ft_printf \
-	hardware_io \
-	kernel \
-	keyboard \
-	math \
-	readline \
-	shell \
-	std_io \
-	terminal \
-	ui \
-	utils \
-	vga \
+	bootloader_screen.c3 \
+	entry.c3 \
 )
 
 C_SRCS	= $(filter %.c, $(SRCS))
@@ -143,7 +153,7 @@ $(OBJECT_DIR)/boot.o: $(SOURCE_DIR)/boot.s
 
 $(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.c 
 	@mkdir -p $(dir $@)
-	@$(CC) $(CFLAGS) $(addprefix -I , $(INCS)) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
 	@echo "Compiled " $< " to "$@
 
 

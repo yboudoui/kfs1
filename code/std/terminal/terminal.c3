@@ -11,20 +11,13 @@ import keyboard::codepage347;
 import keyboard::scancode;
 import std_io;
 
-// #include "vga.h"
-// #include "utils.h"
-// #include "keyboard.h"
-// #include "ecma48.h"
-// #include "std_io.h"
-
-
 const uint	TERMINAL_BUFFER_SIZE = 512;
 const int	TABSIZE = 4;
 
 struct Terminal 
 {
-    vga::frame::Frame          vga_frame;
-    vga::color::Entry_color    default_color;
+    vga::Frame          vga_frame;
+    vga::Entry_color    default_color;
   
     keyboard::Fp_input_handler  input_handler;
     std_io::StdIO             	stdio;
@@ -34,7 +27,7 @@ struct Terminal
     uint                caret_position;
 }
 
-fn void Terminal.init(Terminal *this, vga::color::Entry_color default_color, keyboard::Fp_input_handler input_handler)
+fn void Terminal.init(Terminal *this, vga::Entry_color default_color, keyboard::Fp_input_handler input_handler)
 {
 
 	this.buffer.len = TERMINAL_BUFFER_SIZE;
@@ -44,12 +37,12 @@ fn void Terminal.init(Terminal *this, vga::color::Entry_color default_color, key
     this.default_color = default_color;
 	this.input_handler = input_handler ? input_handler : &terminal_input_handler;
     this.vga_frame.init();
-    this.vga_frame.fill(vga::color::entry(' ', default_color));
+    this.vga_frame.fill(vga::entry(' ', default_color));
 }
 
 fn void Terminal.putchar_at(Terminal *this, vector::Vec2 position, char c)
 {
-	vga::color::Entry entry = vga::color::entry(c, this.default_color);
+	vga::Entry entry = vga::entry(c, this.default_color);
     this.vga_frame.put_entry_at(entry, position);
 }
 
@@ -84,7 +77,7 @@ fn void	Terminal.update(Terminal this)
 fn void Terminal.clear(Terminal *this) // KEEP IN MIND THIS WAS USED AS FUNCTION POINTER CALLBACK void  terminal_clear(void);
 {
 	this.caret_position = 0;
-    this.vga_frame.fill(vga::color::entry(' ', this.default_color));
+    this.vga_frame.fill(vga::entry(' ', this.default_color));
 	this.vga_frame.cursor.position = {0, 0};
 }
 
@@ -100,7 +93,7 @@ fn void Terminal.on_backspace(Terminal* this, char c)
 	);
 
 	this.caret_position -= 1;
-	this.vga_frame.remove(len, vga::color::entry(' ', this.default_color));
+	this.vga_frame.remove(len, vga::entry(' ', this.default_color));
 	this.vga_frame.move_cursor_position_by(len);
 }
 
@@ -118,7 +111,7 @@ fn void Terminal.on_delete(Terminal* this, char c)
 		len = 1;
 		break;
 	}
-	this.vga_frame.remove(len, vga::color::entry(' ', this.default_color));
+	this.vga_frame.remove(len, vga::entry(' ', this.default_color));
 }
 
 fn void Terminal.on_enter(Terminal* this, char c)
@@ -159,11 +152,11 @@ fn void Terminal.on_default(Terminal* this, char c)
 
 	if (c == '\t') {
 		for (uint i = 0; i < TABSIZE; i++)
-			this.vga_frame.put_entry(vga::color::entry(' ', this.default_color));
+			this.vga_frame.put_entry(vga::entry(' ', this.default_color));
 		this.vga_frame.move_cursor_position_by(+TABSIZE);
 	}
 	else {
-		this.vga_frame.put_entry(vga::color::entry(c, this.default_color));
+		this.vga_frame.put_entry(vga::entry(c, this.default_color));
 		this.vga_frame.move_cursor_position_by(+1);
 	}
 }

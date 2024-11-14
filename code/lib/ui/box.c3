@@ -1,4 +1,14 @@
-// #include "ui_box.h"
+module ui;
+
+import utils::vector;
+
+struct Box
+{
+    Vec2    position;
+    Vec2    outer_size;
+    Vec2    inner_size;
+}
+
 
 // #include "utils.h"
 // #include "terminal.h"
@@ -17,7 +27,7 @@
 
 // void print_ui_box(t_ui_box ui_box)
 // {
-//     char buffer[VGA_MAX_PRINTABLE_CHARACTER] = {0};
+//     char buffer[MAX_PRINTABLE_CHARACTER] = {0};
 //     char *line = buffer;
 //     char box_border_set[3][3] = {
 //         {0xDA, 0xC4, 0xBF},
@@ -31,5 +41,5 @@
 //     }
 //     dump_line(&line, ui_box.outer_size.x, box_border_set[2]);
 
-//     terminal_put_block_at(VGA_MAX_PRINTABLE_CHARACTER, buffer, ui_box.position);
+//     terminal_put_block_at(MAX_PRINTABLE_CHARACTER, buffer, ui_box.position);
 // }

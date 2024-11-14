@@ -2,7 +2,9 @@ module kernel;
 
 import terminal;
 import keyboard::scancode;
-import vga::color;
+import vga;
+import utils::vector;
+import utils::string;
 
 const char* LOGO = `
         :::      ::::::::\n
@@ -20,29 +22,31 @@ fn int	wait_user_input(scancode::Scancode key_scancode)
 
 // #include "ui_box.h"
 
-// fn void show(void)
-// {
-// 	terminal_put_block_at(sizeof(LOGO), LOGO, (t_vec2){
-// 		.x = (VGA_WIDTH - 25) / 2,
-// 		.y = (VGA_HEIGHT - 7) / 2,
-// 	});
-// }
+fn void show(Terminal* terminal)
+{
+	terminal.put_block_at(
+		string::strlen(LOGO),
+		LOGO,
+		vector::Vec2{
+			(vga::MAX_WIDTH - 25) / 2,
+			(vga::MAX_HEIGHT - 7) / 2,
+		}
+	);
+}
 
 fn void bootloader_screen()
 {
-	// VGA_DISABLE_CURSOR
+	vga::disable_cursor();
 
-	terminal::Terminal terminal @noinit;
-
-	terminal.init(vga::color::Entry_color{vga::color::Color.RED, vga::color::Color.BLACK}, &wait_user_input);
+	Terminal terminal @noinit;
+	terminal.init(Entry_color{Color.RED, Color.BLACK}, &wait_user_input);
 
 	// current_terminal(&terminal);
 
 	while(42)
 	{
-		terminal.clear();
 		// if (keyboard_handler()) return;
-		// show();
+		show(&terminal);
 		terminal.update();
 	}
 }

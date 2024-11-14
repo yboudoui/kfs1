@@ -1,5 +1,4 @@
-#ifndef UI_BOX_H
-#define UI_BOX_H
+module ui;
 
 // #include "vectors.h"
 // #include "vga.h"
@@ -173,13 +172,3 @@ typedef enum {
 } LineBlockCP437;
 
 */
-
-typedef struct {
-    t_vec2      position;
-    t_vec2      outer_size;
-    t_vec2      inner_size;
-} t_ui_box;
-
-void print_ui_box(t_ui_box ui_box);
-
-#endif

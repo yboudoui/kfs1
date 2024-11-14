@@ -1,37 +1,37 @@
-module vga::frame;
+module vga;
 
-import vga::color;
-import vga::constante;
+const ushort*   VIDEO_MEMORY        = (ushort*)0xB8000;
+const uint      MAX_WIDTH   = 80;
+const uint      MAX_HEIGHT  = 25;
+const uint      MAX_PRINTABLE_CHARACTER = MAX_WIDTH * MAX_HEIGHT;
 
 import utils::memory;
 import utils::window;
 import utils::buffer;
 import utils::vector;
 
-import hardware;
-
 
 // Declaration
 struct Frame
 {
   vector::Clamped_Vec2      cursor;
-  Entry[constante::VGA_MAX_PRINTABLE_CHARACTER] b;
+  Entry[MAX_PRINTABLE_CHARACTER] b;
   Buffer(<Entry>)   buffer;
 } 
 
 fn void	Frame.init(Frame* this)
 {
-    this.buffer.len = constante::VGA_MAX_PRINTABLE_CHARACTER;
+    this.buffer.len = MAX_PRINTABLE_CHARACTER;
     this.buffer.data = &this.b;
-	this.cursor.max = Vec2{constante::VGA_WIDTH, constante::VGA_HEIGHT - 1};
+	this.cursor.max = Vec2{MAX_WIDTH, MAX_HEIGHT - 1};
 	this.cursor.min = Vec2{0, 0};
 }
 
 fn void Frame.put_entry_at(Frame* this, Entry entry, Vec2 position)
 {
-	position.x %= constante::VGA_WIDTH;
-	position.y %= constante::VGA_HEIGHT;
-	uint index = position.y * constante::VGA_WIDTH + position.x;
+	position.x %= MAX_WIDTH;
+	position.y %= MAX_HEIGHT;
+	uint index = position.y * MAX_WIDTH + position.x;
 	this.buffer.data[index] = entry;
 }
 
@@ -40,27 +40,15 @@ fn void Frame.fill(Frame* this, Entry entry)
     this.buffer.clear(entry);
 }
 
-fn void Frame.set_cursor_position(Frame* this)
-{
-    uint caret = this.cursor.get_linear_position();
-
-    // Send the high byte of the cursor position to VGA port 0x3D4 (index 0x0E)
-    hardware::outb(constante::VGA_COMMAND_PORT, 0x0E);
-    hardware::outb(constante::VGA_DATA_PORT, (char)(caret >> 8) & 0xFF);  // High byte
-
-    // Send the low byte of the cursor position to VGA port 0x3D4 (index 0x0F)
-    hardware::outb(constante::VGA_COMMAND_PORT, 0x0F);
-    hardware::outb(constante::VGA_DATA_PORT, (char)(caret & 0xFF));  // Low byte
-}
-
 fn void Frame.main_frame_update(Frame* this)
 {
-	this.set_cursor_position();
+    uint caret = this.cursor.get_linear_position();
+	vga::set_cursor_position(caret);
 	memory::copy(<Entry>)
     (
-        destination:    constante::VIDEO_MEMORY,
+        destination:    VIDEO_MEMORY,
         source:         this.buffer.data,
-        count:          constante::VGA_MAX_PRINTABLE_CHARACTER
+        count:          MAX_PRINTABLE_CHARACTER
     );
 }
 

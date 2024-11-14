@@ -32,8 +32,8 @@ module shell;
 // {
 // 	readline::Buffer*   tmp = null;
 
-// 	uint start = (this.scroll_index < VGA_HEIGHT) ? 0 : this.scroll_index - VGA_HEIGHT + 1;
-// 	uint end = start + VGA_HEIGHT - 1;
+// 	uint start = (this.scroll_index < HEIGHT) ? 0 : this.scroll_index - HEIGHT + 1;
+// 	uint end = start + HEIGHT - 1;
 
 //     this.terminal.clear();
 // 	for (uint i = start; i < end; i++)
@@ -71,7 +71,7 @@ module shell;
 // fn int Shell.input_on_button_down(Shell* this, t_key_scancode key_scancode)
 // {
 //     if (!vga_frame_move_cursor_down()) return 0;
-//     if(this.scroll_index <= VGA_HEIGHT) {
+//     if(this.scroll_index <= HEIGHT) {
 //         this.scroll_index += 1;
 //         this.scrool();
 //     }
