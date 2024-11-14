@@ -14,9 +14,9 @@ CC_FLAGS= \
 --emit-stdlib=no \
 -g
 
+# -O2 \
 
 CFLAGS= \
--O2 \
 -ffreestanding \
 -nostdlib \
 -fno-builtin \
@@ -180,3 +180,6 @@ run: all
 runiso: iso
 	qemu-system-i386 -k en-us -cdrom $(BUILD_DIR)/$(NAME).iso
 
+run_debug: all
+	qemu-system-i386 -s -S -k en-us -kernel $(KERNEL_BIN)
+	

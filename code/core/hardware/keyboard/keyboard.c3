@@ -2,53 +2,59 @@ module keyboard;
 
 import keyboard::scancode;
 import hardware;
+import utils::memory;
 
 // Basic IO
-fn Scancode geKey_scancode()
-{
-    const uint KEYBOARD_DATA_PORT = 0x60;
-    return (Scancode)hardware::inb(KEYBOARD_DATA_PORT);
-}
+// extern fn char get_key_scancode();
 
-enum Key_state
-{
-  KEY_RELEASED,
-  KEY_PRESSED,
-}
 
-const Key_state[(int)scancode::Scancode.MAX_KEY_SCANCODE] KEYBOARD_STATE = {  }; // KEY_RELEASED
-
-fn Scancode set_keyboard_state(Scancode scancode)
+fn char get_key_scancode()
 {
-    int s = (int)scancode;
-    if (s & 0x80)
+    char _v = 0;
+    asm
     {
-        s ^= 0x80;
-        KEYBOARD_STATE[s] = KEY_RELEASED;
+        in _v, 0x60;
+    }
+    return _v;
+} 
+
+// fn char get_key_scancode()
+// {
+//     return hardware::inb(0x60);
+// } 
+
+
+bool[217] keyboard_state;
+
+fn char set_keyboard_state(char scancode)
+{
+    if (scancode & 0x80)
+    {
+        scancode ^= 0x80;
+        keyboard_state[scancode] = false;
     }
     else {
-        KEYBOARD_STATE[s] = KEY_PRESSED;
+        keyboard_state[scancode] = true;
     }
-    return (Scancode)s;
+    return scancode;
 }
 
 fn Scancode get_key_on_pressed()
 {
     static Scancode last_scancode;
-    int             scancode;
+    char             scancode;
     
-    scancode = (int)geKey_scancode();
+    scancode = get_key_scancode();
     if (scancode == 0xE0) {
-        scancode = (int)set_keyboard_state(geKey_scancode());
+        scancode = set_keyboard_state(get_key_scancode());
     } else {
-        scancode = (int)set_keyboard_state((Scancode)scancode);
+        scancode = set_keyboard_state(scancode);
     }
-
-    if (KEYBOARD_STATE[scancode] == KEY_RELEASED) {
-        last_scancode = (Scancode)0;
-        return (Scancode)0;
+    if (keyboard_state[scancode] == false) {
+        last_scancode = Scancode.NONE;
+        return Scancode.NONE;
     }
-    if (last_scancode == (Scancode)scancode) return (Scancode)0;
-    last_scancode = (Scancode)scancode;
-    return (Scancode)scancode;
+    if (last_scancode == scancode::SCANCODE_SET[scancode]) return Scancode.NONE;
+    last_scancode = scancode::SCANCODE_SET[scancode];
+    return  scancode::SCANCODE_SET[scancode];
 }

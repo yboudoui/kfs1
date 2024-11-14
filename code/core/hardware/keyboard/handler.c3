@@ -18,13 +18,13 @@ fn int Keyboard_handlers.handle_input(Keyboard_handlers this, Scancode key_scanc
     return handler(key_scancode);
 }
 
-fn int keyboard_handler(Keyboard_handlers handler)
+fn int handler(Fp_input_handler handler)
 {
-    int             handler_output;
+    int             handler_output = 0;
     Scancode        scancode = get_key_on_pressed();
 
-    if (scancode != (Scancode)0) {
-        handler_output = handler.handle_input(scancode);
+    if (scancode != Scancode.NONE) {
+        handler_output = handler(scancode);
     }
     return handler_output;
 }

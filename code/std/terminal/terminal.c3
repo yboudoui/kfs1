@@ -16,18 +16,18 @@ const int	TABSIZE = 4;
 
 struct Terminal 
 {
-    vga::Frame          vga_frame;
-    vga::Entry_color    default_color;
+    Frame      					vga_frame;
+    Entry_color					default_color;
   
-    keyboard::Fp_input_handler  input_handler;
-    std_io::StdIO             	stdio;
+    Fp_input_handler			input_handler;
+    StdIO             			stdio;
     
-	char[TERMINAL_BUFFER_SIZE] b;
-	Buffer(<char>)   buffer;
-    uint                caret_position;
+	char[TERMINAL_BUFFER_SIZE]	b;
+	Buffer(<char>)				buffer;
+    uint                		caret_position;
 }
 
-fn void Terminal.init(Terminal *this, vga::Entry_color default_color, keyboard::Fp_input_handler input_handler)
+fn void Terminal.init(Terminal *this, Entry_color default_color, Fp_input_handler input_handler)
 {
 
 	this.buffer.len = TERMINAL_BUFFER_SIZE;
@@ -35,14 +35,16 @@ fn void Terminal.init(Terminal *this, vga::Entry_color default_color, keyboard::
 
 
     this.default_color = default_color;
-	this.input_handler = input_handler ? input_handler : &terminal_input_handler;
+	this.input_handler = &terminal_input_handler;
+	if (input_handler) this.input_handler = input_handler;
+
     this.vga_frame.init();
     this.vga_frame.fill(vga::entry(' ', default_color));
 }
 
-fn void Terminal.putchar_at(Terminal *this, vector::Vec2 position, char c)
+fn void Terminal.putchar_at(Terminal *this, Vec2 position, char c)
 {
-	vga::Entry entry = vga::entry(c, this.default_color);
+	Entry entry = vga::entry(c, this.default_color);
     this.vga_frame.put_entry_at(entry, position);
 }
 
@@ -176,14 +178,13 @@ fn void Terminal.on_default(Terminal* this, char c)
 // 	return current_terminal;
 // }
 
-fn int terminal_input_handler(scancode::Scancode key_scancode)
+fn int terminal_input_handler(Scancode key_scancode)
 {
 	static char*[] ops = {
 	    [scancode::KEY_UP]    = "\033[%dA",
 	    [scancode::KEY_DOWN]  = "\033[%dB",
 	    [scancode::KEY_RIGHT] = "\033[%dC",
 	    [scancode::KEY_LEFT]  = "\033[%dD",
-	    // NULL,
 	};
 
     if(ops[key_scancode] != null) {

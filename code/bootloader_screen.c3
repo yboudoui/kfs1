@@ -2,32 +2,32 @@ module kernel;
 
 import terminal;
 import keyboard::scancode;
+import keyboard;
 import vga;
 import utils::vector;
 import utils::string;
+import utils::printf;
 
 const char* LOGO = `
-        :::      ::::::::\n
-      :+:      :+:    :+:\n
-    +:+ +:+         +:+  \n
-  +#+  +:+       +#+     \n
-+#+#+#+#+#+   +#+        \n
-     #+#    #+#          \n
-    ###   ########.fr    \n`;
+        :::      ::::::::
+      :+:      :+:    :+:
+    +:+ +:+         +:+  
+  +#+  +:+       +#+     
++#+#+#+#+#+   +#+        
+     #+#    #+#          
+    ###   ########.fr    `;
 
-fn int	wait_user_input(scancode::Scancode key_scancode)
+fn int	wait_user_input(Scancode key_scancode)
 {
-    return 42;
+	return 42;
 }
-
-// #include "ui_box.h"
 
 fn void show(Terminal* terminal)
 {
 	terminal.put_block_at(
 		string::strlen(LOGO),
 		LOGO,
-		vector::Vec2{
+		Vec2{
 			(vga::MAX_WIDTH - 25) / 2,
 			(vga::MAX_HEIGHT - 7) / 2,
 		}
@@ -41,12 +41,36 @@ fn void bootloader_screen()
 	Terminal terminal @noinit;
 	terminal.init(Entry_color{Color.RED, Color.BLACK}, &wait_user_input);
 
-	// current_terminal(&terminal);
-
 	while(42)
 	{
-		// if (keyboard_handler()) return;
+
+		if (1)
+		{
+
+				if (keyboard::handler(terminal.input_handler)) {
+					break;
+				}
+
+
+		} else {
+
+			
+				if (keyboard::get_key_scancode() & 0x80) {
+					terminal.default_color.background = Color.GREEN;
+				} else {
+					terminal.default_color.background = Color.RED;
+				}
+
+		}
 		show(&terminal);
 		terminal.update();
 	}
+
+	while(1) {
+
+	terminal.default_color.background = Color.CYAN;
+	terminal.clear();
+	terminal.update();
+	}
+
 }
