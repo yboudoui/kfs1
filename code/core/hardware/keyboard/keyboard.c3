@@ -4,24 +4,11 @@ import keyboard::scancode;
 import hardware;
 import utils::memory;
 
-// Basic IO
-// extern fn char get_key_scancode();
-
-
+const ushort KEYBOARD_DATA_PORT = 0x60;
 fn char get_key_scancode()
 {
-    char _v = 0;
-    asm
-    {
-        in _v, 0x60;
-    }
-    return _v;
+    return (char)hardware::inb(KEYBOARD_DATA_PORT);
 } 
-
-// fn char get_key_scancode()
-// {
-//     return hardware::inb(0x60);
-// } 
 
 
 bool[217] keyboard_state;

@@ -36,8 +36,7 @@ SOURCE_DIR=code
 # Core
 ######################################################
 
-SRCS_HARDWARE_IO		+= io.c
-SRCS_HARDWARE_IO		+= imported_io.c3
+SRCS_HARDWARE_IO		+= io.c3
 
 SRCS_HARDWARE_KEYBOARD	+= codepage347.c3
 SRCS_HARDWARE_KEYBOARD	+= scancode.c3
@@ -130,36 +129,18 @@ SRCS= $(addprefix $(SOURCE_DIR)/, \
 	entry.c3 \
 )
 
-C_SRCS	= $(filter %.c, $(SRCS))
-C3_SRCS = $(filter %.c3, $(SRCS))
-
-OBJS += $(patsubst $(SOURCE_DIR)/%.c, $(OBJECT_DIR)/%.o, $(C_SRCS))
-OBJS += $(OBJECT_DIR)/boot.o
-
 KERNEL_BIN=$(BUILD_DIR)/$(NAME).bin
-
 
 all: $(KERNEL_BIN)
 	@echo "Project builted"
 
-$(KERNEL_BIN): c3_obj $(OBJS) 
+$(KERNEL_BIN): c3_obj 
 	@$(LD) $(LDFLAGS) -o $(KERNEL_BIN) $(shell find $(OBJECT_DIR) -name '*.o')
 	@echo $(KERNEL_BIN)
 
-$(OBJECT_DIR)/boot.o: $(SOURCE_DIR)/boot.s
-	@mkdir -p $(OBJECT_DIR)
-	@$(AS) $(SOURCE_DIR)/boot.s -o $(OBJECT_DIR)/boot.o
-	@echo $@
-
-$(OBJECT_DIR)/%.o: $(SOURCE_DIR)/%.c 
-	@mkdir -p $(dir $@)
-	@$(CC) $(CFLAGS) -c $< -o $@
-	@echo "Compiled " $< " to "$@
-
-
 c3_obj:
 	@mkdir -p $(OBJECT_DIR)
-	$(CC3) compile-only --obj-out $(OBJECT_DIR) $(C3_SRCS) $(CC_FLAGS)
+	$(CC3) compile-only --obj-out $(OBJECT_DIR) $(SRCS) $(CC_FLAGS)
 	@echo "Compiled " $< " to "$@
 
 clean:

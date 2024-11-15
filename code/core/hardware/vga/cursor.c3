@@ -21,11 +21,11 @@ fn void    enable_cursor(char cursor_start, char cursor_end)
 	char data;
 
 	hardware::outb(COMMAND_PORT, 0x0A);
-	data = hardware::inb(DATA_PORT);
+	data = (char)hardware::inb(DATA_PORT);
 	hardware::outb(DATA_PORT, (data & 0xC0) | cursor_start);
 
 	hardware::outb(COMMAND_PORT, 0x0B);
-	data = hardware::inb(DATA_PORT);
+	data = (char)hardware::inb(DATA_PORT);
 	hardware::outb(DATA_PORT, (data & 0xE0) | cursor_end);
 }
 

@@ -66,6 +66,7 @@ fn void bootloader_screen()
 		terminal.update();
 	}
 
+	vga::enable_cursor(14,15);
 	while(1) {
 
 	terminal.default_color.background = Color.CYAN;
