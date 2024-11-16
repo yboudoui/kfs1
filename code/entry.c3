@@ -1,50 +1,35 @@
 module kernel;
 
-// extern fn void kernel_main();
+import shell;
+import vga;
+import keyboard::scancode;
+import context;
 
-fn int entry()
+struct Multiplexer
 {
-    return 0;
+    Shell[2] shells;
+
+    Shell* current;
 }
 
-// static t_shell shells[2] = {0};
+fn void Multiplexer.init(Multiplexer* this)
+{
+    this.shells[0].init(Color.WHITE);
+	this.shells[1].init(Color.LIGHT_MAGENTA);
+    this.current = &this.shells[0];
+	vga::enable_cursor(14,15);
+}
 
-// int shell_get_character(t_key_scancode key_scancode)
-// {
-//     if (key_scancode == KEY_1 || key_scancode == KEY_2) {
-//         current_shell(&shells[key_scancode - KEY_1]);
-// 		current_keyboard_handler(shell_get_character);
-//     }
+fn int Multiplexer.handle_input(Multiplexer* this, Scancode key_scancode)
+{
+    if (key_scancode == Scancode.KEY_1 || key_scancode == Scancode.KEY_2)
+    {
+        this.current = &this.shells[key_scancode - Scancode.KEY_1];
+    }
+    return this.current.handle_input(key_scancode);
+}
 
-
-// 	CURRENT_SHELL
-// 	shell->terminal.input_handler(key_scancode);
-// 	readline();
-
-// 	current_keyboard_handlers(&shell_scroll); keyboard_handle_input(key_scancode);
-
-
-//     return 0;
-// }
-
-// void kernel_main(void)
-// {	
-// 	VGA_ENABLE_CURSOR
-
-// 	current_shell(&shells[0]);
-// 	shell_init_color(VGA_COLOR_WHITE, VGA_COLOR_BLACK);
-
-// 	current_shell(&shells[1]);
-// 	shell_init_color(VGA_COLOR_LIGHT_MAGENTA, VGA_COLOR_BLACK);
-
-// 	current_shell(&shells[0]);
-
-// 	current_keyboard_handler(shell_get_character);
-// 	bool stop = false;
-	
-// 	while(stop == false)
-// 	{
-// 		if (keyboard_handler()) stop = true;
-// 		terminal_update();
-// 	}
-// }
+fn void Multiplexer.update(Multiplexer* this)
+{
+    this.current.update();
+}

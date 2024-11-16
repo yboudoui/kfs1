@@ -1,30 +1,29 @@
-module keyboard;
+module keyboard(<Type>);
 
-def Fp_input_handler = fn int (Scancode);
+def Fp_input_handler = fn int (Type*, Scancode);
 
 struct Keyboard_handlers
 {
-  Fp_input_handler                              default_handler;
-  Fp_input_handler[(int)scancode::Scancode.MAX_KEY_SCANCODE]  handlers;
+    Type*                                               ref;
+    Fp_input_handler                                    default_handler;
+    Fp_input_handler[(int)Scancode.MAX_KEY_SCANCODE]    handlers;
 }
 
-fn int Keyboard_handlers.handle_input(Keyboard_handlers this, Scancode key_scancode)
+fn int Keyboard_handlers.handle_input(Keyboard_handlers* this, Scancode key_scancode) @dynamic
 {
     Fp_input_handler handler;
 
     handler = this.handlers[key_scancode];
     if (handler == null) handler = this.default_handler;
     if (handler == null) return 0;
-    return handler(key_scancode);
+    return handler(this.ref, key_scancode); 
 }
 
-fn int handler(Fp_input_handler handler)
+fn int handler(Type* ref)
 {
-    int             handler_output = 0;
-    Scancode        scancode = get_key_on_pressed();
+    int             output;
+    Scancode        scancode = io::get_key_on_pressed();
 
-    if (scancode != Scancode.NONE) {
-        handler_output = handler(scancode);
-    }
-    return handler_output;
+    if (scancode != Scancode.NONE) output = ref.handle_input(scancode);
+    return output;
 }

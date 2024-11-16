@@ -2,7 +2,7 @@ module utils::string;
 
 // Basic string manipulation
 
-fn uint strlen(char* str) 
+fn uint len(char* str) 
 {
 	uint len = 0;
 	while (str[len] != '\0') len++;

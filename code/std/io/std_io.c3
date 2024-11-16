@@ -17,7 +17,7 @@ struct BufferIO
 
 fn int BufferIO.read(BufferIO* this, char *buffer, uint size)
 {
-    int bytes = string::strlen(&this.buffer);
+    int bytes = string::len(&this.buffer);
     if (bytes >= size) bytes = size;
 
     memory::copy(<char>)(buffer, &this.buffer, bytes);

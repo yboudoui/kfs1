@@ -32,9 +32,10 @@ fn void _start()  @section(".text") @nostrip @noreturn @export("_start")
 	}
 }
 
-fn int main()
+
+import context;
+fn void main()
 {
-	kernel::bootloader_screen();
-	// kernel::entry();
-	return 0;
+	context::start(<BootLoader>)();
+	context::start(<Multiplexer>)();
 }

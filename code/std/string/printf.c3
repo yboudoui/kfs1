@@ -18,7 +18,7 @@ fn int dump_string(char *buffer, any* arg)
 {
 	char** str = (char**)arg;
 
-	uint	size = string::strlen(*str);
+	uint	size = string::len(*str);
 	memory::copy(<char>)(buffer, *str, size);
 	return size;
 }

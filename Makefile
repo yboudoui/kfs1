@@ -12,17 +12,8 @@ CC_FLAGS= \
 --use-stdlib=no \
 --link-libc=no \
 --emit-stdlib=no \
+--no-entry \
 -g
-
-# -O2 \
-
-CFLAGS= \
--ffreestanding \
--nostdlib \
--fno-builtin \
--fno-exceptions \
--fno-stack-protector \
--nodefaultlibs \
 
 
 LDFLAGS=-T linker.ld
@@ -35,6 +26,8 @@ SOURCE_DIR=code
 ######################################################
 # Core
 ######################################################
+
+SRCS_CONTEXT			+= context.c3
 
 SRCS_HARDWARE_IO		+= io.c3
 
@@ -51,6 +44,7 @@ SRCS_KERNEL				+= kernel.c3
 
 SRCS_CORE = \
 	$(addprefix core/, \
+		$(addprefix context/, $(SRCS_CONTEXT)) \
 		$(addprefix hardware/, \
 			$(addprefix io/, $(SRCS_HARDWARE_IO))		\
 			$(addprefix keyboard/, $(SRCS_HARDWARE_KEYBOARD))	\
@@ -127,6 +121,7 @@ SRCS= $(addprefix $(SOURCE_DIR)/, \
 	main.c3 \
 	bootloader_screen.c3 \
 	entry.c3 \
+	logo42.c3 \
 )
 
 KERNEL_BIN=$(BUILD_DIR)/$(NAME).bin

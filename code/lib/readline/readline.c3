@@ -11,7 +11,6 @@ import terminal::ecma48;
 const uint READLINE_BUFFER_SIZE = 1024;
 const int FD = std_io::STD_OUT;
 
-
 struct Buffer
 {
     uint  caret_position;
@@ -41,7 +40,7 @@ fn int Buffer.update_caret_position(Buffer* this, int n)
     return (old_position - new_position);
 }
 
-fn void    Buffer.reset(Buffer* this)
+fn void Buffer.reset(Buffer* this)
 {
 	memory::set(<char>)(this.buffer.data, 0, 1); //~~??
 }
@@ -83,7 +82,7 @@ fn void Buffer.on_enter(Buffer* this, char c)
     // dprintf(fd, "%c", c);
 }
 
-fn void Buffer.on_cursor_mouvement(Buffer* this, vector::Vec2 mouvement)
+fn void Buffer.on_cursor_mouvement(Buffer* this, Vec2 mouvement)
 {
     if(this.update_caret_position(mouvement.x)) {
         ecma48::move_cursor(FD, mouvement.x, 0);

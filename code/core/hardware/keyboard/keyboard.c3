@@ -1,4 +1,4 @@
-module keyboard;
+module keyboard::io;
 
 import keyboard::scancode;
 import hardware;
@@ -45,3 +45,19 @@ fn Scancode get_key_on_pressed()
     last_scancode = scancode::SCANCODE_SET[scancode];
     return  scancode::SCANCODE_SET[scancode];
 }
+
+
+
+// interface Kh
+// {
+//     fn int handle_input(Scancode);
+// }
+
+// fn int handler(Kh h)
+// {
+//     int             output;
+//     Scancode        scancode = io::get_key_on_pressed();
+
+//     if (scancode != Scancode.NONE) output = h.handle_input(scancode);
+//     return output;
+// }

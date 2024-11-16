@@ -1,5 +1,15 @@
 module utils::memory(<Type>);
 
+fn void     zero(Type* destination, uint count)
+{
+    char *tmp = (char*)destination;
+    count *= Type.sizeof;
+    for (uint index = 0; index < count; index++)
+    {
+        tmp[index] = 0;
+    }                 
+}
+
 fn void     set(Type* destination, Type value, uint count)
 {
     for (uint index = 0; index < count; index++)

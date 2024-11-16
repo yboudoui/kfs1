@@ -14,12 +14,11 @@ import std_io;
 const uint	TERMINAL_BUFFER_SIZE = 512;
 const int	TABSIZE = 4;
 
-struct Terminal 
+struct Terminal
 {
     Frame      					vga_frame;
     Entry_color					default_color;
   
-    Fp_input_handler			input_handler;
     StdIO             			stdio;
     
 	char[TERMINAL_BUFFER_SIZE]	b;
@@ -27,19 +26,16 @@ struct Terminal
     uint                		caret_position;
 }
 
-fn void Terminal.init(Terminal *this, Entry_color default_color, Fp_input_handler input_handler)
+fn void Terminal.init(Terminal *this,  Color foreground = Color.LIGHT_GREY, Color background = Color.BLACK)
 {
 
 	this.buffer.len = TERMINAL_BUFFER_SIZE;
     this.buffer.data = &this.b;
 
-
-    this.default_color = default_color;
-	this.input_handler = &terminal_input_handler;
-	if (input_handler) this.input_handler = input_handler;
+    this.default_color = Entry_color{foreground, background};
 
     this.vga_frame.init();
-    this.vga_frame.fill(vga::entry(' ', default_color));
+    this.vga_frame.fill(vga::entry(' ', this.default_color));
 }
 
 fn void Terminal.putchar_at(Terminal *this, Vec2 position, char c)
@@ -65,7 +61,7 @@ fn void	Terminal.put_block_at(Terminal *this, uint size, char* buffer, Vec2 posi
 	}
 }
 
-fn void	Terminal.update(Terminal this)
+fn void	Terminal.update(Terminal* this)
 {
     char[std_io::STD_IO_BUFFER_SIZE]	read_buffer @noinit;
     uint								read_size;
@@ -129,7 +125,7 @@ fn bool Terminal.loot_at(Terminal this, int nb, char c)
 	return this.buffer.data[this.caret_position + nb] == c;
 }
 
-fn void Terminal.on_cursor_mouvement(Terminal* this, vector::Vec2 mouvement)
+fn void Terminal.on_cursor_mouvement(Terminal* this, Vec2 mouvement)
 {	
 	if (this.caret_position == this.buffer.size && mouvement.x > 0) return;
 
@@ -163,22 +159,7 @@ fn void Terminal.on_default(Terminal* this, char c)
 	}
 }
 
-
-// t_terminal* current_terminal(t_terminal* terminal)
-// {
-// 	static t_terminal* current_terminal = NULL;
-
-// 	if (terminal != NULL) {
-// 		current_terminal = terminal;
-// 		current_this.buffer.len = TERMINAL_BUFFER_SIZE;
-//         current_vga_frame(&current_this.vga_frame);
-// 		current_keyboard_handler(current_this.input_handler);
-// 		current_stdio(&current_this.stdio);
-// 	}
-// 	return current_terminal;
-// }
-
-fn int terminal_input_handler(Scancode key_scancode)
+fn int Terminal.handle_input(Terminal this, Scancode key_scancode)
 {
 	static char*[] ops = {
 	    [scancode::KEY_UP]    = "\033[%dA",
