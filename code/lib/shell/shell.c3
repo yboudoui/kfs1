@@ -15,7 +15,8 @@ struct Shell
     uint                                            current_working_buffer;
     // readline::Buffer* readline_buffer;
     // readline::Buffer[TERMINAL_READLINE_BUFFER_SIZE] readline_buffer;
-    readline::Buffer* readline_buffer;
+    // readline::Buffer* readline_buffer;
+    readline::Buffer readline_buffer;
 
 }
 
@@ -37,7 +38,7 @@ fn int Shell.handle_input(Shell* this, Scancode key_scancode)
     out = this.terminal.handle_input(key_scancode);
     if (out) return out;
 
-    // readline
+    this.readline_buffer.readline();
 
     out = this.handler.handle_input(key_scancode);
     if (out) return out;
@@ -54,28 +55,28 @@ fn void Shell.update(Shell* this)
 
 fn void Shell.scrool(Shell* this) @private
 {
-	readline::Buffer*   tmp = null;
+	// readline::Buffer*   tmp = null;
 
-	uint start = (this.scroll_index < vga::MAX_HEIGHT) ? 0 : this.scroll_index - vga::MAX_HEIGHT + 1;
-	uint end = start + vga::MAX_HEIGHT - 1;
+	// uint start = (this.scroll_index < vga::MAX_HEIGHT) ? 0 : this.scroll_index - vga::MAX_HEIGHT + 1;
+	// uint end = start + vga::MAX_HEIGHT - 1;
 
-    this.terminal.clear();
-	for (uint i = start; i < end; i++)
-	{
-		tmp = &this.readline_buffer[i % TERMINAL_READLINE_BUFFER_SIZE];
-		terminal::write(tmp.buffer.data, tmp.buffer.size);
-	}
+    // this.terminal.clear();
+	// for (uint i = start; i < end; i++)
+	// {
+	// 	tmp = &this.readline_buffer[i % TERMINAL_READLINE_BUFFER_SIZE];
+	// 	terminal::write(tmp.buffer.data, tmp.buffer.size);
+	// }
 }
 fn int Shell.on_return(Shell* this, Scancode key_scancode)
 {
-    this.scroll_index += 1;
-    this.scrool();
+    // this.scroll_index += 1;
+    // this.scrool();
 
-    this.current_working_buffer += 1;
-    this.current_working_buffer %= TERMINAL_READLINE_BUFFER_SIZE - 1;
-    uint working_buffer = this.current_working_buffer;
-    this.readline_buffer[working_buffer].reset();
-    // current_readline_buffer(&this.readline_buffer[working_buffer]); //?
+    // this.current_working_buffer += 1;
+    // this.current_working_buffer %= TERMINAL_READLINE_BUFFER_SIZE - 1;
+    // uint working_buffer = this.current_working_buffer;
+    // this.readline_buffer[working_buffer].reset();
+    // // current_readline_buffer(&this.readline_buffer[working_buffer]); //?
     return 0;
 }
 

@@ -54,7 +54,7 @@ fn StdIO* current_std_io(StdIO* std_io)
     return current_std_io;
 }
 
-fn int read(int fd, char *buffer, uint size)
+fn int read(int fd, char* buffer, uint size)
 {
     StdIO* stdio = current_std_io(null);
 
@@ -62,7 +62,7 @@ fn int read(int fd, char *buffer, uint size)
     return stdio.fds[fd].read(buffer, size);
 }
 
-fn int write(int fd, char *buffer, uint size)
+fn int write(int fd, char* buffer, uint size)
 {
     StdIO* stdio = current_std_io(null);
 

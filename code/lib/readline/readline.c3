@@ -85,22 +85,23 @@ fn void Buffer.on_enter(Buffer* this, char c)
 fn void Buffer.on_cursor_mouvement(Buffer* this, Vec2 mouvement)
 {
     if(this.update_caret_position(mouvement.x)) {
-        ecma48::move_cursor(FD, mouvement.x, 0);
+        ecma48::move_cursor(<Buffer>)(FD, mouvement.x, 0);
     }
 }
 
-// fn void readline()
-// {
-//     static t_ecma48_handlers handlers = {
-//         .on_cursor_mouvement = on_cursor_mouvement,
-//         .default_char_handler = on_default,
-//         .char_handlers = {
-//             ['\b']      = on_backspace,
-//             ['\177']    = on_delete, 
-//             ['\n']      = on_enter,
-//         }
-//     };
-//     char                read_buffer[STD_IO_BUFFER_SIZE] = {0};
-//     size_t              read_size = read(STD_IN, read_buffer, STD_IO_BUFFER_SIZE);
-//     ecma48_hooks(read_buffer, read_size, &handlers);
-// }
+fn void Buffer.readline(Buffer* this)
+{
+    Ecma48_handlers(<Buffer>) handlers = {
+        .ref = this,
+        .on_cursor_mouvement    = &Buffer.on_cursor_mouvement,
+        .default_char_handler   = &Buffer.on_default,
+        .char_handlers = {
+            [0x08]  = &Buffer.on_backspace,
+            [0x7F]  = &Buffer.on_delete, 
+            [0x0A]  = &Buffer.on_enter,
+        }
+    };
+    char[std_io::STD_IO_BUFFER_SIZE]    read_buffer;
+    usz read_size = std_io::read(std_io::STD_IN, &read_buffer, std_io::STD_IO_BUFFER_SIZE);
+    handlers.hooks(&read_buffer, read_size);
+}

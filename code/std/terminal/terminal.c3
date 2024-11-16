@@ -192,4 +192,3 @@ fn int write(char* buffer, uint size)
 	// return size;
 	return 0;
 }
-
