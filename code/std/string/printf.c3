@@ -1,6 +1,6 @@
-module utils::printf;
+module utils::string;
 
-import utils::string;
+import std_io;
 import utils::memory;
 
 const uint BUFFER_SIZE = 2048;
@@ -74,8 +74,10 @@ fn int dump_percentage(char *buffer, any* arg)
 	return 1;
 }
 
-fn int	vsprintf(char* buffer, char *str, any[] args)
+fn int	vsprintf(char* buffer, char* str, any[] args)
 {
+	if (str == null) return (-1);
+
 	static Fp_dump[128] dispatch = {
 		['c'] = &dump_character,
 		['s'] = &dump_string,
@@ -88,10 +90,9 @@ fn int	vsprintf(char* buffer, char *str, any[] args)
 		['%'] = &dump_percentage,
 	};
 
-	int		len;
-	int		i;
+	int		len = 0;
+	int		i = 0;
 
-	if (!str) return (-1);
 	while (*str)
 	{
 		if (str[0] == '%' && dispatch[str[1]]) {
@@ -105,17 +106,16 @@ fn int	vsprintf(char* buffer, char *str, any[] args)
 	return (len);
 }
 
-import std_io;
-fn int vdprintf(int fd, char *str, any[] args)
+fn int vdprintf(int fd, char* str, any[] args)
 {
-	char[BUFFER_SIZE]	buffer @noinit;
+	static char[BUFFER_SIZE]	buffer;
 
 	int len = vsprintf(&buffer, str, args);
     if (len < 0) return len;
     return (std_io::write(fd, &buffer, len));
 }
 
-fn int dprintf(int fd, char *str, args...)
+fn int dprintf(int fd, char* str, args...)
 {
 	return vdprintf(fd, str, args);
 }
@@ -130,13 +130,13 @@ fn int	printf(char *str, args...)
 	return vdprintf(std_io::STD_IN, str, args);
 }
 
-import terminal;
-fn int	printk(char *str, args...)
-{
-	char[BUFFER_SIZE]	buffer @noinit;
+// import terminal;
+// fn int	printk(char *str, args...)
+// {
+// 	char[BUFFER_SIZE]	buffer @noinit;
 
-	int len = vsprintf(&buffer, str, args);
-    if (len < 0) return len;
-	terminal::write(&buffer, len);
-    return len;
-}
+// 	int len = vsprintf(&buffer, str, args);
+//     if (len < 0) return len;
+// 	terminal::write(&buffer, len);
+//     return len;
+// }

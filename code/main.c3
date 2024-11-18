@@ -32,10 +32,8 @@ fn void _start()  @section(".text") @nostrip @noreturn @export("_start")
 	}
 }
 
-
-import context;
 fn void main()
 {
-	context::start(<BootLoader>)();
-	context::start(<Multiplexer>)();
+	kernel::bootloader();
+	kernel::entry();
 }

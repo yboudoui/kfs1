@@ -2,7 +2,6 @@ module terminal::ecma48(<Type>);
 
 import utils::math;
 import utils::string;
-import utils::printf;
 import utils::vector;
 
 // #include "std_io.h" TODO: plug this
@@ -28,8 +27,8 @@ struct Ecma48_handlers
 
 fn int move_cursor(int fd, int x = 0, int y = 0)
 {
-    if (y) printf::dprintf(fd, "\033[%d%c", math::abs(y), (y < 0) ? 'A' : 'B');
-    if (x) printf::dprintf(fd, "\033[%d%c", math::abs(x), (x < 0) ? 'D' : 'C');
+    if (y) string::dprintf(fd, "\033[%d%c", math::abs(y), (y < 0) ? 'A' : 'B');
+    if (x) string::dprintf(fd, "\033[%d%c", math::abs(x), (x < 0) ? 'D' : 'C');
     return 0;
 }
 

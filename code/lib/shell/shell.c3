@@ -9,26 +9,31 @@ const uint TERMINAL_READLINE_BUFFER_SIZE = 128;
 
 struct Shell
 {
-    Keyboard_handlers(<Shell>)                      handler;
-    terminal::Terminal                              terminal;
-    uint                                            scroll_index;
-    uint                                            current_working_buffer;
+    Keyboard_handlers(<Shell>)  handler;
+    Terminal                    terminal;
+    uint                        scroll_index;
+    uint                        current_working_buffer;
+    Buffer                      readline_buffer;
     // readline::Buffer* readline_buffer;
     // readline::Buffer[TERMINAL_READLINE_BUFFER_SIZE] readline_buffer;
     // readline::Buffer* readline_buffer;
-    readline::Buffer readline_buffer;
 
 }
 
 fn void Shell.init(Shell* this, Color foreground = Color.LIGHT_GREY, Color background = Color.BLACK)
 {
     this.terminal.init(foreground, background);
+    this.handler = {
+        .ref = this,
+        .default_handler = null,
+        .handlers = {
+            [Scancode.KEY_ENTER]   = &Shell.on_return,
+            [scancode::KEY_UP]     = &Shell.on_button_up,
+            [scancode::KEY_DOWN]   = &Shell.on_button_down,
+        }
+    };
 
-    this.handler.ref = this;
-    this.handler.default_handler = null;
-    this.handler.handlers[Scancode.KEY_ENTER]   = &Shell.on_return;
-    this.handler.handlers[scancode::KEY_UP]     = &Shell.on_button_up;
-    this.handler.handlers[scancode::KEY_DOWN]   = &Shell.on_button_down;
+    this.readline_buffer.init();
 }
 
 fn int Shell.handle_input(Shell* this, Scancode key_scancode)
@@ -53,7 +58,7 @@ fn void Shell.update(Shell* this)
 //////
 
 
-fn void Shell.scrool(Shell* this) @private
+fn void Shell.scrool(Shell* this)
 {
 	// readline::Buffer*   tmp = null;
 
@@ -67,6 +72,7 @@ fn void Shell.scrool(Shell* this) @private
 	// 	terminal::write(tmp.buffer.data, tmp.buffer.size);
 	// }
 }
+
 fn int Shell.on_return(Shell* this, Scancode key_scancode)
 {
     // this.scroll_index += 1;

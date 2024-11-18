@@ -9,7 +9,7 @@ struct Keyboard_handlers
     Fp_input_handler[(int)Scancode.MAX_KEY_SCANCODE]    handlers;
 }
 
-fn int Keyboard_handlers.handle_input(Keyboard_handlers* this, Scancode key_scancode) @dynamic
+fn int Keyboard_handlers.handle_input(Keyboard_handlers* this, Scancode key_scancode) 
 {
     Fp_input_handler handler;
 
@@ -22,7 +22,7 @@ fn int Keyboard_handlers.handle_input(Keyboard_handlers* this, Scancode key_scan
 fn int handler(Type* ref)
 {
     int             output;
-    Scancode        scancode = io::get_key_on_pressed();
+    Scancode        scancode = keyboard::io::get_key_on_pressed();
 
     if (scancode != Scancode.NONE) output = ref.handle_input(scancode);
     return output;

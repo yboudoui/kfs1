@@ -47,11 +47,11 @@ struct StdIO
 
 fn StdIO* current_std_io(StdIO* std_io)
 {
-    static StdIO* current_std_io = null;
+    static StdIO* current = null;
     if (std_io != null) {
-        current_std_io = std_io;
+        current = std_io;
     }
-    return current_std_io;
+    return current;
 }
 
 fn int read(int fd, char* buffer, uint size)
@@ -69,3 +69,4 @@ fn int write(int fd, char* buffer, uint size)
     if (stdio == null) return -1;
     return stdio.fds[fd].write(buffer, size);
 }
+

@@ -10,7 +10,30 @@ fn void     zero(Type* destination, uint count)
     }                 
 }
 
-fn void     set(Type* destination, Type value, uint count)
+fn void* memset(void* dest, int value, usz n) @export("memset") @nostrip
+{
+    char *src = (char*)dest;
+    for (uint index = 0; index < n; index++)
+    {
+        src[index] = (char)value;
+    }
+    return dest;
+}
+
+fn void* memcpy(void* dest, void* src, usz n) @export("memcpy") @nostrip
+{
+    if (dest == null || src == null) return dest;
+
+    char* destination = (char*)dest;
+    char* source = (char*)src;
+    for (uint index = 0; index < n; index++)
+    {
+        destination[index] = source[index];
+    }
+	return (destination);
+}
+
+fn void     set(Type* destination, Type value, uint count) 
 {
     for (uint index = 0; index < count; index++)
     {

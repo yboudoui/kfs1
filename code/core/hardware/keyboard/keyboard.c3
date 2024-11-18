@@ -11,8 +11,8 @@ fn char get_key_scancode()
 } 
 
 
-bool[217] keyboard_state;
 
+bool[217] keyboard_state;
 fn char set_keyboard_state(char scancode)
 {
     if (scancode & 0x80)
@@ -45,19 +45,3 @@ fn Scancode get_key_on_pressed()
     last_scancode = scancode::SCANCODE_SET[scancode];
     return  scancode::SCANCODE_SET[scancode];
 }
-
-
-
-// interface Kh
-// {
-//     fn int handle_input(Scancode);
-// }
-
-// fn int handler(Kh h)
-// {
-//     int             output;
-//     Scancode        scancode = io::get_key_on_pressed();
-
-//     if (scancode != Scancode.NONE) output = h.handle_input(scancode);
-//     return output;
-// }

@@ -27,8 +27,6 @@ SOURCE_DIR=code
 # Core
 ######################################################
 
-SRCS_CONTEXT			+= context.c3
-
 SRCS_HARDWARE_IO		+= io.c3
 
 SRCS_HARDWARE_KEYBOARD	+= codepage347.c3
@@ -44,7 +42,6 @@ SRCS_KERNEL				+= kernel.c3
 
 SRCS_CORE = \
 	$(addprefix core/, \
-		$(addprefix context/, $(SRCS_CONTEXT)) \
 		$(addprefix hardware/, \
 			$(addprefix io/, $(SRCS_HARDWARE_IO))		\
 			$(addprefix keyboard/, $(SRCS_HARDWARE_KEYBOARD))	\
