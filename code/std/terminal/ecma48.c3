@@ -25,11 +25,10 @@ struct Ecma48_handlers
     Fp_ecma48_char_handler[255] char_handlers;
 }
 
-fn int move_cursor(int fd, int x = 0, int y = 0)
+fn void move_cursor(int fd, int x = 0, int y = 0)
 {
     if (y) string::dprintf(fd, "\033[%d%c", math::abs(y), (y < 0) ? 'A' : 'B');
     if (x) string::dprintf(fd, "\033[%d%c", math::abs(x), (x < 0) ? 'D' : 'C');
-    return 0;
 }
 
 fn int Ecma48_handlers.hooks_handler(Ecma48_handlers* this, char* input)

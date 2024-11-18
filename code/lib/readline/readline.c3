@@ -87,20 +87,20 @@ fn void Buffer.on_enter(Buffer* this, char c)
 {
     this.buffer.insert(this.caret_position, {'\n'});
     // TODO: does readline need to forward this?
-    // dprintf(fd, "%c", c);
+    string::dprintf(FD, "%c", c);
 }
 
 fn void Buffer.on_cursor_mouvement(Buffer* this, Vec2 mouvement)
 {
-    if(this.update_caret_position(mouvement.x)) {
-        ecma48::move_cursor(<Buffer>)(FD, mouvement.x, 0);
+    if(this.update_caret_position(mouvement.x) != 0) {
+        ecma48::move_cursor(<Buffer>)(FD, x:mouvement.x);
     }
 }
 
 fn void Buffer.readline(Buffer* this)
 {
-    static char[std_io::STD_IO_BUFFER_SIZE]    read_buffer;// @noinit;
-    usz read_size = std_io::read(
+    static char[std_io::STD_IO_BUFFER_SIZE]    read_buffer;
+    int read_size = std_io::read(
         std_io::STD_IN,
         &read_buffer,
         std_io::STD_IO_BUFFER_SIZE

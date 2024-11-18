@@ -49,6 +49,8 @@ fn void entry()
     bool stop = false;
 
     mtp.init();
+    string::printf("GG\b\ntoto");
+
 	while(stop == false)
 	{
 		if (keyboard::handler(<Multiplexer>)(&mtp)) stop = true;

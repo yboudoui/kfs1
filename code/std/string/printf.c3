@@ -127,7 +127,7 @@ fn int	sprintf(char* buffer, char *str, args...)
 
 fn int	printf(char *str, args...)
 {
-	return vdprintf(std_io::STD_IN, str, args);
+	return vdprintf(std_io::STD_OUT, str, args);
 }
 
 // import terminal;
