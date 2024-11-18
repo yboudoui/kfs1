@@ -5,16 +5,16 @@ import utils::memory;
 
 const uint BUFFER_SIZE = 2048;
 
-def Fp_dump = fn int(char*, any*);
+def Fp_dump = fn int(char*, any);
 
-fn int dump_character(char *buffer, any* arg)
+fn int dump_character(char *buffer, any arg)
 {
 	char* character = (char*)arg;
 	buffer[0] = *character;
 	return 1;
 }
 
-fn int dump_string(char *buffer, any* arg)
+fn int dump_string(char *buffer, any arg)
 {
 	char** str = (char**)arg;
 
@@ -23,7 +23,7 @@ fn int dump_string(char *buffer, any* arg)
 	return size;
 }
 
-fn int dump_pointer(char *buffer, any* arg)
+fn int dump_pointer(char *buffer, any arg)
 {
 	ulong* address = (ulong*)arg;
 
@@ -35,7 +35,7 @@ fn int dump_pointer(char *buffer, any* arg)
 	return (string::LOWER_HEXA.convert(buffer + 2, (int)*address) + 2);
 }
 
-fn int dump_number(char *buffer, any* arg)
+fn int dump_number(char *buffer, any arg)
 {
 	int* number = (int*)arg;
 
@@ -50,25 +50,25 @@ fn int dump_number(char *buffer, any* arg)
 	return (string::DECIMAL.convert(&buffer[is_negative], *number)) + is_negative;
 }
 
-fn int dump_unsigned_number(char *buffer, any* arg)
+fn int dump_unsigned_number(char *buffer, any arg)
 {
 	int* number = (int*)arg;
 	return (string::DECIMAL.convert(buffer, *number));
 }
 
-fn int dump_lower_hexadecimal_case(char *buffer, any* arg)
+fn int dump_lower_hexadecimal_case(char *buffer, any arg)
 {
 	uint* number = (uint*)arg;
 	return (string::LOWER_HEXA.convert(buffer, *number));
 }
 
-fn int dump_upper_hexadecimal_case(char *buffer, any* arg)
+fn int dump_upper_hexadecimal_case(char *buffer, any arg)
 {
 	uint* number = (uint*)arg;
 	return (string::UPPER_HEXA.convert(buffer, *number));
 }
 
-fn int dump_percentage(char *buffer, any* arg)
+fn int dump_percentage(char *buffer, any arg)
 {
 	buffer[0] = '%';
 	return 1;
@@ -96,7 +96,7 @@ fn int	vsprintf(char* buffer, char* str, any[] args)
 	while (*str)
 	{
 		if (str[0] == '%' && dispatch[str[1]]) {
-			len += dispatch[str[1]](&buffer[len], &args[i]);
+			len += dispatch[str[1]](&buffer[len], args[i]);
 			str += 2;
 			i += 1;
 		} else {

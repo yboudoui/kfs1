@@ -15,14 +15,11 @@ import utils::vector;
 struct Frame
 {
   vector::Clamped_Vec2      cursor;
-  Entry[MAX_PRINTABLE_CHARACTER] b;
-  Buffer(<Entry>)   buffer;
+  Buffer(<Entry, MAX_PRINTABLE_CHARACTER>)   buffer;
 } 
 
 fn void	Frame.init(Frame* this)
 {
-    this.buffer.len = MAX_PRINTABLE_CHARACTER;
-    this.buffer.data = &this.b;
 	this.cursor.max = Vec2{MAX_WIDTH, MAX_HEIGHT - 1};
 	this.cursor.min = Vec2{0, 0};
 }
@@ -37,7 +34,7 @@ fn void Frame.put_entry_at(Frame* this, Entry entry, Vec2 position)
 
 fn void Frame.fill(Frame* this, Entry entry)
 {
-    this.buffer.clear(entry);
+    this.buffer.set(entry);
 }
 
 fn void Frame.main_frame_update(Frame* this)
@@ -47,22 +44,17 @@ fn void Frame.main_frame_update(Frame* this)
 	memory::copy(<Entry>)
     (
         destination:    VIDEO_MEMORY,
-        source:         this.buffer.data,
+        source:         &this.buffer.data,
         count:          MAX_PRINTABLE_CHARACTER
     );
 }
 
 fn void Frame.remove(Frame* this, int nb, Entry default_entry)
 {
-    Buffer(<Entry>) tmp_fill = {
-        .len = 1,
-        .size = 0,
-        .data = &default_entry,
-    };
     uint caret = this.cursor.get_linear_position();
     this.buffer.remove(
         window::from_position(caret, nb),
-        tmp_fill,
+        &&Entry[1]{default_entry},
     );
 }
 
@@ -74,7 +66,7 @@ fn void Frame.move_cursor_position_by(Frame* this, int n)
 fn void Frame.put_entry(Frame* this, Entry entry)
 {
     uint caret = this.cursor.get_linear_position();
-    this.buffer.insert_one(caret, entry);
+    this.buffer.insert(caret, {entry});
 }
 
 fn bool Frame.next_line(Frame* this)

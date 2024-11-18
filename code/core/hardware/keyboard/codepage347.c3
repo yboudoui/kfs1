@@ -2,7 +2,7 @@ module keyboard::codepage347;
 
 import keyboard::scancode;
 
-char[255] table = {
+const char[255] TABLE = {
 //   [scancode::Scancode.KEY_BACK_QUOTE]            = 0x60,
   [scancode::Scancode.KEY_0]                     = '0',
   [scancode::Scancode.KEY_1]                     = '1',
@@ -59,6 +59,5 @@ char[255] table = {
 
   [scancode::Scancode.KEY_SPACE]                 = ' ',
 
-  [scancode::KEY_DELETE]                = 0x7F,
-  // 0,
+  [scancode::KEY_DELETE]                        = 0x7F,
 };

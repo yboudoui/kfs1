@@ -18,22 +18,17 @@ const int	TABSIZE = 4;
 
 struct Terminal
 {
-    Frame      					vga_frame;
-    Entry_color					default_color;
+    Frame      								vga_frame;
+    Entry_color								default_color;
   
-    StdIO             			stdio;
+    StdIO             						stdio;
     
-	char[TERMINAL_BUFFER_SIZE]	b;
-	Buffer(<char>)				buffer;
-    uint                		caret_position;
+	Buffer(<char, TERMINAL_BUFFER_SIZE>)	buffer;
+    uint                					caret_position;
 }
 
 fn void Terminal.init(Terminal *this,  Color foreground = Color.LIGHT_GREY, Color background = Color.BLACK)
 {
-
-	this.buffer.len = TERMINAL_BUFFER_SIZE;
-    this.buffer.data = &this.b;
-
     this.default_color = Entry_color{foreground, background};
 
     this.vga_frame.init();
@@ -65,7 +60,7 @@ fn void	Terminal.put_block_at(Terminal *this, uint size, char* buffer, Vec2 posi
 
 fn void	Terminal.update(Terminal* this)
 {
-    static char[std_io::STD_IO_BUFFER_SIZE]	read_buffer;
+    char[std_io::STD_IO_BUFFER_SIZE]	read_buffer;
 	int read_size = std_io::read(std_io::STD_OUT, &read_buffer, std_io::STD_IO_BUFFER_SIZE);
 
 	if (read_size > 0)
@@ -101,7 +96,7 @@ fn int Terminal.handle_input(Terminal this, Scancode key_scancode)
     if(ops[key_scancode] != null) {
         error = string::dprintf(std_io::STD_IN, ops[key_scancode], 1);
 	} else {
-        error = string::dprintf(std_io::STD_IN, "%c", keyboard::codepage347::table[key_scancode]);
+        error = string::dprintf(std_io::STD_IN, "%c", keyboard::codepage347::TABLE[key_scancode]);
 	}
 	if (error < 0) return -1;
 	return 0;
@@ -125,7 +120,7 @@ fn void Terminal.on_backspace(Terminal* this, char c)
 
 	this.buffer.remove(
 		window::from_position(this.caret_position, 1),
-		Buffer(<char>){1, 0, " "}
+		" "
 	);
 
 	this.caret_position -= 1;
@@ -135,7 +130,10 @@ fn void Terminal.on_backspace(Terminal* this, char c)
 
 fn void Terminal.on_delete(Terminal* this, char c)
 {
-	this.buffer.remove(window::from_position(this.caret_position, 1), Buffer(<char>){1, 0, " "});
+	this.buffer.remove(
+		window::from_position(this.caret_position, 1),
+		" "
+	);
 
 	int len;
 	switch (this.buffer.data[this.caret_position])
@@ -153,7 +151,7 @@ fn void Terminal.on_delete(Terminal* this, char c)
 fn void Terminal.on_enter(Terminal* this, char c)
 {
 	// t_buffer buffer = {TERMINAL_BUFFER_SIZE, this.buffer.size, this.buffer.data};
-	// m_buffer_insert_one(char)(&buffer, this.caret_position, '\n');
+	// m_buffer_insert(char)(&buffer, this.caret_position, {'\n'});
 	// this.buffer.size = buffer.size;
     this.vga_frame.next_line();
 }
@@ -183,7 +181,7 @@ fn void Terminal.on_cursor_mouvement(Terminal* this, Vec2 mouvement)
 
 fn void Terminal.on_default(Terminal* this, char c)
 {
-	this.buffer.insert_one(this.caret_position, c);
+	this.buffer.insert(this.caret_position, &&(char[1]{c}));
 	this.caret_position += 1;
 
 	if (c == '\t') {

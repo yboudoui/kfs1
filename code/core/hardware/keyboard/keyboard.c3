@@ -10,8 +10,6 @@ fn char get_key_scancode()
     return (char)hardware::inb(KEYBOARD_DATA_PORT);
 } 
 
-
-
 bool[217] keyboard_state;
 fn char set_keyboard_state(char scancode)
 {

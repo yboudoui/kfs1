@@ -70,15 +70,16 @@ fn int Ecma48_handlers.hooks_handler(Ecma48_handlers* this, char* input)
     }
     char c = input[index];
     Fp_ecma48_char_handler char_handler = this.char_handlers[c];
-    if (char_handler) {
-        char_handler(this.ref, c);
-    } else if (this.default_char_handler) {
-        this.default_char_handler(this.ref, c);
-    } 
+    if (char_handler == null) char_handler = this.default_char_handler;
+    if (char_handler) char_handler(this.ref, c);
     return 1;
 }
 
 fn void Ecma48_handlers.hooks(Ecma48_handlers* this, char* buffer, uint size)
 {
-    for (uint i = 0; i < size; i+= this.hooks_handler(&buffer[i]));
+    uint index;
+    while (index < size)
+    {
+        index+= this.hooks_handler(buffer + index);
+    }
 }

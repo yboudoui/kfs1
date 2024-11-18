@@ -43,21 +43,14 @@ fn void     set(Type* destination, Type value, uint count)
 
 fn Type*    copy(Type* destination, Type* source, uint count)
 {
-	if (destination == null || source == null)
-    {
-        return (destination);
-    }
-
-    for (uint index = 0; index < count; index++)
-    {
-        destination[index] = source[index];
-    }
+	if (!destination || !source) return (destination);
+    for (uint i = 0; i < count; i++) destination[i] = source[i];
 	return (destination);
 }
 
-fn Type*    move(Type *destination, Type *source, uint count)
+fn Type*    move(Type* destination, Type* source, uint count)
 {        
-	if (destination == null || source == null) return (destination);
+	if (!destination || !source) return (destination);
 
 	int     direction   = 1;
     uint    index       = 0;
@@ -74,7 +67,7 @@ fn Type*    move(Type *destination, Type *source, uint count)
     return (destination);                                                          
 }
 
-fn int	compare(Type* s1, Type* s2, uint n)
+fn int      compare(Type* s1, Type* s2, uint n)
 {
     char *ptr1 = (char*)s1;
     char *ptr2 = (char*)s2;

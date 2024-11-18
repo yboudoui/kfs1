@@ -13,23 +13,23 @@ const int FD = std_io::STD_OUT;
 
 struct Buffer
 {
-    Ecma48_handlers(<Buffer>)   ecma48_handlers;
-    uint  caret_position;
-    char[READLINE_BUFFER_SIZE]  b;
-    Buffer(<char>)              buffer;
+    Ecma48_handlers(<Buffer>)               ecma48_handlers;
+    uint                                    caret_position;
+    Buffer(<char, READLINE_BUFFER_SIZE>)    buffer;
 }
 
 fn void Buffer.init(Buffer* this)
 {
-    this.buffer.data = &this.b;
-    this.buffer.len = READLINE_BUFFER_SIZE;
-
-    this.ecma48_handlers.ref = this;
-    this.ecma48_handlers.on_cursor_mouvement    = &Buffer.on_cursor_mouvement;
-    this.ecma48_handlers.default_char_handler   = &Buffer.on_default;
-    this.ecma48_handlers.char_handlers[0x08]    = &Buffer.on_backspace;
-    this.ecma48_handlers.char_handlers[0x7F]    = &Buffer.on_delete;
-    this.ecma48_handlers.char_handlers[0x0A]    = &Buffer.on_enter;
+    this.ecma48_handlers = {
+        .ref = this,
+        .on_cursor_mouvement    = &Buffer.on_cursor_mouvement,
+        .default_char_handler   = &Buffer.on_default,
+        .char_handlers = {
+            [0x08]    = &Buffer.on_backspace,
+            [0x7F]    = &Buffer.on_delete,
+            [0x0A]    = &Buffer.on_enter,
+        }
+    };
 }
 
 fn int Buffer.update_caret_position(Buffer* this, int n)
@@ -50,16 +50,16 @@ fn int Buffer.update_caret_position(Buffer* this, int n)
 
 fn void Buffer.reset(Buffer* this)
 {
-	memory::set(<char>)(this.buffer.data, 0, 1); //~~??
+    this.buffer.clear();
 }
 
 fn void Buffer.on_backspace(Buffer* this, char c)
 {
-    if (this.caret_position = 0) return;
+    if (this.caret_position == 0) return;
 
     this.buffer.remove(
         window::from_position(this.caret_position, -1),
-		Buffer(<char>){1, 0, " "}
+        " "
     );
     this.update_caret_position(-1);
     string::dprintf(FD, "%c", c);
@@ -71,21 +71,21 @@ fn void Buffer.on_delete(Buffer* this, char c)
 
     this.buffer.remove(
         window::from_position(this.caret_position, 1),
-		Buffer(<char>){1, 0, " "}
+        " "
     );
     string::dprintf(FD, "%c", c);
 }
 
 fn void Buffer.on_default(Buffer* this, char c)
 {
-    this.buffer.insert_one(this.caret_position, c);
+    this.buffer.insert(this.caret_position, {c});
     this.update_caret_position(+1);
     string::dprintf(FD, "%c", c);
 }
 
 fn void Buffer.on_enter(Buffer* this, char c)
 {
-    this.buffer.insert_one(this.caret_position, '\n');
+    this.buffer.insert(this.caret_position, {'\n'});
     // TODO: does readline need to forward this?
     // dprintf(fd, "%c", c);
 }
