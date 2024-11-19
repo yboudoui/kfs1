@@ -53,7 +53,6 @@ enum Scancode : int
   KEY_LEFT_SHIFT,
 
   KEY_LEFT_CONTROL,
-  // KEY_BACK_SLASH,
   KEY_Z,
   KEY_X,
   KEY_C,

@@ -29,7 +29,7 @@ fn void Buffer.insert(Buffer* this, uint position, Type[] fill)
                                                  
 fn void Buffer.remove(Buffer* this, Window window, Type[] fill)
 {                                                           
-    if (window.start > window.end) return;                                             
+    if (window.start > window.end) return;
 
     memory::move(<Type>)(
         destination:    &this.data[window.start],

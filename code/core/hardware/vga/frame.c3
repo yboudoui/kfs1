@@ -14,9 +14,9 @@ import utils::vector;
 // Declaration
 struct Frame
 {
-  vector::Clamped_Vec2      cursor;
-  Buffer(<Entry, MAX_PRINTABLE_CHARACTER>)   buffer;
-} 
+  Clamped_Vec2                              cursor;
+  Buffer(<Entry, MAX_PRINTABLE_CHARACTER>)  buffer;
+}
 
 fn void	Frame.init(Frame* this)
 {

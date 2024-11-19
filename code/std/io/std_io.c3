@@ -34,7 +34,7 @@ fn int BufferIO.read(BufferIO* this, char *buffer, uint size)
 
 fn int BufferIO.write(BufferIO* this, char *buffer, uint size)
 {
-    if (size > STD_IO_BUFFER_SIZE - this.caret) return -1;
+    if (size > (STD_IO_BUFFER_SIZE - this.caret)) return -1;
     memory::copy(<char>)(&this.buffer[this.caret], buffer, size);
     this.caret += size;
     return size;

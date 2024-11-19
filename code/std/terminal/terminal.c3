@@ -1,28 +1,21 @@
 module terminal;
 
-import terminal::ecma48;
-import vga;
-import utils::vector;
-import utils::string;
-import utils::buffer;
-import utils::window;
-import utils::memory;
+import terminal::handlers @public;
 
-import keyboard;
-import keyboard::codepage347;
-import keyboard::scancode;
+import vga;
 import std_io;
+import ecma48;
+import utils::vector;
+import utils::buffer;
+import keyboard::scancode;
 
 const uint	TERMINAL_BUFFER_SIZE = 512;
-const int	TABSIZE = 4;
 
 struct Terminal
 {
-    Frame      								vga_frame;
+	Frame      								vga_frame;
     Entry_color								default_color;
-  
     StdIO             						stdio;
-    
 	Buffer(<char, TERMINAL_BUFFER_SIZE>)	buffer;
     uint                					caret_position;
 }
@@ -35,76 +28,49 @@ fn void Terminal.init(Terminal *this,  Color foreground = Color.LIGHT_GREY, Colo
     this.vga_frame.fill(vga::entry(' ', this.default_color));
 }
 
-fn void Terminal.putchar_at(Terminal *this, Vec2 position, char c)
-{
-	Entry entry = vga::entry(c, this.default_color);
-    this.vga_frame.put_entry_at(entry, position);
-}
-
-fn void	Terminal.put_block_at(Terminal *this, uint size, char* buffer, Vec2 position)
-{
-	Vec2 tmp;
-
-	for (uint index = 0; index < size; index++)
-	{
-		if(buffer[index] == '\n')
-		{
-			tmp.x = 0;
-			tmp.y += 1;
-			continue;
-		}
-        this.putchar_at(position + tmp, buffer[index]);
-		tmp.x += 1;
-	}
-}
-
 fn void	Terminal.update(Terminal* this)
 {
-    char[std_io::STD_IO_BUFFER_SIZE]	read_buffer;
-	int read_size = std_io::read(std_io::STD_OUT, &read_buffer, std_io::STD_IO_BUFFER_SIZE);
+	handlers::HANDLER.hooks_fd(this, std_io::STD_OUT);
 
-	if (read_size > 0)
-	{
-		Ecma48_handlers(<Terminal>) handlers = {
-			.ref = this,
-			.on_cursor_mouvement	= &Terminal.on_cursor_mouvement,
-			.on_clear_screen		= &Terminal.clear,
-			.default_char_handler	= &Terminal.on_default,
-			.char_handlers = {
-				[0x08]	= &Terminal.on_backspace,
-				[0x7F]	= &Terminal.on_delete,
-				[0x0A]	= &Terminal.on_enter,
-			}
-		};
-		handlers.hooks(&read_buffer, read_size);
-	}
-	
-	// write(&read_buffer, read_size); 
+
+	// char[std_io::STD_IO_BUFFER_SIZE]	read_buffer;
+	// int read_size = std_io::read(std_io::STD_OUT, &read_buffer, std_io::STD_IO_BUFFER_SIZE);
+	// for(usz i = 0; i < read_size; i++) {
+	// 	this.vga_frame.put_entry(vga::entry(read_buffer[i], this.default_color));
+	// 	this.vga_frame.move_cursor_position_by(+1);
+	// }
+
 	this.vga_frame.main_frame_update();
 }
 
 fn int Terminal.handle_input(Terminal this, Scancode key_scancode)
 {
-	static char*[] ops = {
-	    [scancode::KEY_UP]    = "\033[%dA",
-	    [scancode::KEY_DOWN]  = "\033[%dB",
-	    [scancode::KEY_RIGHT] = "\033[%dC",
-	    [scancode::KEY_LEFT]  = "\033[%dD",
-	};
-
-	int error = 0;
-    if(ops[key_scancode] != null) {
-        error = string::dprintf(std_io::STD_IN, ops[key_scancode], 1);
-	} else {
-        error = string::dprintf(std_io::STD_IN, "%c", keyboard::codepage347::TABLE[key_scancode]);
-	}
-	if (error < 0) return -1;
-	return 0;
+	return ecma48::handler::dispatch(std_io::STD_IN, key_scancode);
 }
 
+module terminal::handlers @private;
 
+import vga;
+import utils::vector;
+import utils::window;
+import ecma48;
 
-// CALLBACKS
+import std_io;
+import utils::string;
+
+const int	TABSIZE = 4;
+
+const Ecma48_handlers(<Terminal>) HANDLER = {
+	.on_cursor_mouvement	= &Terminal.on_cursor_mouvement,
+	.on_clear_screen		= &Terminal.clear,
+	.default_char_handler	= &Terminal.on_default,
+	.char_handlers = {
+		[0x08]	= &Terminal.on_backspace,
+		[0x7F]	= &Terminal.on_delete,
+		[0x0A]	= &Terminal.on_enter,
+	}
+};
+
 fn void Terminal.clear(Terminal *this)
 {
 	this.caret_position = 0;
@@ -156,14 +122,9 @@ fn void Terminal.on_enter(Terminal* this, char c)
     this.vga_frame.next_line();
 }
 
-fn bool Terminal.loot_at(Terminal this, int nb, char c) // TODO, ugly to remove
-{
-	return this.buffer.data[this.caret_position + nb] == c;
-}
-
 fn void Terminal.on_cursor_mouvement(Terminal* this, Vec2 mouvement)
-{	
-	if (this.caret_position == this.buffer.size && mouvement.x > 0) return;
+{
+	// if (this.caret_position == this.buffer.data.len && mouvement.x > 0) return;
 
     int sign = 1;
 	if(mouvement.x < 0) sign = -1;
@@ -174,7 +135,8 @@ fn void Terminal.on_cursor_mouvement(Terminal* this, Vec2 mouvement)
     {
 		int index = (sign * i);
 		if (sign < 0) index -= 1;
-		this.vga_frame.move_cursor_position_by(sign * (this.loot_at(index, '\t') ? TABSIZE : 1));
+		bool look_at = this.buffer.data[this.caret_position + index] == '\t';
+		this.vga_frame.move_cursor_position_by(sign * (look_at ? TABSIZE : 1));
     }
 	this.caret_position += mouvement.x;
 }
@@ -185,28 +147,15 @@ fn void Terminal.on_default(Terminal* this, char c)
 	this.caret_position += 1;
 
 	if (c == '\t') {
-		for (uint i = 0; i < TABSIZE; i++)
+		for (uint i = 0; i < TABSIZE; i++) {
+			// string::dprintf(std_io::STD_OUT, " ");
 			this.vga_frame.put_entry(vga::entry(' ', this.default_color));
+		}
 		this.vga_frame.move_cursor_position_by(+TABSIZE);
 	}
 	else {
 		this.vga_frame.put_entry(vga::entry(c, this.default_color));
+		// string::dprintf(std_io::STD_OUT, "%c", c);
 		this.vga_frame.move_cursor_position_by(+1);
 	}
 }
-
-////////////////////////
-
-// fn int write(char* buffer, uint size)
-// {
-//     static Ecma48_handlers(<Terminal>) handlers;
-
-// 	handlers.on_cursor_mouvement	= &Terminal.on_cursor_mouvement;
-// 	handlers.on_clear_screen		= &Terminal.clear;
-// 	handlers.default_char_handler	= &Terminal.on_default;
-// 	handlers.char_handlers[0x08]	= &Terminal.on_backspace;
-// 	handlers.char_handlers[0x7F]	= &Terminal.on_delete;
-// 	handlers.char_handlers[0x0A]	= &Terminal.on_enter;
-// 	// handlers.hooks(buffer, size);
-// 	return size;
-// }

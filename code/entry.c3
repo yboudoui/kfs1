@@ -18,7 +18,7 @@ fn void Multiplexer.init(Multiplexer* this)
     this.shells[0].init(Color.WHITE);
 	this.shells[1].init(Color.BLACK, Color.LIGHT_MAGENTA);
     this.set_current_shell(0);
-	vga::enable_cursor(14,15);
+	vga::enable_cursor();
 }
 
 fn void Multiplexer.set_current_shell(Multiplexer* this, uint shell_nb)
@@ -49,7 +49,6 @@ fn void entry()
     bool stop = false;
 
     mtp.init();
-    string::printf("GG\b\ntoto");
 
 	while(stop == false)
 	{

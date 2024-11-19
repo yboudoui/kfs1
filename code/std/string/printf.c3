@@ -37,17 +37,18 @@ fn int dump_pointer(char *buffer, any arg)
 
 fn int dump_number(char *buffer, any arg)
 {
-	int* number = (int*)arg;
+	int* number = arg.ptr;
 
     // TODO: Clean this
 	int is_negative = 0;
-	if (*number < 0) {
+	if (*number < 0)
+	{
 		*number *= -1;
 		buffer[0] = '-';
 		// memcpy(buffer, "-", 1);
 		is_negative = 1;
 	}
-	return (string::DECIMAL.convert(&buffer[is_negative], *number)) + is_negative;
+	return (string::DECIMAL.convert(buffer + is_negative, *number)) + is_negative;
 }
 
 fn int dump_unsigned_number(char *buffer, any arg)
@@ -76,31 +77,38 @@ fn int dump_percentage(char *buffer, any arg)
 
 fn int	vsprintf(char* buffer, char* str, any[] args)
 {
-	if (str == null) return (-1);
+	if (!buffer || !str) return (-1);
 
-	static Fp_dump[128] dispatch = {
-		['c'] = &dump_character,
-		['s'] = &dump_string,
-		['p'] = &dump_pointer,
-		['i'] = &dump_number,
-		['d'] = &dump_number,
-		['u'] = &dump_unsigned_number,
-		['x'] = &dump_lower_hexadecimal_case,
-		['X'] = &dump_upper_hexadecimal_case,
-		['%'] = &dump_percentage,
-	};
+	static Fp_dump[128] dispatch;
+	dispatch['c'] = &dump_character;
+	dispatch['s'] = &dump_string;
+	dispatch['p'] = &dump_pointer;
+	dispatch['i'] = &dump_number;
+	dispatch['d'] = &dump_number;
+	dispatch['u'] = &dump_unsigned_number;
+	dispatch['x'] = &dump_lower_hexadecimal_case;
+	dispatch['X'] = &dump_upper_hexadecimal_case;
+	dispatch['%'] = &dump_percentage;
+	
 
 	int		len = 0;
 	int		i = 0;
+	char	current, next;
 
-	while (*str)
+	for (usz index = 0; str[index] != '\0'; index++)
 	{
-		if (str[0] == '%' && dispatch[str[1]]) {
-			len += dispatch[str[1]](&buffer[len], args[i]);
-			str += 2;
+		current = str[index];
+		next = str[index + 1] ? str[index + 1] : '\0';
+		if (current == '%' && dispatch[next])
+		{
+			len += dispatch[next](&buffer[len], args[i]);
+			index += 1;
 			i += 1;
-		} else {
-			buffer[len++] = *str++;
+		}
+		else
+		{
+			buffer[len] = current;
+			len += 1;
 		}
 	}
 	return (len);
@@ -108,7 +116,7 @@ fn int	vsprintf(char* buffer, char* str, any[] args)
 
 fn int vdprintf(int fd, char* str, any[] args)
 {
-	static char[BUFFER_SIZE]	buffer;
+	char[BUFFER_SIZE]	buffer;
 
 	int len = vsprintf(&buffer, str, args);
     if (len < 0) return len;

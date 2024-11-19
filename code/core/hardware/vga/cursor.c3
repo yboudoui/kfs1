@@ -13,10 +13,7 @@ fn void    disable_cursor()
 	hardware::outb(DATA_PORT, 0x20);
 }
 
-// #define VGA_ENABLE_CURSOR   vga_enable_cursor(14, 15);
-// TODO reabilit this
-
-fn void    enable_cursor(char cursor_start, char cursor_end)
+fn void    enable_cursor(char cursor_start = 14, char cursor_end = 15)
 {
 	char data;
 

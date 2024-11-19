@@ -1,38 +1,50 @@
 module readline;
+import readline::handler @public;
 
 import utils::buffer;
-import utils::string;
-import utils::window;
 import utils::memory;
-import utils::vector;
 import std_io;
-import terminal::ecma48;
+
 
 const uint READLINE_BUFFER_SIZE = 1024;
+
+struct Readline
+{
+    Buffer(<char, READLINE_BUFFER_SIZE>)    buffer;
+    uint                                    caret_position;
+}
+
+fn void Readline.reset(Readline* this)
+{
+    this.buffer.clear();
+}
+
+fn void Readline.readline(Readline* this)
+{
+    handler::HANDLER.hooks_fd(this, std_io::STD_IN);
+}
+
+module readline::handler @private;
+
+import utils::vector;
+import utils::window;
+import utils::string;
+import std_io;
+import ecma48;
+
 const int FD = std_io::STD_OUT;
 
-struct Buffer
-{
-    Ecma48_handlers(<Buffer>)               ecma48_handlers;
-    uint                                    caret_position;
-    Buffer(<char, READLINE_BUFFER_SIZE>)    buffer;
-}
+const Ecma48_handlers(<Readline>) HANDLER = {
+    .on_cursor_mouvement    = &Readline.on_cursor_mouvement,
+    .default_char_handler   = &Readline.on_default,
+    .char_handlers = {
+        [0x08]              = &Readline.on_backspace,
+        [0x7F]              = &Readline.on_delete,
+        [0x0A]              = &Readline.on_enter,
+    }
+};
 
-fn void Buffer.init(Buffer* this)
-{
-    this.ecma48_handlers = {
-        .ref = this,
-        .on_cursor_mouvement    = &Buffer.on_cursor_mouvement,
-        .default_char_handler   = &Buffer.on_default,
-        .char_handlers = {
-            [0x08]    = &Buffer.on_backspace,
-            [0x7F]    = &Buffer.on_delete,
-            [0x0A]    = &Buffer.on_enter,
-        }
-    };
-}
-
-fn int Buffer.update_caret_position(Buffer* this, int n)
+fn int Readline.update_caret_position(Readline* this, int n)
 {
     int  old_position   = this.caret_position;
     int  new_position   = old_position + n;
@@ -48,12 +60,7 @@ fn int Buffer.update_caret_position(Buffer* this, int n)
     return (old_position - new_position);
 }
 
-fn void Buffer.reset(Buffer* this)
-{
-    this.buffer.clear();
-}
-
-fn void Buffer.on_backspace(Buffer* this, char c)
+fn void Readline.on_backspace(Readline* this, char c)
 {
     if (this.caret_position == 0) return;
 
@@ -65,7 +72,7 @@ fn void Buffer.on_backspace(Buffer* this, char c)
     string::dprintf(FD, "%c", c);
 }
 
-fn void Buffer.on_delete(Buffer* this, char c)
+fn void Readline.on_delete(Readline* this, char c)
 {
     if (this.caret_position == 0) return;
 
@@ -76,34 +83,23 @@ fn void Buffer.on_delete(Buffer* this, char c)
     string::dprintf(FD, "%c", c);
 }
 
-fn void Buffer.on_default(Buffer* this, char c)
+fn void Readline.on_default(Readline* this, char c)
 {
     this.buffer.insert(this.caret_position, {c});
     this.update_caret_position(+1);
     string::dprintf(FD, "%c", c);
 }
 
-fn void Buffer.on_enter(Buffer* this, char c)
+fn void Readline.on_enter(Readline* this, char c)
 {
     this.buffer.insert(this.caret_position, {'\n'});
     // TODO: does readline need to forward this?
     string::dprintf(FD, "%c", c);
 }
 
-fn void Buffer.on_cursor_mouvement(Buffer* this, Vec2 mouvement)
+fn void Readline.on_cursor_mouvement(Readline* this, Vec2 mouvement)
 {
     if(this.update_caret_position(mouvement.x) != 0) {
-        ecma48::move_cursor(<Buffer>)(FD, x:mouvement.x);
+        ecma48::handler::move_cursor(FD, Vec2{mouvement.x, 0});
     }
-}
-
-fn void Buffer.readline(Buffer* this)
-{
-    static char[std_io::STD_IO_BUFFER_SIZE]    read_buffer;
-    int read_size = std_io::read(
-        std_io::STD_IN,
-        &read_buffer,
-        std_io::STD_IO_BUFFER_SIZE
-    );
-    this.ecma48_handlers.hooks(&read_buffer, read_size);
 }
