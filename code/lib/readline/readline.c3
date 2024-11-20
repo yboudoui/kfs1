@@ -1,8 +1,8 @@
 module readline;
-import readline::handler @public;
 
 import utils::buffer;
-import utils::memory;
+import utils;
+import utils::string;
 import std_io;
 
 
@@ -19,12 +19,13 @@ fn void Readline.reset(Readline* this)
     this.buffer.clear();
 }
 
+import ecma48;
 fn void Readline.readline(Readline* this)
 {
-    handler::HANDLER.hooks_fd(this, std_io::STD_IN);
+    readline::handler::HANDLER.hooks_fd(this, std_io::STD_IN);
 }
 
-module readline::handler @private;
+module readline::handler;
 
 import utils::vector;
 import utils::window;
@@ -87,7 +88,12 @@ fn void Readline.on_default(Readline* this, char c)
 {
     this.buffer.insert(this.caret_position, {c});
     this.update_caret_position(+1);
-    string::dprintf(FD, "%c", c);
+
+    // TODO: if (c == '\t')
+
+    utils::string::dprintf(FD, "%c", c);
+    // 11 LOL TODO
+    ecma48::handler::move_cursor(FD, Vec2{+11, 0});
 }
 
 fn void Readline.on_enter(Readline* this, char c)

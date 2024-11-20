@@ -12,31 +12,28 @@ const uint STD_ERR = 2;
 struct BufferIO
 {
   char[STD_IO_BUFFER_SIZE]  buffer;
-  uint                      caret;
+  uint                      size;
 }
 
 fn int BufferIO.read(BufferIO* this, char *buffer, uint size)
 {
-    int bytes = string::len(&this.buffer);
-    if (bytes >= size) bytes = size;
+    if (size > this.size) size = this.size;
+    
+    memory::copy(<char>)(buffer, &this.buffer, size);
+    memory::move(<char>)(&this.buffer, &this.buffer[size], STD_IO_BUFFER_SIZE - size);
+    memory::set(<char>)(&this.buffer[STD_IO_BUFFER_SIZE - 1 - size], (char)0, size);
 
-    memory::copy(<char>)(buffer, &this.buffer, bytes);
-    if (size >= this.caret) {
-         this.caret = 0;
-    } else {
-        this.caret -= size;
-    }
-   
-    // TODO: memmove before memset remaining size
-    memory::set(<char>)(&this.buffer, 0, STD_IO_BUFFER_SIZE);
-    return bytes;
+    this.size -= size;
+    return size;
 }
 
 fn int BufferIO.write(BufferIO* this, char *buffer, uint size)
 {
-    if (size > (STD_IO_BUFFER_SIZE - this.caret)) return -1;
-    memory::copy(<char>)(&this.buffer[this.caret], buffer, size);
-    this.caret += size;
+    if (size > STD_IO_BUFFER_SIZE) size = STD_IO_BUFFER_SIZE;
+
+    memory::copy(<char>)(&this.buffer[this.size], buffer, size);
+
+    this.size += size;
     return size;
 }
 
@@ -48,9 +45,7 @@ struct StdIO
 fn StdIO* current_std_io(StdIO* std_io)
 {
     static StdIO* current = null;
-    if (std_io != null) {
-        current = std_io;
-    }
+    if (std_io != null) current = std_io;
     return current;
 }
 

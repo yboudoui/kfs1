@@ -4,6 +4,8 @@ import terminal;
 import readline;
 import keyboard::scancode;
 import vga;
+import utils;
+import std_io;
 
 const uint TERMINAL_READLINE_BUFFER_SIZE = 128;
 
@@ -35,6 +37,8 @@ fn void Shell.init(Shell* this, Color foreground = Color.LIGHT_GREY, Color backg
 
 fn int Shell.handle_input(Shell* this, Scancode key_scancode)
 {
+    std_io::current_std_io(&this.terminal.stdio);
+
     int out;
 
     out = this.terminal.handle_input(key_scancode);
@@ -42,8 +46,9 @@ fn int Shell.handle_input(Shell* this, Scancode key_scancode)
 
     this.readline_buffer.readline();
 
-    out = this.handler.handle_input(key_scancode);
-    if (out) return out;
+    // Probably will be deleted
+    // out = this.handler.handle_input(key_scancode);
+    // if (out) return out;
 
     return 0;
 }

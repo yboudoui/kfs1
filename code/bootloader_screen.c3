@@ -21,7 +21,6 @@ fn void BootLoader.init(BootLoader* this)
 fn int BootLoader.handle_input(BootLoader* this, Scancode s) 
 {
 	return 42;
-	// return this.terminal.handle_input(s);
 }
 
 fn void BootLoader.update(BootLoader *this) 

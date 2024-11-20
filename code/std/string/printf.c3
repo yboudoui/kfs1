@@ -116,7 +116,7 @@ fn int	vsprintf(char* buffer, char* str, any[] args)
 
 fn int vdprintf(int fd, char* str, any[] args)
 {
-	char[BUFFER_SIZE]	buffer;
+	static char[BUFFER_SIZE]	buffer;
 
 	int len = vsprintf(&buffer, str, args);
     if (len < 0) return len;

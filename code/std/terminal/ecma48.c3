@@ -4,7 +4,7 @@ import std_io;
 import utils::string;
 import utils::vector;
 
-const char ESCAPE_SEQUENCE              = 0x1B;
+const char ESCAPE_SEQUENCE              = '\e';
 const char CONTROL_SEQUENCE_INTRODUCER  = 0x5B;
 
 def Fp_ecma48_char_handler      = fn void (Type*, char);
@@ -19,7 +19,7 @@ struct Ecma48_handlers
     Fp_ecma48_char_handler[255] char_handlers;
 }
 
-fn int Ecma48_handlers.dispatch(Ecma48_handlers* this, Type* ref, char* input) @private
+fn int Ecma48_handlers.dispatch(Ecma48_handlers* this, Type* ref, char* input)
 {
     uint index = 0;
 
@@ -55,6 +55,7 @@ fn int Ecma48_handlers.dispatch(Ecma48_handlers* this, Type* ref, char* input) @
             return index + 1;
         }
     }
+
     char c = input[index];
     Fp_ecma48_char_handler char_handler = this.char_handlers[c];
     if (char_handler == null) char_handler = this.default_char_handler;
@@ -71,11 +72,8 @@ fn void Ecma48_handlers.hooks_fd(Ecma48_handlers* this, Type* ref, int fd)
 
 fn void Ecma48_handlers.hooks(Ecma48_handlers* this, Type* ref, char* buffer, uint size)
 {
-    uint index;
-    while (index < size)
-    {
-        index+= this.dispatch(ref, buffer + index);
-    }
+    uint index = 0;
+    while (index < size) index += this.dispatch(ref, &buffer[index]);
 }
 
 module ecma48::handler;
@@ -86,16 +84,15 @@ import utils::vector;
 import keyboard::scancode;
 import keyboard::codepage347;
 
-
 fn void move_cursor(int fd, Vec2 mouvement)
 {
     int x = mouvement[0];
     int y = mouvement[1];
-    if (y) string::dprintf(fd, /*"\033"*/ "%z( %d )[%d%c", 123, 8000, (y < 0) ? 'A' : 'B');
-    if (x) string::dprintf(fd, /*"\033"*/ "[%d%c", math::abs(x), (x < 0) ? 'D' : 'C');
+    if (y) string::dprintf(fd, "\e[%d%c", math::abs(y), (y < 0) ? 'A' : 'B');
+    if (x) string::dprintf(fd, "\e[%d%c", math::abs(x), (x < 0) ? 'D' : 'C');
 }
 
-fn int dispatch(int fd, Scancode key_scancode)
+fn int dispatch(Scancode key_scancode, int fd)
 {
 	static Vec2[] ops = {
 	    [scancode::KEY_UP]    = { 0, -1},
@@ -105,10 +102,11 @@ fn int dispatch(int fd, Scancode key_scancode)
 	};
 
 	int error = 0;
-    if(ops[key_scancode] != Vec2{}) {
+    if(ops[key_scancode] != Vec2{0,0}) {
 		ecma48::handler::move_cursor(fd, ops[key_scancode]);
 	} else {
-        error = string::dprintf(fd, "%c", keyboard::codepage347::TABLE[key_scancode]);
+        char c = keyboard::codepage347::TABLE[key_scancode];
+        error = string::dprintf(fd, "%c", c);
 	}
 	if (error < 0) return -1;
 	return 0;
