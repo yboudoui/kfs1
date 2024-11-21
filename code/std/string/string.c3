@@ -9,7 +9,7 @@ fn uint len(char* str)
 	return len;
 }
 
-fn int  strcmp(char *s1, char *s2)
+fn int  compare(char *s1, char *s2)
 {
 	while ((*s1 || *s2))
 	{
@@ -70,27 +70,30 @@ fn void atoi(int* result, char** buffer)
     (*buffer) = tmp;
 }
 
-struct Itoa_base
-{
-    char    *buffer;
-    uint    len;
-}
-
-fn int Itoa_base.convert(Itoa_base this, char *buffer, int nb)
+fn int itoa_base(char[] base, char *buffer, int nb)
 {
     if (nb == 0) {
-        buffer[0] = this.buffer[0];
-        return 0;
+        buffer[0] = base[0];
+        return 1;
     }
-    int next = nb / this.len;
-    if (next) {
-        int place = this.convert(buffer, next);
-        buffer[place] = this.buffer[nb % this.len];
-        return 1 + place;
-    }
-    return 0;
+    int next = nb / base.len;
+    int place = itoa_base(base, buffer, next);
+    if (next == 0) place = 0;
+    buffer[place] = base[nb % base.len];
+    return 1 + place;
 }
 
-const Itoa_base LOWER_HEXA  = {"0123456789abcdef",  16};
-const Itoa_base UPPER_HEXA  = {"0123456789ABCDEF",  16};
-const Itoa_base DECIMAL     = {"0123456789",        10};
+const char[] LOWER_HEXA_BASE  = "0123456789abcdef";
+const char[] UPPER_HEXA_BASE  = "0123456789ABCDEF";
+const char[] DECIMAL_BASE  = "0123456789";
+
+// fn void! test_itoa_base_convert() @test
+// {
+//     char[64]    buffer;
+//     int value;
+//     int result;
+
+//     DECIMAL.convert(&buffer, 42);
+//     assert(compare(&buffer, "42") == 0, "Itoa_base.convert value:42 test:ok");
+//     assert(compare(&buffer, "42") != 0, "Itoa_base.convert value:42 test:ko");
+// }

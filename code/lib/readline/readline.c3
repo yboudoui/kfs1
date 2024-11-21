@@ -19,7 +19,6 @@ fn void Readline.reset(Readline* this)
     this.buffer.clear();
 }
 
-import ecma48;
 fn void Readline.readline(Readline* this)
 {
     readline::handler::HANDLER.hooks_fd(this, std_io::STD_IN);
@@ -50,38 +49,36 @@ fn int Readline.update_caret_position(Readline* this, int n)
     int  old_position   = this.caret_position;
     int  new_position   = old_position + n;
 
-    if (new_position < 0) {
-        new_position = 0;
-    }
-    if (new_position > this.buffer.size) {
-        new_position = this.buffer.size;
-    }
+    if (new_position < 0) new_position = 0;
+    if (new_position > this.buffer.size) new_position = this.buffer.size;
 
     this.caret_position = new_position;
     return (old_position - new_position);
 }
 
+const int	TABSIZE = 4;
+
 fn void Readline.on_backspace(Readline* this, char c)
 {
     if (this.caret_position == 0) return;
 
-    this.buffer.remove(
-        window::from_position(this.caret_position, -1),
-        " "
-    );
+	int len = (this.buffer.data[this.caret_position - 1] == '\t') ? TABSIZE : 1;
+
+    this.buffer.remove(window::from_position(this.caret_position, -1));
     this.update_caret_position(-1);
-    string::dprintf(FD, "%c", c);
+
+    for (usz i = 0; i < len; i++) string::dprintf(FD, "%c", c);
 }
 
 fn void Readline.on_delete(Readline* this, char c)
 {
-    if (this.caret_position == 0) return;
+    // if (this.caret_position == 0) return;
 
-    this.buffer.remove(
-        window::from_position(this.caret_position, 1),
-        " "
-    );
-    string::dprintf(FD, "%c", c);
+	// int len = (this.buffer.data[this.caret_position - 1] == '\t') ? TABSIZE : 1;
+
+    // this.buffer.remove(window::from_position(this.caret_position, 1));
+
+    // for (usz i = 0; i < len; i++) string::dprintf(FD, "%c", c);
 }
 
 fn void Readline.on_default(Readline* this, char c)
@@ -89,17 +86,17 @@ fn void Readline.on_default(Readline* this, char c)
     this.buffer.insert(this.caret_position, {c});
     this.update_caret_position(+1);
 
-    // TODO: if (c == '\t')
-
-    utils::string::dprintf(FD, "%c", c);
-    // 11 LOL TODO
-    ecma48::handler::move_cursor(FD, Vec2{+11, 0});
+	if (this.buffer.data[this.caret_position - 1] == '\t') {
+        ecma48::handler::move_cursor(FD, Vec2{+TABSIZE, 0});
+    }
+    else {
+        utils::string::dprintf(FD, "%c", c);
+    }
 }
 
 fn void Readline.on_enter(Readline* this, char c)
 {
     this.buffer.insert(this.caret_position, {'\n'});
-    // TODO: does readline need to forward this?
     string::dprintf(FD, "%c", c);
 }
 

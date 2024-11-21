@@ -11,13 +11,13 @@ struct Buffer {
 fn void Buffer.insert(Buffer* this, uint position, Type[] fill)
 { 
     if (position > this.data.len) return;
-
+    
     memory::move(<Type>)
     (
         destination:    &this.data[position + fill.len],
         source:         &this.data[position],
         count:          this.data.len - (position + fill.len)
-    );                                         
+    );
     uint index_fill = 0;
     for (uint index = position; index < position + fill.len; index++)
     {
@@ -27,7 +27,7 @@ fn void Buffer.insert(Buffer* this, uint position, Type[] fill)
     this.size += fill.len;                                                           
 }
                                                  
-fn void Buffer.remove(Buffer* this, Window window, Type[] fill)
+fn void Buffer.remove(Buffer* this, Window window, Type[] fill = {(Type)0})
 {                                                           
     if (window.start > window.end) return;
 

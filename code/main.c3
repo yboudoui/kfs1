@@ -7,11 +7,17 @@ struct Multiboot_header @align(4)
     int checksum;
 }
 
+const int MAGIC		= 0x1BADB002;
+const int ALIGN		= (1 << 0);
+const int MEMINFO	= (1 << 1);
+const int FLAGS		= ALIGN | MEMINFO;
+const int CHECKSUM	= -(MAGIC + FLAGS);
+
 Multiboot_header multiboot_header @section(".multiboot")  @nostrip = {
-    .magic = 0x1BADB002,            // MAGIC
-    .flags = (1 << 0) | (1 << 1),   // FLAGS (ALIGN | MEMINFO)
-    .checksum = -(0x1BADB002 + ((1 << 0) | (1 << 1))) // CHECKSUM
-}; 
+    .magic		= MAGIC,
+    .flags		= ALIGN | MEMINFO,
+    .checksum	= CHECKSUM
+};
 
 char[16384] stack @section(".bss")  @nostrip @align(16);  // 16 KiB
 

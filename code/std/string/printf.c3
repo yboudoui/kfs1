@@ -9,14 +9,14 @@ def Fp_dump = fn int(char*, any);
 
 fn int dump_character(char *buffer, any arg)
 {
-	char* character = (char*)arg;
+	char* character = (char*)arg.ptr;
 	buffer[0] = *character;
 	return 1;
 }
 
 fn int dump_string(char *buffer, any arg)
 {
-	char** str = (char**)arg;
+	char** str = (char**)arg.ptr;
 
 	uint	size = string::len(*str);
 	memory::copy(<char>)(buffer, *str, size);
@@ -25,14 +25,14 @@ fn int dump_string(char *buffer, any arg)
 
 fn int dump_pointer(char *buffer, any arg)
 {
-	ulong* address = (ulong*)arg;
+	ulong* address = (ulong*)arg.ptr;
 
 	if (*address == 0) {
 		memory::copy(<char>)(buffer, "0x0", 3);
 		return (3);
 	}
 	memory::copy(<char>)(buffer, "0x", 2);
-	return (string::LOWER_HEXA.convert(buffer + 2, (int)*address) + 2);
+	return (string::itoa_base(LOWER_HEXA_BASE, buffer + 2, (int)*address) + 2);
 }
 
 fn int dump_number(char *buffer, any arg)
@@ -48,25 +48,25 @@ fn int dump_number(char *buffer, any arg)
 		// memcpy(buffer, "-", 1);
 		is_negative = 1;
 	}
-	return (string::DECIMAL.convert(buffer + is_negative, *number)) + is_negative;
+	return (string::itoa_base(DECIMAL_BASE, buffer + is_negative, *number) + is_negative);
 }
 
 fn int dump_unsigned_number(char *buffer, any arg)
 {
-	int* number = (int*)arg;
-	return (string::DECIMAL.convert(buffer, *number));
+	int* number = (int*)arg.ptr;
+	return (string::itoa_base(DECIMAL_BASE, buffer, *number));
 }
 
 fn int dump_lower_hexadecimal_case(char *buffer, any arg)
 {
 	uint* number = (uint*)arg;
-	return (string::LOWER_HEXA.convert(buffer, *number));
+	return (string::itoa_base(LOWER_HEXA_BASE, buffer, *number));
 }
 
 fn int dump_upper_hexadecimal_case(char *buffer, any arg)
 {
 	uint* number = (uint*)arg;
-	return (string::UPPER_HEXA.convert(buffer, *number));
+	return (string::itoa_base(UPPER_HEXA_BASE, buffer, *number));
 }
 
 fn int dump_percentage(char *buffer, any arg)

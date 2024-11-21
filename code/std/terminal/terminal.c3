@@ -6,7 +6,6 @@ import vga;
 import std_io;
 import ecma48;
 import utils::vector;
-import utils::buffer;
 import utils;
 import keyboard::scancode;
 
@@ -14,11 +13,9 @@ const uint	TERMINAL_BUFFER_SIZE = 512;
 
 struct Terminal
 {
-	Frame      								vga_frame;
-    Entry_color								default_color;
-    StdIO             						stdio;
-	Buffer(<char, TERMINAL_BUFFER_SIZE>)	buffer;
-    uint                					caret_position;
+	Frame      	vga_frame;
+    Entry_color	default_color;
+    StdIO		stdio;
 }
 
 fn void Terminal.init(Terminal *this,  Color foreground = Color.LIGHT_GREY, Color background = Color.BLACK)
@@ -50,8 +47,6 @@ import ecma48;
 import std_io;
 import utils::string;
 
-const int	TABSIZE = 4;
-
 const Ecma48_handlers(<Terminal>) HANDLER = {
 	.on_cursor_mouvement	= &Terminal.on_cursor_mouvement,
 	.on_clear_screen		= &Terminal.clear,
@@ -65,52 +60,23 @@ const Ecma48_handlers(<Terminal>) HANDLER = {
 
 fn void Terminal.clear(Terminal *this)
 {
-	this.caret_position = 0;
     this.vga_frame.fill(vga::entry(' ', this.default_color));
 	this.vga_frame.cursor.position = {0, 0};
 }
 
 fn void Terminal.on_backspace(Terminal* this, char c)
 {
-	if (this.caret_position == 0) return;
-
-	int len = (this.buffer.data[this.caret_position - 1] == '\t') ? -TABSIZE : -1;
-
-	this.buffer.remove(
-		window::from_position(this.caret_position, 1),
-		" "
-	);
-
-	this.caret_position -= 1;
-	this.vga_frame.remove(len, vga::entry(' ', this.default_color));
-	this.vga_frame.move_cursor_position_by(len);
+	this.vga_frame.remove(-1, vga::entry(' ', this.default_color));
+	this.vga_frame.move_cursor_position_by(-1);
 }
 
 fn void Terminal.on_delete(Terminal* this, char c)
 {
-	this.buffer.remove(
-		window::from_position(this.caret_position, 1),
-		" "
-	);
-
-	int len;
-	switch (this.buffer.data[this.caret_position])
-	{
-	case '\t':
-		len = TABSIZE;
-		break;
-	default:
-		len = 1;
-		break;
-	}
-	this.vga_frame.remove(len, vga::entry(' ', this.default_color));
+	// this.vga_frame.remove(1, vga::entry(' ', this.default_color));
 }
 
 fn void Terminal.on_enter(Terminal* this, char c)
 {
-	// t_buffer buffer = {TERMINAL_BUFFER_SIZE, this.buffer.size, this.buffer.data};
-	// m_buffer_insert(char)(&buffer, this.caret_position, {'\n'});
-	// this.buffer.size = buffer.size;
     this.vga_frame.next_line();
 }
 
@@ -123,4 +89,5 @@ fn void Terminal.on_cursor_mouvement(Terminal* this, Vec2 mouvement)
 fn void Terminal.on_default(Terminal* this, char c)
 {
 	this.vga_frame.put_entry(vga::entry(c, this.default_color));
+	this.vga_frame.move_cursor_position_by(+1);
 }

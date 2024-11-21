@@ -49,7 +49,6 @@ fn void entry()
     bool stop = false;
 
     mtp.init();
-
 	while(stop == false)
 	{
 		if (keyboard::handler(<Multiplexer>)(&mtp)) stop = true;
