@@ -76,6 +76,10 @@ SRCS_LIB			= $(addprefix lib/, \
 # Std
 ######################################################
 
+SRCS_STD_COLLECTIONS	= $(addprefix collections/, \
+	collections.c3 \
+)
+
 SRCS_STD_IO		= $(addprefix io/, \
 	std_io.c3 \
 )
@@ -102,6 +106,7 @@ SRCS_TERMINAL	= $(addprefix terminal/, \
 )
 
 SRCS_STD		= $(addprefix std/, \
+	$(SRCS_STD_COLLECTIONS) \
 	$(SRCS_STD_IO) \
 	$(SRCS_STD_MATH) \
 	$(SRCS_STD_MEMORY) \

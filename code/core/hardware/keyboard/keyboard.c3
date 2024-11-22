@@ -15,10 +15,12 @@ union Hl
 }
 
 State[Scancode.elements] keyboard_state;
+import utils;
 
 fn bool get_key_state(Key_State* key)
 {
-    Hl                  scancode;
+    *key = Key_State{};
+    Hl scancode;
 
     scancode.raw = hardware::inb(KEYBOARD_DATA_PORT);
 
@@ -33,6 +35,8 @@ fn bool get_key_state(Key_State* key)
     // If the scancode is not in the table we abort
     if (key.code == Scancode.NONE) return false;
     if (keyboard_state[key.code] == key.state) return false;
+
+    utils::string::printf("{ %x }",  scancode.raw);
 
     keyboard_state[key.code] = key.state;
     return true;

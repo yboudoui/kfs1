@@ -57,9 +57,10 @@ fn int Ecma48_handlers.dispatch(Ecma48_handlers* this, Type* ref, char* input)
     }
 
     char c = input[index];
+
     Fp_ecma48_char_handler char_handler = this.char_handlers[c];
     if (char_handler == null) char_handler = this.default_char_handler;
-    if (char_handler) char_handler(ref, c);
+    if (char_handler != null) char_handler(ref, c);
     return 1;
 }
 
@@ -92,8 +93,11 @@ fn void move_cursor(int fd, Vec2 mouvement)
     if (x) string::dprintf(fd, "\e[%d%c", math::abs(x), (x < 0) ? 'D' : 'C');
 }
 
+import utils::collections;
+
 fn int dispatch(Scancode key_scancode, int fd)
 {
+    Scancode[] keys = {Scancode.KEY_UP, Scancode.KEY_DOWN, Scancode.KEY_RIGHT, Scancode.KEY_LEFT};
 	static Vec2[] ops = {
 	    [Scancode.KEY_UP]    = { 0, -1},
 	    [Scancode.KEY_DOWN]  = { 0, +1},
@@ -102,16 +106,15 @@ fn int dispatch(Scancode key_scancode, int fd)
 	};
 
 	int error = 0;
-    utils::string::printf(" [%s] ", Scancode.names[(int)key_scancode]);
-    // if(ops[key_scancode] != Vec2{0,0}) {
-	// 	ecma48::handler::move_cursor(fd, ops[key_scancode]);
-    //     return 0;
-	// }
-    //  else {
-    //     if (key_scancode == Scancode.KEY_DELETE) return 0;
-    //     char c = keyboard::codepage347::TABLE[key_scancode];
-    //     error = string::dprintf(fd, "%c", c);
-	// }
-	// if (error < 0) return -1;
+    utils::string::printf(" %d, (%x) [%s] ", key_scancode, keyboard::codepage347::TABLE[key_scancode], Scancode.names[(int)key_scancode]);
+
+    if (try i = collections::one_of(<Scancode>)(keys, key_scancode)) {
+		ecma48::handler::move_cursor(fd, ops[keys[i]]);
+    }
+    else {
+        char c = keyboard::codepage347::TABLE[key_scancode];
+        error = string::dprintf(fd, "%c", c);
+	}
+	if (error < 0) return -1;
 	return 0;
 }

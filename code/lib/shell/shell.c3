@@ -40,10 +40,7 @@ fn int Shell.handle_input(Shell* this, Scancode key_scancode)
     int out;
 
     out = this.terminal.handle_input(key_scancode);
-    if (out) {
-        utils::string::printf("stop"); return 0;
-        // return out;
-    }
+    if (out) return out;
 
     this.readline_buffer.readline();
 

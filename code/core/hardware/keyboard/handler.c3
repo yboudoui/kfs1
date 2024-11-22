@@ -21,12 +21,17 @@ fn int Keyboard_handlers.handle_input(Keyboard_handlers* this, Scancode key_scan
 }
 
 import keyboard::io;
+
+import utils;
 fn int handler(Type* ref)
 {
     Key_State key;
 
     if (keyboard::io::get_key_state(&key)) {
-        if (key.state == PRESSED) return ref.handle_input(key.code);
+        if (key.state == PRESSED) {
+            // utils::string::printf("LL");
+            return ref.handle_input(key.code);
+        }
     }
     return 0;
 }
