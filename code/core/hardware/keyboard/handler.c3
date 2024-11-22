@@ -1,12 +1,13 @@
 module keyboard(<Type>);
+import keyboard::scancode;
 
 def Fp_input_handler = fn int (Type*, Scancode);
 
 struct Keyboard_handlers
 {
-    Type*                                               ref;
-    Fp_input_handler                                    default_handler;
-    Fp_input_handler[(int)Scancode.MAX_KEY_SCANCODE]    handlers;
+    Type*                               ref;
+    Fp_input_handler                    default_handler;
+    Fp_input_handler[Scancode.elements] handlers;
 }
 
 fn int Keyboard_handlers.handle_input(Keyboard_handlers* this, Scancode key_scancode) 
@@ -19,11 +20,13 @@ fn int Keyboard_handlers.handle_input(Keyboard_handlers* this, Scancode key_scan
     return handler(this.ref, key_scancode); 
 }
 
+import keyboard::io;
 fn int handler(Type* ref)
 {
-    int             output;
-    Scancode        scancode = keyboard::io::get_key_on_pressed();
+    Key_State key;
 
-    if (scancode != Scancode.NONE) output = ref.handle_input(scancode);
-    return output;
+    if (keyboard::io::get_key_state(&key)) {
+        if (key.state == PRESSED) return ref.handle_input(key.code);
+    }
+    return 0;
 }

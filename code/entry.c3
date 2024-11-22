@@ -30,10 +30,10 @@ fn void Multiplexer.set_current_shell(Multiplexer* this, uint shell_nb)
 
 fn int Multiplexer.handle_input(Multiplexer* this, Scancode key_scancode)
 {
-    if (key_scancode == Scancode.KEY_1 || key_scancode == Scancode.KEY_2)
-    {
-        this.set_current_shell(key_scancode - Scancode.KEY_1);
-    }
+    // if (key_scancode == Scancode.KEY_1 || key_scancode == Scancode.KEY_2)
+    // {
+    //     this.set_current_shell(key_scancode - Scancode.KEY_1);
+    // }
     return this.current.handle_input(key_scancode);
 }
 

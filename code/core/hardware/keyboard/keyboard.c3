@@ -2,44 +2,38 @@ module keyboard::io;
 
 import keyboard::scancode;
 import hardware;
-import utils::memory;
 
 const ushort KEYBOARD_DATA_PORT = 0x60;
-fn char get_key_scancode()
+union Hl 
 {
-    return (char)hardware::inb(KEYBOARD_DATA_PORT);
-} 
-
-bool[217] keyboard_state;
-fn char set_keyboard_state(char scancode)
-{
-    if (scancode & 0x80)
+    ushort  raw;
+    struct
     {
-        scancode ^= 0x80;
-        keyboard_state[scancode] = false;
+        char extend;
+        char code;
     }
-    else {
-        keyboard_state[scancode] = true;
-    }
-    return scancode;
 }
 
-fn Scancode get_key_on_pressed()
+State[Scancode.elements] keyboard_state;
+
+fn bool get_key_state(Key_State* key)
 {
-    static Scancode last_scancode;
-    char             scancode;
-    
-    scancode = get_key_scancode();
-    if (scancode == 0xE0) {
-        scancode = set_keyboard_state(get_key_scancode());
+    Hl                  scancode;
+
+    scancode.raw = hardware::inb(KEYBOARD_DATA_PORT);
+
+    // If the received code is out of the SCANCODE_SET len we abort
+    if (!(scancode.code > 0 && scancode.code < scancode::SCANCODE_SET.len)) return false;
+
+    if (scancode.extend == 0xE0) {
+        *key = scancode::SCANCODE_SET_EXTENDED[scancode.code];
     } else {
-        scancode = set_keyboard_state(scancode);
+        *key = scancode::SCANCODE_SET[scancode.code];
     }
-    if (keyboard_state[scancode] == false) {
-        last_scancode = Scancode.NONE;
-        return Scancode.NONE;
-    }
-    if (last_scancode == scancode::SCANCODE_SET[scancode]) return Scancode.NONE;
-    last_scancode = scancode::SCANCODE_SET[scancode];
-    return  scancode::SCANCODE_SET[scancode];
+    // If the scancode is not in the table we abort
+    if (key.code == Scancode.NONE) return false;
+    if (keyboard_state[key.code] == key.state) return false;
+
+    keyboard_state[key.code] = key.state;
+    return true;
 }

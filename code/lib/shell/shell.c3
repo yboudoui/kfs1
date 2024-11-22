@@ -18,8 +18,6 @@ struct Shell
     Readline                    readline_buffer;
     // readline::Buffer* readline_buffer;
     // readline::Buffer[TERMINAL_READLINE_BUFFER_SIZE] readline_buffer;
-    // readline::Buffer* readline_buffer;
-
 }
 
 fn void Shell.init(Shell* this, Color foreground = Color.LIGHT_GREY, Color background = Color.BLACK)
@@ -29,8 +27,8 @@ fn void Shell.init(Shell* this, Color foreground = Color.LIGHT_GREY, Color backg
         .ref = this,
         .handlers = {
             [Scancode.KEY_ENTER]   = &Shell.on_return,
-            [scancode::KEY_UP]     = &Shell.on_button_up,
-            [scancode::KEY_DOWN]   = &Shell.on_button_down,
+            [Scancode.KEY_UP]     = &Shell.on_button_up,
+            [Scancode.KEY_DOWN]   = &Shell.on_button_down,
         }
     };
 }
@@ -42,7 +40,10 @@ fn int Shell.handle_input(Shell* this, Scancode key_scancode)
     int out;
 
     out = this.terminal.handle_input(key_scancode);
-    if (out) return out;
+    if (out) {
+        utils::string::printf("stop"); return 0;
+        // return out;
+    }
 
     this.readline_buffer.readline();
 

@@ -95,19 +95,23 @@ fn void move_cursor(int fd, Vec2 mouvement)
 fn int dispatch(Scancode key_scancode, int fd)
 {
 	static Vec2[] ops = {
-	    [scancode::KEY_UP]    = { 0, -1},
-	    [scancode::KEY_DOWN]  = { 0, +1},
-	    [scancode::KEY_RIGHT] = {+1,  0},
-	    [scancode::KEY_LEFT]  = {-1,  0},
+	    [Scancode.KEY_UP]    = { 0, -1},
+	    [Scancode.KEY_DOWN]  = { 0, +1},
+	    [Scancode.KEY_RIGHT] = {+1,  0},
+	    [Scancode.KEY_LEFT]  = {-1,  0},
 	};
 
 	int error = 0;
-    if(ops[key_scancode] != Vec2{0,0}) {
-		ecma48::handler::move_cursor(fd, ops[key_scancode]);
-	} else {
-        char c = keyboard::codepage347::TABLE[key_scancode];
-        error = string::dprintf(fd, "%c", c);
-	}
-	if (error < 0) return -1;
+    utils::string::printf(" [%s] ", Scancode.names[(int)key_scancode]);
+    // if(ops[key_scancode] != Vec2{0,0}) {
+	// 	ecma48::handler::move_cursor(fd, ops[key_scancode]);
+    //     return 0;
+	// }
+    //  else {
+    //     if (key_scancode == Scancode.KEY_DELETE) return 0;
+    //     char c = keyboard::codepage347::TABLE[key_scancode];
+    //     error = string::dprintf(fd, "%c", c);
+	// }
+	// if (error < 0) return -1;
 	return 0;
 }

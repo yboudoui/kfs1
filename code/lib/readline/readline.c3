@@ -72,6 +72,7 @@ fn void Readline.on_backspace(Readline* this, char c)
 
 fn void Readline.on_delete(Readline* this, char c)
 {
+    return ;    
     // if (this.caret_position == 0) return;
 
 	// int len = (this.buffer.data[this.caret_position - 1] == '\t') ? TABSIZE : 1;
