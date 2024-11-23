@@ -29,7 +29,6 @@ fn int handler(Type* ref)
 
     if (keyboard::io::get_key_state(&key)) {
         if (key.state == PRESSED) {
-            // utils::string::printf("LL");
             return ref.handle_input(key.code);
         }
     }

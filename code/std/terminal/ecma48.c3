@@ -106,7 +106,8 @@ fn int dispatch(Scancode key_scancode, int fd)
 	};
 
 	int error = 0;
-    utils::string::printf(" %d, (%x) [%s] ", key_scancode, keyboard::codepage347::TABLE[key_scancode], Scancode.names[(int)key_scancode]);
+    // utils::string::printf(" %d, (%x) [%s] ", key_scancode, keyboard::codepage347::TABLE[key_scancode], Scancode.names[(int)key_scancode]);
+    // utils::string::printf(" [%s] ", Scancode.names[(int)key_scancode]);
 
     if (try i = collections::one_of(<Scancode>)(keys, key_scancode)) {
 		ecma48::handler::move_cursor(fd, ops[keys[i]]);

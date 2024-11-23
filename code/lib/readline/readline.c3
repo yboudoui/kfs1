@@ -73,7 +73,6 @@ fn void Readline.on_backspace(Readline* this, char c)
 fn void Readline.on_delete(Readline* this, char c)
 {
     if (this.caret_position == this.buffer.size) return;
-    // utils::string::printf("[%d][%d]", this.caret_position, this.buffer.size);
 
 	int len = (this.buffer.data[this.caret_position - 1] == '\t') ? TABSIZE : 1;
 
@@ -84,7 +83,6 @@ fn void Readline.on_delete(Readline* this, char c)
 
 fn void Readline.on_default(Readline* this, char c)
 {
-    // utils::string::printf("[%d]", c);
 
     this.buffer.insert(this.caret_position, {c});
     this.update_caret_position(+1);
