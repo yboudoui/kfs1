@@ -5,18 +5,19 @@ import utils;
 import utils::string;
 import std_io;
 
-
 const uint READLINE_BUFFER_SIZE = 1024;
 
 struct Readline
 {
     Buffer(<char, READLINE_BUFFER_SIZE>)    buffer;
     uint                                    caret_position;
+    CaretBuffer(<READLINE_BUFFER_SIZE>) b;
 }
 
 fn void Readline.reset(Readline* this)
 {
     this.buffer.clear();
+    // this.b.buffer.clear();
 }
 
 fn void Readline.readline(Readline* this)
@@ -60,21 +61,42 @@ const int	TABSIZE = 4;
 
 fn void Readline.on_backspace(Readline* this, char c)
 {
-    if (this.caret_position == 0) return;
+    char[1] tmp;
+    // this.b.select(&tmp, -1)!!;
 
-	int len = (this.buffer.data[this.caret_position - 1] == '\t') ? TABSIZE : 1;
 
-    this.buffer.remove(window::from_position(this.caret_position, -1));
-    this.update_caret_position(-1);
+    int a  = this.b.select(&tmp, -1)!!;
+    string::dprintf(FD, "%d ", a);
 
+    // string::printf("[%d]", tmp[0]);
+    this.b.remove(-1);
+
+	int len = (tmp[0] == '\t') ? TABSIZE : 1;
     for (usz i = 0; i < len; i++) string::dprintf(FD, "%c", c);
+
+
+    // TODO: replace for loop by
+    //string::dprintf(FD, "%*.c", len, c);
+  
+
+  //old
+
+    // if (this.caret_position == 0) return;
+
+	// int len = (this.buffer.data[this.caret_position - 1] == '\t') ? TABSIZE : 1;
+
+    // this.buffer.remove(window::from_position(this.caret_position, -1));
+    // this.update_caret_position(-1);
+
+    // for (usz i = 0; i < len; i++) string::dprintf(FD, "%c", c);
 }
 
 fn void Readline.on_delete(Readline* this, char c)
 {
     if (this.caret_position == this.buffer.size) return;
 
-	int len = (this.buffer.data[this.caret_position - 1] == '\t') ? TABSIZE : 1;
+	int len = 1;
+    if (this.caret_position > 0 && this.buffer.data[this.caret_position - 1] == '\t') len = TABSIZE;
 
     this.buffer.remove(window::from_position(this.caret_position, 1));
 
@@ -83,11 +105,15 @@ fn void Readline.on_delete(Readline* this, char c)
 
 fn void Readline.on_default(Readline* this, char c)
 {
+    char[1] tmp;
+    this.b.select(&tmp, -1)!!;
+    this.b.insert({c});
 
-    this.buffer.insert(this.caret_position, {c});
-    this.update_caret_position(+1);
+    // this.buffer.insert(this.caret_position, {c});
+    // this.update_caret_position(+1);
 
-	if (this.buffer.data[this.caret_position - 1] == '\t') {
+	// if (this.buffer.data[this.caret_position - 1] == '\t') {
+	if (tmp[0] == '\t') {
         ecma48::handler::move_cursor(FD, Vec2{+TABSIZE, 0});
     }
     else {

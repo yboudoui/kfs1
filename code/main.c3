@@ -40,6 +40,6 @@ fn void _start()  @section(".text") @nostrip @noreturn @export("_start")
 
 fn void main()
 {
-	// kernel::bootloader();
+	kernel::bootloader();
 	kernel::entry();
 }

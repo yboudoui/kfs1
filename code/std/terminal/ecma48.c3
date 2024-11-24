@@ -105,7 +105,6 @@ fn int dispatch(Scancode key_scancode, int fd)
 	    [Scancode.KEY_LEFT]  = {-1,  0},
 	};
 
-	int error = 0;
     // utils::string::printf(" %d, (%x) [%s] ", key_scancode, keyboard::codepage347::TABLE[key_scancode], Scancode.names[(int)key_scancode]);
     // utils::string::printf(" [%s] ", Scancode.names[(int)key_scancode]);
 
@@ -114,8 +113,7 @@ fn int dispatch(Scancode key_scancode, int fd)
     }
     else {
         char c = keyboard::codepage347::TABLE[key_scancode];
-        error = string::dprintf(fd, "%c", c);
+        if (string::dprintf(fd, "%c", c) < 0) return -1;
 	}
-	if (error < 0) return -1;
 	return 0;
 }

@@ -37,18 +37,17 @@ fn int dump_pointer(char *buffer, any arg)
 
 fn int dump_number(char *buffer, any arg)
 {
-	int* number = arg.ptr;
+	int number = *(int*)arg.ptr;
 
     // TODO: Clean this
 	int is_negative = 0;
-	if (*number < 0)
+	if (number < 0)
 	{
-		*number *= -1;
+		number *= -1;
 		buffer[0] = '-';
-		// memcpy(buffer, "-", 1);
 		is_negative = 1;
 	}
-	return (string::itoa_base(DECIMAL_BASE, buffer + is_negative, *number) + is_negative);
+	return (string::itoa_base(DECIMAL_BASE, buffer + is_negative, number) + is_negative);
 }
 
 fn int dump_unsigned_number(char *buffer, any arg)

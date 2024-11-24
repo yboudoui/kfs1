@@ -85,6 +85,7 @@ SRCS_STD_IO		= $(addprefix io/, \
 )
 
 SRCS_STD_MATH		= $(addprefix math/, \
+	clamped_value.c3 \
 	math.c3 \
 	window.c3 \
 	vector.c3 \
@@ -96,6 +97,7 @@ SRCS_STD_MEMORY		= $(addprefix memory/, \
 )
 
 SRCS_STD_STRING		= $(addprefix string/, \
+	caret_buffer.c3 \
 	printf.c3 \
 	string.c3 \
 )

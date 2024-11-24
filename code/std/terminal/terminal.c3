@@ -72,7 +72,7 @@ fn void Terminal.on_backspace(Terminal* this, char c)
 
 fn void Terminal.on_delete(Terminal* this, char c)
 {
-	this.vga_frame.remove(1, vga::entry(' ', this.default_color));
+	this.vga_frame.remove(+1, vga::entry(' ', this.default_color));
 }
 
 fn void Terminal.on_enter(Terminal* this, char c)

@@ -36,6 +36,17 @@ fn bool Clamped_Vec2.with(Clamped_Vec2* this, Fp_Set_Vec2... updates)
     return (memory::compare(<Vec2>)(&this.position, &tmp, 1) == 0);
 }
 
+struct Clamped_int
+{
+    int min, max, position;
+}
+
+fn void Clamped_int.update(Clamped_int* this)
+{
+    clamp_int(&this.position, this.min, this.max);
+}
+
+
 fn void clamp_int(int* value, int min, int max)
 {
     if (*value < min) (*value) = min;
