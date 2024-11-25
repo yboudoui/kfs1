@@ -9,12 +9,7 @@ const uint READLINE_BUFFER_SIZE = 1024;
 
 struct Readline
 {
-    CaretBuffer(<READLINE_BUFFER_SIZE>) b;
-}
-
-fn void Readline.reset(Readline* this)
-{
-    this.b.reset();
+    inline CaretBuffer(<char, READLINE_BUFFER_SIZE>) b;
 }
 
 fn void Readline.readline(Readline* this)

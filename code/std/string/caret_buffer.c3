@@ -1,4 +1,4 @@
-module utils::string::caret_buffer(<BUFFER_SIZE>);
+module utils::string::caret_buffer(<Type, BUFFER_SIZE>);
 
 import utils::math;
 import utils::buffer;
@@ -14,7 +14,7 @@ fault Err
 
 struct CaretBuffer
 {
-    Buffer(<char, BUFFER_SIZE>) buffer;
+    inline Buffer(<Type, BUFFER_SIZE>) buffer;
     Clamped(<0, BUFFER_SIZE>)   caret_position;
 }
 
@@ -31,7 +31,7 @@ fn int CaretBuffer.update_caret(CaretBuffer* this, int n = 0)
     return this.caret_position.update(n);
 }
 
-fn int! CaretBuffer.select(CaretBuffer* this, char[] buffer, int n = 0)
+fn int! CaretBuffer.select(CaretBuffer* this, Type[] buffer, int n = 0)
 {
     if (n == 0) return 0;
     int len = math::abs(n);
@@ -42,9 +42,9 @@ fn int! CaretBuffer.select(CaretBuffer* this, char[] buffer, int n = 0)
     
     clampe_value::clamp(<int>)(0, max, &len);
     
-    char* source = &this.buffer.data[this.caret_position];
+    Type* source = &this.buffer.data[this.caret_position];
     if (n < 0) source -= len;
-    memory::copy(<char>)(buffer, source, len);
+    memory::copy(<Type>)(buffer, source, len);
 
     return (n < 0) ? -len : len;
 }
@@ -58,7 +58,7 @@ fn int CaretBuffer.remove(CaretBuffer* this, int n = 0)
     return (n);
 }
 
-fn int CaretBuffer.insert(CaretBuffer* this, char[] str)
+fn int CaretBuffer.insert(CaretBuffer* this, Type[] str)
 {
     return this.caret_position.update(this.buffer.insert(this.caret_position, str));
 }
