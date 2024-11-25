@@ -43,7 +43,7 @@ fn void     set(Type* destination, Type value, uint count)
 
 fn Type*    copy(Type* destination, Type* source, uint count)
 {
-	if (!destination || !source) return (destination);
+	if (!destination || !source || !count) return (destination);
     for (uint i = 0; i < count; i++) destination[i] = source[i];
 	return (destination);
 }

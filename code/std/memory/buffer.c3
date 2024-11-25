@@ -7,10 +7,20 @@ struct Buffer {
     uint                size;
     Type[MAX_CAPACITY]  data;
 }
-                                                            
-fn void Buffer.insert(Buffer* this, uint position, Type[] fill)
-{ 
-    if (position > this.data.len) return;
+
+fn void Buffer.fill_remaining(Buffer* this, uint from, uint until, Type[] fill) @private
+{
+    uint index_fill = 0;
+    for (uint index = from; index < until; index++)
+    {
+        this.data[index] = fill[index_fill];
+        index_fill = (index_fill + 1) % fill.len;
+    }
+}
+
+fn int Buffer.insert(Buffer* this, uint position, Type[] fill)
+{
+    if (position > this.data.len) return 0; // NOTE:Should return an error
     
     memory::move(<Type>)
     (
@@ -18,32 +28,32 @@ fn void Buffer.insert(Buffer* this, uint position, Type[] fill)
         source:         &this.data[position],
         count:          this.data.len - (position + fill.len)
     );
-    uint index_fill = 0;
-    for (uint index = position; index < position + fill.len; index++)
-    {
-        index_fill          %= fill.len;
-        this.data[index]    = fill[index_fill++];
-    }                                                                                   
-    this.size += fill.len;                                                           
+    this.fill_remaining(
+        from:   position,
+        until:  position + fill.len,
+        fill:   fill
+    );
+    this.size += fill.len;
+    return fill.len;
 }
                                                  
-fn void Buffer.remove(Buffer* this, Window window, Type[] fill = {(Type)0})
+fn int Buffer.remove(Buffer* this, Window window, Type[] fill = {(Type)0})
 {                                                           
-    if (window.start > window.end) return;
+    if (window.start > window.end) return 0; // NOTE:Should return an error
 
+    uint count = this.data.len - window.end;
     memory::move(<Type>)(
         destination:    &this.data[window.start],
         source:         &this.data[window.end],
-        count:          this.data.len - window.end
+        count:          count
     );
-    uint index_fill = 0;
-    for (uint index = (this.data.len - window.size()); index < this.data.len; index++)
-    {
-        this.data[index] = fill[index_fill];
-        index_fill += 1;
-        index_fill %= fill.len;
-    }
+    this.fill_remaining(
+        from:   count,
+        until:  this.data.len,
+        fill:   fill
+    );
     this.size -= window.size();
+    return window.size();
 }
 
 fn void Buffer.set(Buffer* this, Type fill)

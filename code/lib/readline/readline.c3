@@ -9,15 +9,12 @@ const uint READLINE_BUFFER_SIZE = 1024;
 
 struct Readline
 {
-    Buffer(<char, READLINE_BUFFER_SIZE>)    buffer;
-    uint                                    caret_position;
     CaretBuffer(<READLINE_BUFFER_SIZE>) b;
 }
 
 fn void Readline.reset(Readline* this)
 {
-    this.buffer.clear();
-    // this.b.buffer.clear();
+    this.b.reset();
 }
 
 fn void Readline.readline(Readline* this)
@@ -30,6 +27,7 @@ module readline::handler;
 import utils::vector;
 import utils::window;
 import utils::string;
+import utils::math;
 import std_io;
 import ecma48;
 
@@ -45,91 +43,54 @@ const Ecma48_handlers(<Readline>) HANDLER = {
     }
 };
 
-fn int Readline.update_caret_position(Readline* this, int n)
-{
-    int  old_position   = this.caret_position;
-    int  new_position   = old_position + n;
-
-    if (new_position < 0) new_position = 0;
-    if (new_position > this.buffer.size) new_position = this.buffer.size;
-
-    this.caret_position = new_position;
-    return (old_position - new_position);
-}
-
 const int	TABSIZE = 4;
 
 fn void Readline.on_backspace(Readline* this, char c)
 {
     char[1] tmp;
-    // this.b.select(&tmp, -1)!!;
+    this.b.select(&tmp, -1)!!;
+    if(!this.b.remove(-1)) return;
 
-
-    int a  = this.b.select(&tmp, -1)!!;
-    string::dprintf(FD, "%d ", a);
-
-    // string::printf("[%d]", tmp[0]);
-    this.b.remove(-1);
-
-	int len = (tmp[0] == '\t') ? TABSIZE : 1;
-    for (usz i = 0; i < len; i++) string::dprintf(FD, "%c", c);
-
-
-    // TODO: replace for loop by
-    //string::dprintf(FD, "%*.c", len, c);
-  
-
-  //old
-
-    // if (this.caret_position == 0) return;
-
-	// int len = (this.buffer.data[this.caret_position - 1] == '\t') ? TABSIZE : 1;
-
-    // this.buffer.remove(window::from_position(this.caret_position, -1));
-    // this.update_caret_position(-1);
-
-    // for (usz i = 0; i < len; i++) string::dprintf(FD, "%c", c);
+    int len = (tmp[0] == '\t') ? TABSIZE : 1;
+    while (len--) std_io::write(FD, char[]{0x08}, 1);
 }
 
 fn void Readline.on_delete(Readline* this, char c)
 {
-    if (this.caret_position == this.buffer.size) return;
+    char[1] tmp;
+    this.b.select(&tmp, 1)!!;
+    if(!this.b.remove(1)) return;
 
-	int len = 1;
-    if (this.caret_position > 0 && this.buffer.data[this.caret_position - 1] == '\t') len = TABSIZE;
-
-    this.buffer.remove(window::from_position(this.caret_position, 1));
-
-    for (usz i = 0; i < len; i++) string::dprintf(FD, "%c", c);
+    int len = (tmp[0] == '\t') ? TABSIZE : 1;
+    while (len--) std_io::write(FD, char[]{0x7F}, 1);
 }
 
 fn void Readline.on_default(Readline* this, char c)
 {
-    char[1] tmp;
-    this.b.select(&tmp, -1)!!;
-    this.b.insert({c});
+    if (!this.b.insert({c})) return;
 
-    // this.buffer.insert(this.caret_position, {c});
-    // this.update_caret_position(+1);
+    int len = (c == '\t') ? TABSIZE : 1;
+    c = (c == '\t') ? ' ' : c;
 
-	// if (this.buffer.data[this.caret_position - 1] == '\t') {
-	if (tmp[0] == '\t') {
-        ecma48::handler::move_cursor(FD, Vec2{+TABSIZE, 0});
-    }
-    else {
-        utils::string::dprintf(FD, "%c", c);
-    }
+    while (len--) std_io::write(FD, char[]{c}, 1);
 }
 
 fn void Readline.on_enter(Readline* this, char c)
 {
-    this.buffer.insert(this.caret_position, {'\n'});
-    string::dprintf(FD, "%c", c);
+    this.b.insert({'\n'}); // Will be removed or not
+    std_io::write(FD, char[]{0x0A}, 1);
 }
 
 fn void Readline.on_cursor_mouvement(Readline* this, Vec2 mouvement)
 {
-    if(this.update_caret_position(mouvement.x) != 0) {
-        ecma48::handler::move_cursor(FD, Vec2{mouvement.x, 0});
+    char[1] tmp;
+    int len = math::abs(mouvement.x);
+    int dir = (mouvement.x < 0) ? -1 : 1;
+
+    while (len--) {
+        this.b.select(&tmp, dir)!!;
+        if(!this.b.update_caret(dir)) return;
+        int direction = (tmp[0] == '\t') ? (TABSIZE * dir) : dir;
+        ecma48::handler::move_cursor(FD, Vec2{direction, 0});
     }
 }
