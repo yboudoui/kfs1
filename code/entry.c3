@@ -49,6 +49,7 @@ fn void entry()
     bool stop = false;
 
     mtp.init();
+    string::printf("\e[34m\e[46mHello World\n");
 	while(stop == false)
 	{
 		if (keyboard::handler(<Multiplexer>)(&mtp)) stop = true;

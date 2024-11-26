@@ -63,6 +63,12 @@ fn void Frame.move_cursor_position_by(Frame* this, int n)
     this.cursor.set_with_linear_position_by(n);
 }
 
+fn void Frame.set_cursor_position(Frame* this, Vec2 position)
+{
+    this.cursor.position = position;
+    this.cursor.update();
+}
+
 fn void Frame.put_entry(Frame* this, Entry entry)
 {
     uint caret = this.cursor.get_linear_position();

@@ -48,10 +48,6 @@ fn bool Clamped.is_extremum(Clamped this)
 
 fn bool Clamped.can_be_updated_by(Clamped this, Clamped n)
 {
-    // if (tmp == 0) return false;
-    // if (tmp < 0 && this.is_min()) return false;
-    // if (tmp > 0 && this.is_max()) return false;
-
     Clamped tmp = this + n;
     if (tmp < MIN) return false;
     if (tmp > MAX) return false;

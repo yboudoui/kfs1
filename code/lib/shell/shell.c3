@@ -43,11 +43,6 @@ fn int Shell.handle_input(Shell* this, Scancode key_scancode)
     if (out) return out;
 
     this.readline_buffer.readline();
-
-    // Probably will be deleted
-    // out = this.handler.handle_input(key_scancode);
-    // if (out) return out;
-
     return 0;
 }
 
