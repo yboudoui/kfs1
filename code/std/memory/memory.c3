@@ -41,6 +41,12 @@ fn void     set(Type* destination, Type value, uint count)
     }                 
 }
 
+fn Type*    search(Type* source, Type value, uint count)
+{
+    for (usz i; i < count; i++) if (source[i] == value) return source + i;
+    return null;
+}
+
 fn Type*    copy(Type* destination, Type* source, uint count)
 {
 	if (!destination || !source || !count) return (destination);

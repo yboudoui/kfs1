@@ -24,6 +24,17 @@ fn void putchar_at(Terminal *terminal, Vec2 position, char c)
 
 fn void	put_block_at(Terminal *terminal, uint size, char* buffer, Vec2 position)
 {
+
+	// TODO: need to add the width with in printf in order for this code to work
+	
+	// char* line = buffer;
+	// for(int y = position.y; &buffer[size] - line; y++) {
+	// 	char* new_line = memory::search(line, '\n', &buffer[size] - line);
+	// 	string::dprintf(0, "\e[%d%dH%*.s", y, position.x, new_line - line, line);
+	// 	line = new_line;
+	// }
+	
+
 	Vec2 tmp;
 
 	for (uint index = 0; index < size; index++)
