@@ -39,6 +39,11 @@ SRCS_HARDWARE_VGA		+= frame.c3
 SRCS_HARDWARE_VGA		+= cursor.c3
 
 SRCS_KERNEL				+= kernel.c3
+SRCS_KERNEL				+= buffer_io.c3
+SRCS_KERNEL				+= process.c3
+
+SRCS_TTY				+= tty.c3
+SRCS_TTY				+= ecma48.c3
 
 SRCS_CORE = \
 	$(addprefix core/, \
@@ -48,6 +53,7 @@ SRCS_CORE = \
 			$(addprefix vga/, $(SRCS_HARDWARE_VGA))				\
 		) \
 		$(addprefix kernel/, $(SRCS_KERNEL)) \
+		$(addprefix tty/, $(SRCS_TTY)) \
 )
 
 ######################################################
@@ -102,18 +108,12 @@ SRCS_STD_STRING		= $(addprefix string/, \
 	string.c3 \
 )
 
-SRCS_TERMINAL	= $(addprefix terminal/, \
-	ecma48.c3 \
-	terminal.c3 \
-)
-
 SRCS_STD		= $(addprefix std/, \
 	$(SRCS_STD_COLLECTIONS) \
 	$(SRCS_STD_IO) \
 	$(SRCS_STD_MATH) \
 	$(SRCS_STD_MEMORY) \
 	$(SRCS_STD_STRING) \
-	$(SRCS_TERMINAL) \
 )
 
 ######################################################

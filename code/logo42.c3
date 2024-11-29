@@ -1,6 +1,6 @@
 module kernel;
 
-import terminal;
+import tty;
 import vga;
 import utils::vector;
 import utils::string;
@@ -16,13 +16,13 @@ const char* LOGO = `
 
 
 
-fn void putchar_at(Terminal *terminal, Vec2 position, char c)
+fn void putchar_at(Tty *tty, Vec2 position, char c)
 {
-	Entry entry = vga::entry(c, terminal.default_color);
-    terminal.vga_frame.put_entry_at(entry, position);
+	Entry entry = vga::entry(c, tty.default_color);
+    tty.vga_frame.put_entry_at(entry, position);
 }
 
-fn void	put_block_at(Terminal *terminal, uint size, char* buffer, Vec2 position)
+fn void	put_block_at(Tty *tty, uint size, char* buffer, Vec2 position)
 {
 
 	// TODO: need to add the width with in printf in order for this code to work
@@ -45,17 +45,17 @@ fn void	put_block_at(Terminal *terminal, uint size, char* buffer, Vec2 position)
 			tmp.y += 1;
 			continue;
 		}
-        putchar_at(terminal, position + tmp, buffer[index]);
+        putchar_at(tty, position + tmp, buffer[index]);
 		tmp.x += 1;
 	}
 }
 
-fn void put_logo(Terminal* terminal)
+fn void put_logo(Tty* tty)
 {
 	usz logo_len = string::len(LOGO);
 	Vec2 logo_position = {
 		(vga::MAX_WIDTH - 25) / 2,
 		(vga::MAX_HEIGHT - 7) / 2,
 	};
-	put_block_at(terminal, logo_len, LOGO, logo_position);
+	put_block_at(tty, logo_len, LOGO, logo_position);
 }

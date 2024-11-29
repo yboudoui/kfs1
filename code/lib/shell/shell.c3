@@ -1,55 +1,37 @@
 module shell;
 
-import terminal;
+import tty;
 import readline;
 import keyboard::scancode;
 import vga;
-import utils;
-import std_io;
 
-const uint TERMINAL_READLINE_BUFFER_SIZE = 128;
+// Keyboard_handlers(<Shell>)  handler = {
+//     .handlers = {
+//         [Scancode.KEY_ENTER]    = &Shell.on_return,
+//         [Scancode.KEY_UP]       = &Shell.on_button_up,
+//         [Scancode.KEY_DOWN]     = &Shell.on_button_down,
+//     }
+// };
+// handler.ref = this
 
 struct Shell
 {
-    Keyboard_handlers(<Shell>)  handler;
-    Terminal                    terminal;
-    uint                        scroll_index;
-    uint                        current_working_buffer;
-    Readline                    readline_buffer;
-    // readline::Buffer* readline_buffer;
-    // readline::Buffer[TERMINAL_READLINE_BUFFER_SIZE] readline_buffer;
+    Tty         tty;
+    uint        scroll_index;
+    Readline    readline_buffer;
 }
 
-fn void Shell.init(Shell* this, Color foreground = Color.LIGHT_GREY, Color background = Color.BLACK)
+fn int Shell.handle_input(Shell* this)
 {
-    this.terminal.init(foreground, background);
-    this.handler = {
-        .ref = this,
-        .handlers = {
-            [Scancode.KEY_ENTER]   = &Shell.on_return,
-            [Scancode.KEY_UP]     = &Shell.on_button_up,
-            [Scancode.KEY_DOWN]   = &Shell.on_button_down,
-        }
-    };
-}
+    // kernel::main.set_current_process_id(&this.tty);
 
-fn int Shell.handle_input(Shell* this, Scancode key_scancode)
-{
-    std_io::current_std_io(&this.terminal.stdio);
-
-    int out;
-
-    out = this.terminal.handle_input(key_scancode);
+    int out = this.tty.handle_input();
     if (out) return out;
 
     this.readline_buffer.readline();
     return 0;
 }
 
-fn void Shell.update(Shell* this)
-{
-    this.terminal.update();
-}
 //////
 
 
@@ -60,11 +42,11 @@ fn void Shell.scrool(Shell* this)
 	// uint start = (this.scroll_index < vga::MAX_HEIGHT) ? 0 : this.scroll_index - vga::MAX_HEIGHT + 1;
 	// uint end = start + vga::MAX_HEIGHT - 1;
 
-    // this.terminal.clear();
+    // this.tty.clear();
 	// for (uint i = start; i < end; i++)
 	// {
 	// 	tmp = &this.readline_buffer[i % TERMINAL_READLINE_BUFFER_SIZE];
-	// 	terminal::write(tmp.buffer.data, tmp.buffer.size);
+	// 	tty::write(tmp.buffer.data, tmp.buffer.size);
 	// }
 }
 
@@ -84,7 +66,7 @@ fn int Shell.on_return(Shell* this, Scancode key_scancode)
 fn int Shell.on_button_up(Shell* this, Scancode key_scancode)
 {
     if (this.scroll_index = 0) return 0;
-    if (!this.terminal.vga_frame.move_cursor_up()) {
+    if (!this.tty.vga_frame.move_cursor_up()) {
         if(this.scroll_index) {
             this.scroll_index -= 1;
             this.scrool();
@@ -95,7 +77,7 @@ fn int Shell.on_button_up(Shell* this, Scancode key_scancode)
 
 fn int Shell.on_button_down(Shell* this, Scancode key_scancode)
 {
-    if (!this.terminal.vga_frame.move_cursor_down()) return 0;
+    if (!this.tty.vga_frame.move_cursor_down()) return 0;
     if(this.scroll_index <= vga::MAX_HEIGHT) {
         this.scroll_index += 1;
         this.scrool();

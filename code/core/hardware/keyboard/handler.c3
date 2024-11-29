@@ -22,7 +22,6 @@ fn int Keyboard_handlers.handle_input(Keyboard_handlers* this, Scancode key_scan
 
 import keyboard::io;
 
-import utils;
 fn int handler(Type* ref)
 {
     Key_State key;

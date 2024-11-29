@@ -161,3 +161,15 @@ fn int dispatch(Scancode key_scancode, int fd)
 	}
 	return 0;
 }
+
+import keyboard;
+import std_io;
+
+fn int dispatch_on_key_pressed(int fd)
+{
+    Key_State key;
+    if (keyboard::io::get_key_state(&key) && key.state == PRESSED) return dispatch(key.code, std_io::STD_IN);
+    return 0;
+}
+
+

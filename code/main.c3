@@ -19,12 +19,13 @@ Multiboot_header multiboot_header @section(".multiboot")  @nostrip = {
     .checksum	= CHECKSUM
 };
 
-char[16384] stack @section(".bss")  @nostrip @align(16);  // 16 KiB
+const uint STACK_SIZE = 16 * 1024;
+char[STACK_SIZE] stack @section(".bss")  @nostrip @align(16);  // 16 KiB
 
 
 fn void _start()  @section(".text") @nostrip @noreturn @export("_start")
 {
-	char *stack_top = &stack[16383];
+	char *stack_top = &stack[STACK_SIZE - 1];
 	asm
 	{
 		movl stack_top, $esp;
@@ -40,6 +41,10 @@ fn void _start()  @section(".text") @nostrip @noreturn @export("_start")
 
 fn void main()
 {
-	kernel::bootloader();
-	kernel::entry();
+	kernel::main.new_process(&kernel::bootloader);
+	kernel::main.run_process();
+
+	kernel::main.new_process(&kernel::entry);
+	kernel::main.run_process();
 }
+

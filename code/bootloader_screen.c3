@@ -1,44 +1,21 @@
 module kernel;
 
-import terminal;
-import keyboard::scancode;
+import tty;
 import keyboard;
 import vga;
 
-struct BootLoader
-{
-	Terminal terminal;
-}
-
-import std_io;
-fn void BootLoader.init(BootLoader* this) 
-{
-	vga::disable_cursor();
-	this.terminal.init(Color.RED);
-	std_io::current_std_io(&this.terminal.stdio);
-}
-
-fn int BootLoader.handle_input(BootLoader* this, Scancode s) 
-{
-	return 42;
-}
-
-fn void BootLoader.update(BootLoader *this) 
-{
-	put_logo(&this.terminal);
-	this.terminal.update();
-}
-
 fn void bootloader()
 {
-    BootLoader bt;
+	Tty			tty;
+    Key_State	key;
 
-    bool stop = false;
+	tty.init();
+	tty.default_color.foreground = Color.RED;
 
-    bt.init();
-	while(stop == false)
-	{
-		if (keyboard::handler(<BootLoader>)(&bt)) stop = true;
-        bt.update();
-	}
+	vga::disable_cursor();
+
+	kernel::put_logo(&tty);
+	tty.update();
+	
+	while (key.state != PRESSED) keyboard::io::get_key_state(&key);
 }
